@@ -6,7 +6,15 @@ from django.contrib.auth.models import User
 class Workplace(models.Model):
     name = models.CharField(max_length=255, null=False)
     owner = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_workplaces', null=False)
-    employees = models.ManyToManyField(User, related_name='workplaces')
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
+
+
+class Employee(models.Model):
+    workplace = models.ForeignKey(Workplace, on_delete=models.CASCADE, related_name='employees', null=False)
+    bound_to = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='employments', null=True)
+    bounding_key = models.CharField(max_length=16, null=True)
+    last_name = models.CharField(max_length=128, null=True)
+    first_name = models.CharField(max_length=128, null=True)
     created_at = models.DateTimeField(auto_now_add=True, null=False)
 
 
@@ -20,4 +28,5 @@ class Shift(models.Model):
     schedule = models.ForeignKey(Schedule, on_delete=models.CASCADE, related_name='shifts', null=False)
     time_from = models.DateTimeField(null=False)
     time_to = models.DateTimeField(null=False)
-    employee = models.ForeignKey(User, on_delete=models.CASCADE, related_name='shifts', null=False)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='shifts', null=False)
+    created_at = models.DateTimeField(auto_now_add=True, null=False)
