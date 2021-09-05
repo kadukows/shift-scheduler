@@ -9,6 +9,8 @@ import DarkThemeProvider from "./features/darkThemeProvider/DarkThemeProvider";
 import Navbar from "./features/navbar/Navbar";
 import AlertsList from "./features/alerts/AlertsList";
 import IndexPage from "./features/index/IndexPage";
+import LoginForm from "./features/login/LoginForm";
+import TryAuthWithCurrentToken from "./features/auth/TryAuthWithCurrentToken";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -21,6 +23,8 @@ const App = () => {
 
     return (
         <Provider store={store}>
+            {/* This component tries to authenticate the user upon site loading (with localStorage "token"). */}
+            <TryAuthWithCurrentToken />
             <DarkThemeProvider>
                 <CssBaseline />
                 <Router>
@@ -34,6 +38,9 @@ const App = () => {
                                 <Switch>
                                     <Route exact path="/">
                                         <IndexPage />
+                                    </Route>
+                                    <Route exact path="/login">
+                                        <LoginForm />
                                     </Route>
                                 </Switch>
                             </Grid>
