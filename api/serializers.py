@@ -1,7 +1,10 @@
+from typing import List
+
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from .models import Employee, Workplace, Schedule
+from .helpers import ReadOnlyUponActionSerializer
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -37,27 +40,43 @@ class UserSerializer(serializers.ModelSerializer):
         return super(UserSerializer, self).update(instance, validated_data)
 
 
-class EmployeeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Employee
-        fields = ['id', 'workplace', 'last_name', 'first_name', 'created_at']
-        read_only_fields = ['id', 'created_at']
-
-
 class WorkplaceSerializer(serializers.ModelSerializer):
-    #employees = EmployeeSerializer(many=True)
-
     class Meta:
         model = Workplace
         fields = ['id', 'name', 'created_at', 'employees']
+        read_only_fields = ['id', 'created_at', 'employees']
+
+    def create(self, validated_data):
+        return Workplace.objects.create(owner=self.context['request'].user, **validated_data)
+
+
+class EmployeeSerializer(ReadOnlyUponActionSerializer):
+    action_to_ro_fields = {
+        'update': ["workplace"]
+    }
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'last_name', 'workplace', 'first_name', 'created_at']
         read_only_fields = ['id', 'created_at']
 
+    def validate_workplace(self, value):
+        user: User = self.context['request'].user
+        if value.owner != user:
+            raise serializers.ValidationError("Workplace not found")
 
 
+class ScheduleSerializer(ReadOnlyUponActionSerializer):
+    action_to_ro_fields = {
+        'update': ['workplace', 'month_year']
+    }
 
+    class Meta:
+        model = Schedule
+        fields = ['id', 'workplace', 'month_year', 'created_at']
+        read_only_fields = ['id', 'created_at']
 
-
-# class ScheduleSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Schedule
-#         fields = ['id', 'name', ]
+    def validate_workplace(self, value):
+        user: User = self.context['request'].user
+        if value.owner != user:
+            raise serializers.ValidationError("Workplace not found")

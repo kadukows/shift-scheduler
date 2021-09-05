@@ -7,8 +7,12 @@ from rest_framework.authentication import SessionAuthentication, TokenAuthentica
 from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 
-from .serializers import EmployeeSerializer, UserSerializer, WorkplaceSerializer
-from .models import Employee, Workplace
+from .serializers import (
+    ScheduleSerializer,
+    UserSerializer,
+    WorkplaceSerializer,
+    EmployeeSerializer)
+from .models import Employee, Schedule, Workplace
 from .helpers import LastModifiedHeaderMixin
 
 
@@ -24,6 +28,7 @@ class CustomAuthToken(ObtainAuthToken):
         return Response({
             'token': token.key,
         })
+
 
 class UserViewSet(viewsets.GenericViewSet, generics.ListCreateAPIView):
     serializer_class = UserSerializer
@@ -60,16 +65,20 @@ class WorkplaceViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
 
 
 class EmployeeViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
-    serializer_class = EmployeeSerializer
     queryset = Employee.objects.all()
+    serializer_class  = EmployeeSerializer
     permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
         return Employee.objects.filter(workplace__owner=self.request.user).all()
 
 
-'''
-class EmployeeViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
-    serializer_class = EmployeeSerializer
-    queryset = Employee.objects.all()
-'''
+class ScheduleViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
+    serializer_class = ScheduleSerializer
+    queryset = Schedule.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get_queryset(self):
+        return Schedule.objects.filter(workplace__owner=self.request.user).all()

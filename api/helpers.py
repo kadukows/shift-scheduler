@@ -1,4 +1,5 @@
-from rest_framework import viewsets
+from typing import Dict, List
+from rest_framework import viewsets, serializers
 
 class LastModifiedHeaderMixin:
     @property
@@ -11,3 +12,19 @@ class LastModifiedHeaderMixin:
                 instance = self.get_queryset().order_by("-created_at").first()
             headers["Last-Modified"] = instance.created_at if instance else None
         return headers
+
+
+class ReadOnlyUponActionSerializer(serializers.ModelSerializer):
+    action_to_ro_fields: Dict[str, List[str]] = {}
+
+    def get_extra_kwargs(self):
+        extra_kwargs = super(ReadOnlyUponActionSerializer, self).get_extra_kwargs()
+        action = self.context['view'].action
+
+        if action in self.action_to_ro_fields:
+            for field in self.action_to_ro_fields[action]:
+                kwargs = extra_kwargs.get(field, {})
+                kwargs['read_only'] = True
+                extra_kwargs[field] = kwargs
+
+        return extra_kwargs
