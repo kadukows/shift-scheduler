@@ -21,50 +21,59 @@ const IndexPage = (props: Props) => {
     const classes = useStyles();
 
     return (
-        <Paper className={classes.paper}>
-            <Grid container spacing={2} direction="column" alignItems="center">
-                <Grid item>
-                    <Typography variant="h5" component="h5">
-                        This is as Index Page!
-                    </Typography>
-                </Grid>
-                <Grid item>
-                    <Grid item container direction="row" spacing={2}>
+        <Grid container justifyContent="center">
+            <Grid item>
+                <Paper className={classes.paper}>
+                    <Grid
+                        container
+                        spacing={2}
+                        direction="column"
+                        alignItems="center"
+                    >
                         <Grid item>
-                            <MyButton
-                                onClick={() =>
-                                    dispatch(
-                                        addAlert({
-                                            type: "info",
-                                            message:
-                                                "This is simple info alert",
-                                        })
-                                    )
-                                }
-                            >
-                                info alert
-                            </MyButton>
+                            <Typography variant="h5" component="h5">
+                                This is as Index Page!
+                            </Typography>
                         </Grid>
                         <Grid item>
-                            <MyButton
-                                color="secondary"
-                                onClick={() =>
-                                    dispatch(
-                                        addAlert({
-                                            type: "warning",
-                                            message:
-                                                "This is simple warning alert",
-                                        })
-                                    )
-                                }
-                            >
-                                warnign alert
-                            </MyButton>
+                            <Grid item container direction="row" spacing={2}>
+                                <Grid item>
+                                    <MyButton
+                                        onClick={() =>
+                                            dispatch(
+                                                addAlert({
+                                                    type: "info",
+                                                    message:
+                                                        "This is simple info alert",
+                                                })
+                                            )
+                                        }
+                                    >
+                                        info alert
+                                    </MyButton>
+                                </Grid>
+                                <Grid item>
+                                    <MyButton
+                                        color="secondary"
+                                        onClick={() =>
+                                            dispatch(
+                                                addAlert({
+                                                    type: "warning",
+                                                    message:
+                                                        "This is simple warning alert",
+                                                })
+                                            )
+                                        }
+                                    >
+                                        warnign alert
+                                    </MyButton>
+                                </Grid>
+                            </Grid>
                         </Grid>
                     </Grid>
-                </Grid>
+                </Paper>
             </Grid>
-        </Paper>
+        </Grid>
     );
 };
 

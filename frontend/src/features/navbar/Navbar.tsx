@@ -21,6 +21,9 @@ const useStyles = makeStyles((theme) => ({
     spacer: {
         flexGrow: 1,
     },
+    menuButton: {
+        marginRight: theme.spacing(2),
+    },
     appbarSpacer: theme.mixins.toolbar,
 }));
 
@@ -36,26 +39,34 @@ const MyButton = (
 const Navbar = (props: Props) => {
     const classes = useStyles();
 
+    const MyButton = (
+        props: React.ComponentProps<typeof Button> &
+            React.ComponentProps<typeof RouterLink>
+    ) => (
+        <Button
+            color="inherit"
+            component={RouterLink}
+            className={classes.menuButton}
+            {...props}
+        />
+    );
+
     return (
         <>
             <div className={classes.root}>
                 <AppBar position="absolute">
                     <Toolbar>
-                        <Grid container spacing={2} justifyContent="flex-start">
-                            <Grid item>
-                                <IconButton edge="start" color="inherit">
-                                    <MenuIcon />
-                                </IconButton>
-                            </Grid>
+                        <IconButton
+                            edge="start"
+                            color="inherit"
+                            className={classes.menuButton}
+                        >
+                            <MenuIcon />
+                        </IconButton>
 
-                            <MyButton to="/">Index</MyButton>
-                            <Grid item>
-                                <div className={classes.spacer} />
-                            </Grid>
-                            <Grid item>
-                                <DarkThemeToggler />
-                            </Grid>
-                        </Grid>
+                        <MyButton to="/">Index</MyButton>
+                        <div className={classes.spacer} />
+                        <DarkThemeToggler />
                     </Toolbar>
                 </AppBar>
             </div>

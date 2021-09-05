@@ -1,19 +1,21 @@
 import * as React from "react";
+import { useDispatch } from "react-redux";
 import { Collapse } from "@material-ui/core";
 import { Alert as AlertMui } from "@material-ui/lab";
 
-import { Alert } from "./alertsSlice";
+import { AlertWithId, removeAlert } from "./alertsSlice";
 
 interface Props {
-    alert: Alert;
-    onExit: () => void;
+    alert: AlertWithId;
+    //onExit: () => void;
 }
 
-const CloseableAlert = ({ alert, onExit }: Props) => {
+const CloseableAlert = ({ alert }: Props) => {
     const [on, setOn] = React.useState(true);
+    const dispatch = useDispatch();
 
     return (
-        <Collapse in={on} onExited={onExit}>
+        <Collapse in={on} onExited={() => dispatch(removeAlert(alert.id))}>
             <AlertMui severity={alert.type} onClose={() => setOn(false)}>
                 {alert.message}
             </AlertMui>

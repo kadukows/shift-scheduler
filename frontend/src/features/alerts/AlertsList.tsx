@@ -16,11 +16,7 @@ const AlertsList = () => {
     return (
         <div>
             {alerts.map((alert) => (
-                <CloseableAlert
-                    onExit={() => dispatch(removeAlert(alert.id))}
-                    alert={alert}
-                    key={alert.id}
-                />
+                <CloseableAlert alert={alert} key={alert.id} />
             ))}
         </div>
     );
