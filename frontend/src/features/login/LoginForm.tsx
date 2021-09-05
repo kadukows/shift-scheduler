@@ -93,10 +93,7 @@ const LoginForm = (props: Props) => {
         try {
             const res = await axios.post<{ token: string }>(
                 "/api/get_token/",
-                data,
-                {
-                    withCredentials: false,
-                }
+                data
             );
             dispatch(
                 addAlert({

@@ -43,8 +43,8 @@ class UserSerializer(serializers.ModelSerializer):
 class WorkplaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workplace
-        fields = ['id', 'name', 'last_modified', 'employees']
-        read_only_fields = ['id', 'last_modified', 'employees']
+        fields = ['id', 'name', 'last_modified']
+        read_only_fields = ['id', 'last_modified']
 
     def create(self, validated_data):
         return Workplace.objects.create(owner=self.context['request'].user, **validated_data)
