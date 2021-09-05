@@ -1,3 +1,43 @@
-from django.test import TestCase
+from datetime import date
 
-# Create your tests here.
+from django.test import TestCase
+from django.contrib.auth.models import User
+
+from .models import Schedule, Workplace
+from .serializers import ScheduleSerializer
+
+
+
+
+class ScheduleSerializerTests(TestCase):
+    class RequestMock:
+        def __init__(self, user):
+            self.user = user
+
+    class ViewMock:
+        def __init__(self, action):
+            self.action = action
+
+    def setUp(self):
+        user = User.objects.create_user('foo', 'email@domain.com', 'foo')
+        workplace = Workplace.objects.create(name="Test work location", owner=user)
+        self.schedule = Schedule.objects.create(workplace=workplace, month_year=date(1990, 1, 1))
+
+        self.context = {
+            'request': self.RequestMock(user),
+            'view': self.ViewMock('create')
+        }
+
+    def test_schedule_serializer_deserializers_and_saves(self):
+        '''Assert that serialized object can be correctly deserialized'''
+        serialized = ScheduleSerializer(self.schedule, context=self.context).data
+        self.assertEqual(serialized['id'], self.schedule.id)
+        self.assertEqual(serialized['workplace'], self.schedule.workplace.id)
+
+        print(self.context)
+
+        deserialized = ScheduleSerializer(context=self.context, data=serialized)
+        deserialized.is_valid()
+        new_schedule = deserialized.save()
+
+        self.assertNotEqual(new_schedule, self.schedule)

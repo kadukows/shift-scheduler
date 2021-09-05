@@ -3,8 +3,8 @@ from typing import List
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Employee, Workplace, Schedule
-from .helpers import ReadOnlyUponActionSerializer
+from .models import Employee, Workplace, Schedule, Shift
+from .helpers import ReadOnlyUponActionSerializerMixin
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -43,40 +43,70 @@ class UserSerializer(serializers.ModelSerializer):
 class WorkplaceSerializer(serializers.ModelSerializer):
     class Meta:
         model = Workplace
-        fields = ['id', 'name', 'created_at', 'employees']
-        read_only_fields = ['id', 'created_at', 'employees']
+        fields = ['id', 'name', 'last_modified', 'employees']
+        read_only_fields = ['id', 'last_modified', 'employees']
 
     def create(self, validated_data):
         return Workplace.objects.create(owner=self.context['request'].user, **validated_data)
 
 
-class EmployeeSerializer(ReadOnlyUponActionSerializer):
+class EmployeeSerializer(ReadOnlyUponActionSerializerMixin, serializers.ModelSerializer):
     action_to_ro_fields = {
         'update': ["workplace"]
     }
 
     class Meta:
         model = Employee
-        fields = ['id', 'last_name', 'workplace', 'first_name', 'created_at']
-        read_only_fields = ['id', 'created_at']
+        fields = ['id', 'last_name', 'workplace', 'first_name', 'last_modified']
+        read_only_fields = ['id', 'last_modified']
 
     def validate_workplace(self, value):
         user: User = self.context['request'].user
         if value.owner != user:
             raise serializers.ValidationError("Workplace not found")
 
+        return value
 
-class ScheduleSerializer(ReadOnlyUponActionSerializer):
+
+class ScheduleSerializer(ReadOnlyUponActionSerializerMixin, serializers.ModelSerializer):
     action_to_ro_fields = {
         'update': ['workplace', 'month_year']
     }
 
+    month_year = serializers.DateField(format='%m.%Y', input_formats=['%m.%Y'])
     class Meta:
         model = Schedule
-        fields = ['id', 'workplace', 'month_year', 'created_at']
-        read_only_fields = ['id', 'created_at']
+        fields = ['id', 'workplace', 'month_year', 'last_modified']
+        read_only_fields = ['id', 'last_modified']
 
-    def validate_workplace(self, value):
+    def validate_workplace(self, value: Workplace):
         user: User = self.context['request'].user
         if value.owner != user:
             raise serializers.ValidationError("Workplace not found")
+
+        return value
+
+
+class ShiftSerializer(ReadOnlyUponActionSerializerMixin, serializers.ModelSerializer):
+    action_to_ro_fields = {
+        'update': ['schedule', 'employee']
+    }
+
+    class Meta:
+        model = Shift
+        fields = ['id', 'schedule', 'employee', 'time_from', 'time_to', 'last_modified']
+        read_only_fields = ['id']
+
+    def validate_schedule(self, value: Schedule):
+        '''check if schedule belongs to owned workplace'''
+        if value.workplace.owner != self.context['request'].user:
+            raise serializers.ValidationError("Schedule not found")
+
+        return value
+
+    def validate_employee(self, value: Employee):
+        '''check if employee belongs to owned workplace'''
+        if value.workplace.owner != self.context['request'].user:
+            raise serializers.ValidationError("Employee not found")
+
+        return value

@@ -1,4 +1,5 @@
 from django.contrib.auth.models import User
+from django.db.models import query
 from rest_framework import viewsets, generics, permissions
 from rest_framework.request import Request
 from rest_framework.response import Response
@@ -9,10 +10,11 @@ from rest_framework.authtoken.models import Token
 
 from .serializers import (
     ScheduleSerializer,
+    ShiftSerializer,
     UserSerializer,
     WorkplaceSerializer,
     EmployeeSerializer)
-from .models import Employee, Schedule, Workplace
+from .models import Employee, Schedule, Workplace, Shift
 from .helpers import LastModifiedHeaderMixin
 
 
@@ -48,11 +50,6 @@ class UserViewSet(viewsets.GenericViewSet, generics.ListCreateAPIView):
         serializer = UserSerializer(request.user)
         return Response(serializer.data)
 
-    @action(methods=["post"], detail=False, url_path="get_token", url_name="get_token")
-    def get_token(self, request: Request, *args, **kwargs):
-        auth = CustomAuthToken()
-        return auth.post(request, *args, **kwargs)
-
 
 class WorkplaceViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
     serializer_class = WorkplaceSerializer
@@ -65,8 +62,8 @@ class WorkplaceViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
 
 
 class EmployeeViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
-    queryset = Employee.objects.all()
     serializer_class  = EmployeeSerializer
+    queryset = Employee.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
@@ -82,3 +79,13 @@ class ScheduleViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Schedule.objects.filter(workplace__owner=self.request.user).all()
+
+
+class ShiftViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
+    serializer_class = ShiftSerializer
+    queryset = Shift.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get_queryset(self):
+        return Shift.objects.filter(schedule__workplace__owner=self.request.user).all()
