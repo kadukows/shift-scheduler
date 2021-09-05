@@ -1,11 +1,48 @@
 import * as React from "react";
+import { Provider } from "react-redux";
+import { HashRouter as Router, Switch, Route } from "react-router-dom";
+import { CssBaseline, makeStyles, Container, Grid } from "@material-ui/core";
 
-interface Props {
-    name?: string;
-}
+import { store } from "./store";
 
-const App = ({ name }: Props) => {
-    return <h1>Hello {name ? name : "react"}!</h1>;
+import DarkThemeProvider from "./features/darkThemeProvider/DarkThemeProvider";
+import Navbar from "./features/navbar/Navbar";
+import AlertsList from "./features/alerts/AlertsList";
+import IndexPage from "./features/index/IndexPage";
+
+const useStyles = makeStyles((theme) => ({
+    container: {
+        marginTop: theme.spacing(2),
+    },
+}));
+
+const App = () => {
+    const classes = useStyles();
+
+    return (
+        <Provider store={store}>
+            <DarkThemeProvider>
+                <CssBaseline />
+                <Router>
+                    <Navbar />
+                    <Container className={classes.container}>
+                        <Grid container spacing={2} direction="column">
+                            <Grid item>
+                                <AlertsList />
+                            </Grid>
+                            <Grid item>
+                                <Switch>
+                                    <Route exact path="/">
+                                        <IndexPage />
+                                    </Route>
+                                </Switch>
+                            </Grid>
+                        </Grid>
+                    </Container>
+                </Router>
+            </DarkThemeProvider>
+        </Provider>
+    );
 };
 
 export default App;
