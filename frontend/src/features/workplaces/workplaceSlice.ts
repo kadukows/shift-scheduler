@@ -1,5 +1,6 @@
 import {
     createSlice,
+    createEntityAdapter,
     PayloadAction,
     ThunkAction,
     AnyAction,
@@ -16,45 +17,35 @@ interface Workplace {
     last_modified: string;
 }
 
-interface WorkplaceState {
-    //idToWorkplace: Map<number, Workplace>;
-    idToWorkplace: { [id: number]: Workplace };
+const workplaceAdapter = createEntityAdapter<Workplace>({
+    sortComparer: (lhs, rhs) =>
+        Date.parse(rhs.last_modified) - Date.parse(lhs.last_modified),
+});
+
+interface WorkplaceState
+    extends ReturnType<typeof workplaceAdapter.getInitialState> {
     loading: boolean;
 }
 
 const initialState: WorkplaceState = {
-    idToWorkplace: {},
     loading: false,
+    ...workplaceAdapter.getInitialState(),
 };
 
 const workplaceSlice = createSlice({
     name: "workplace",
     initialState,
     reducers: {
-        addWorkplaces(state, action: PayloadAction<Workplace[]>) {
-            for (const workplace of action.payload) {
-                //state.idToWorkplace.set(workplace.id, workplace);
-                state.idToWorkplace[workplace.id] = workplace;
-            }
-        },
-        removeWorkplace(state, action: PayloadAction<number>) {
-            //state.idToWorkplace.delete(action.payload);
-            delete state.idToWorkplace[action.payload];
-        },
-        updateWorkplace(state, action: PayloadAction<Workplace>) {
-            if (!(action.payload.id in state.idToWorkplace)) {
-                throw new Error("updateWorkplace(): workplace not found");
-            }
-
-            state.idToWorkplace[action.payload.id] = action.payload;
-        },
+        setWorkplaces: workplaceAdapter.setAll,
+        removeWorkplace: workplaceAdapter.removeOne,
+        updateWorkplace: workplaceAdapter.updateOne,
         setLoading(state, action: PayloadAction<boolean>) {
             state.loading = action.payload;
         },
     },
 });
 
-export const { addWorkplaces, removeWorkplace, updateWorkplace, setLoading } =
+export const { setWorkplaces, removeWorkplace, updateWorkplace, setLoading } =
     workplaceSlice.actions;
 export const workplaceReducer = workplaceSlice.reducer;
 
@@ -69,9 +60,7 @@ export const getWorkplaces =
                 getTokenRequestConfig(getState().authReducer.token)
             );
 
-            dispatch(addWorkplaces(res.data));
-        } catch (err) {
-            console.log("Could not fetch workplaces :<");
+            dispatch(setWorkplaces(res.data));
         } finally {
             dispatch(setLoading(false));
         }

@@ -10,6 +10,7 @@ import Navbar from "./features/navbar/Navbar";
 import AlertsList from "./features/alerts/AlertsList";
 import IndexPage from "./features/index/IndexPage";
 import LoginForm from "./features/login/LoginForm";
+import LogoutPage from "./features/auth/LogoutPage";
 import TryAuthWithCurrentToken from "./features/auth/TryAuthWithCurrentToken";
 
 const useStyles = makeStyles((theme) => ({
@@ -41,6 +42,9 @@ const App = () => {
                                     </Route>
                                     <Route exact path="/login">
                                         <LoginForm />
+                                    </Route>
+                                    <Route exact path="/logout">
+                                        <LogoutPage />
                                     </Route>
                                 </Switch>
                             </Grid>

@@ -40,3 +40,7 @@ export function handleErrors<Inputs>(
         setNonFieldError(error.data.non_field_errors);
     }
 }
+
+export const combineClx = (lhs: string, rhs: string) => {
+    return `${lhs} ${rhs}`;
+};

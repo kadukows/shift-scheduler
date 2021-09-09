@@ -10,7 +10,6 @@ import { observer } from "redux-observers";
 
 import { getTokenRequestConfig } from "../helpers";
 import { RootState } from "../../store";
-import { addWorkplaces } from "../workplaces/workplaceSlice";
 
 interface Employee {
     id: number;
@@ -39,7 +38,7 @@ const employeeSlice = createSlice({
     initialState,
     reducers: {
         addEmployee: employeeAdapter.addOne,
-        addEmployees: employeeAdapter.setAll,
+        setEmployees: employeeAdapter.setAll,
         removeEmployee: employeeAdapter.removeOne,
         updateEmployee: employeeAdapter.updateOne,
         setLoading(state, action: PayloadAction<boolean>) {
@@ -48,7 +47,7 @@ const employeeSlice = createSlice({
     },
 });
 
-export const { addEmployees, removeEmployee, updateEmployee, setLoading } =
+export const { setEmployees, removeEmployee, updateEmployee, setLoading } =
     employeeSlice.actions;
 export const employeeReducer = employeeSlice.reducer;
 
@@ -63,7 +62,7 @@ export const getEmployees =
                 getTokenRequestConfig(getState().authReducer.token)
             );
 
-            dispatch(addEmployees(res.data));
+            dispatch(setEmployees(res.data));
         } finally {
             dispatch(setLoading(false));
         }

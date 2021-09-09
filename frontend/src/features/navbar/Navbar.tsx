@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Link as RouterLink } from "react-router-dom";
+import { useSelector } from "react-redux";
 import {
     makeStyles,
     AppBar,
@@ -11,6 +12,8 @@ import {
 import { Menu as MenuIcon } from "@material-ui/icons";
 
 import DarkThemeToggler from "../darkThemeProvider/DarkThemeToggler";
+import { combineClx } from "../helpers";
+import { RootState } from "../../store";
 
 interface Props {}
 
@@ -36,20 +39,41 @@ const MyButton = (
     </Grid>
 );
 
+type LinksProps = React.PropsWithChildren<{ ButtonStyled: React.ElementType }>;
+
+const NoAuthLink = ({ ButtonStyled, children }: LinksProps) => (
+    <>
+        {children}
+        <ButtonStyled to="/login">Login</ButtonStyled>
+    </>
+);
+const AuthLink = ({ ButtonStyled, children }: LinksProps) => (
+    <>
+        {children}
+        <ButtonStyled to="/logout">Logout</ButtonStyled>
+    </>
+);
+
 const Navbar = (props: Props) => {
     const classes = useStyles();
+    const auth = useSelector((state: RootState) => state.authReducer);
 
-    const MyButton = (
-        props: React.ComponentProps<typeof Button> &
-            React.ComponentProps<typeof RouterLink>
-    ) => (
+    const MyButton = ({
+        className,
+        ...rest
+    }: React.ComponentProps<typeof Button> &
+        React.ComponentProps<typeof RouterLink>) => (
         <Button
             color="inherit"
             component={RouterLink}
-            className={classes.menuButton}
-            {...props}
+            className={combineClx(classes.menuButton, className)}
+            {...rest}
         />
     );
+
+    const Links = auth.authenticated
+        ? (props: any) => <AuthLink ButtonStyled={MyButton} {...props} />
+        : (props: any) => <NoAuthLink ButtonStyled={MyButton} {...props} />;
 
     return (
         <>
@@ -65,7 +89,9 @@ const Navbar = (props: Props) => {
                         </IconButton>
 
                         <MyButton to="/">Index</MyButton>
-                        <div className={classes.spacer} />
+                        <Links>
+                            <div className={classes.spacer} />
+                        </Links>
                         <DarkThemeToggler />
                     </Toolbar>
                 </AppBar>
