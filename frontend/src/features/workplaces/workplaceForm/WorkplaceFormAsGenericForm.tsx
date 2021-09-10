@@ -4,13 +4,14 @@ import * as yup from "yup";
 import { Workplace } from "../workplaceSlice";
 import GenericForm, { Field } from "../../genericForm/GenericForm";
 
-interface Props {
-    formId: string;
-    sucessfullySubmitted: (a: Workplace) => void;
+export interface Inputs {
+    name: string;
 }
 
-interface Inputs {
-    name: string;
+interface Props {
+    formId: string;
+    submit: (a: Inputs) => void;
+    defaultValues?: Inputs;
 }
 
 const fields: Field<Inputs>[] = [
@@ -23,14 +24,15 @@ const fields: Field<Inputs>[] = [
 
 const WorkplaceFormAsGenericForm = ({
     formId,
-    sucessfullySubmitted,
+    submit,
+    defaultValues,
 }: Props) => {
     return (
-        <GenericForm
+        <GenericForm<Inputs>
             fields={fields}
-            apiSubmit="/api/workplace/"
-            sucessfullySubmitted={sucessfullySubmitted}
+            submit={submit}
             formId={formId}
+            defaultValues={defaultValues ? defaultValues : undefined}
         />
     );
 };

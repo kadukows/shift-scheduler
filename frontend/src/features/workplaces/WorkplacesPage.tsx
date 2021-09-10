@@ -1,4 +1,5 @@
 import * as React from "react";
+import axios from "axios";
 import {
     Grid,
     Typography,
@@ -10,15 +11,21 @@ import {
     DialogActions,
     DialogContent,
 } from "@material-ui/core";
+//import * as Icons from "@material-ui/icons";
+import Icon from "@material-ui/core/Icon";
 import { Link as RouterLink } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
 import WorkplacesGrid from "./WorkplacesGrid";
 import WorkplacesAgGrid from "./WorkplacesAgGrid";
 import WorkplaceForm from "./workplaceForm/WorkplaceForm";
-import WorkplaceFormAsGenericForm from "./workplaceForm/WorkplaceFormAsGenericForm";
+import WorkplaceFormAsGenericForm, {
+    Inputs as WorkplaceFormInputs,
+} from "./workplaceForm/WorkplaceFormAsGenericForm";
 import { Workplace, addWorkplace } from "../workplaces/workplaceSlice";
 import { addAlert } from "../alerts/alertsSlice";
+import { getTokenRequestConfig } from "../helpers";
+import { RootState } from "../../store";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -34,16 +41,23 @@ const newWorkplaceFormId = "new-workplace-form";
 const WorkplacesPage = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const auth = useSelector((state: RootState) => state.authReducer);
     const [newModalOpen, setNewModalOpen] = React.useState(false);
 
-    const newWorkplaceSubmitted = (workplace: Workplace) => {
+    const newWorkplaceSubmitted = async (inputs: WorkplaceFormInputs) => {
+        const res = await axios.post<Workplace>(
+            "/api/workplace/",
+            inputs,
+            getTokenRequestConfig(auth.token)
+        );
+
         dispatch(
             addAlert({
                 type: "success",
-                message: `Sucessfully added a workplace: "${workplace.name}"`,
+                message: `Sucessfully added a workplace: "${res.data.name}"`,
             })
         );
-        dispatch(addWorkplace(workplace));
+        dispatch(addWorkplace(res.data));
         setNewModalOpen(false);
     };
 
@@ -54,13 +68,14 @@ const WorkplacesPage = () => {
                 <DialogContent>
                     <WorkplaceFormAsGenericForm
                         formId={newWorkplaceFormId}
-                        sucessfullySubmitted={newWorkplaceSubmitted}
+                        submit={newWorkplaceSubmitted}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button
                         color="primary"
                         onClick={() => setNewModalOpen(false)}
+                        variant="contained"
                     >
                         Close
                     </Button>
@@ -68,6 +83,7 @@ const WorkplacesPage = () => {
                         color="primary"
                         type="submit"
                         form={newWorkplaceFormId}
+                        variant="contained"
                     >
                         Add workplace
                     </Button>
@@ -77,14 +93,10 @@ const WorkplacesPage = () => {
                 <Grid container direction="column" spacing={2}>
                     <Grid item>
                         <Typography variant="h5" component="h5">
-                            Your Workplaces ,0
+                            Your Workplaces{" "}
+                            <Icon className="fas fa-briefcase" />
                         </Typography>
                     </Grid>
-                    {/*
-                <Grid item>
-                    <WorkplacesGrid />
-                </Grid>
-                */}
                     <Grid item>
                         <WorkplacesAgGrid />
                     </Grid>

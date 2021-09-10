@@ -40,7 +40,7 @@ const WorkplacesAgGrid = () => {
                     rowData={workplaces}
                     rowSelection="multiple"
                     pagination
-                    paginationPageSize={5}
+                    paginationPageSize={10}
                     domLayout="autoHeight"
                 >
                     <AgGridColumn

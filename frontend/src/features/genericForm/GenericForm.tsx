@@ -26,22 +26,22 @@ interface StringField<Inputs> {
 
 export type Field<Inputs> = StringField<Inputs>;
 
-interface Props<Inputs, ReturnType> {
+interface Props<Inputs> {
     fields: Field<Inputs>[];
-    apiSubmit: string;
-    sucessfullySubmitted: (a: ReturnType) => void;
+    submit: (a: Inputs) => void;
     formId: string;
+    defaultValues?: Inputs;
 }
 
 const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 
-function GenericForm<Inputs, ReturnType>({
+function GenericForm<Inputs>({
     fields,
-    apiSubmit,
-    sucessfullySubmitted,
+    submit,
     formId,
-}: Props<Inputs, ReturnType>) {
-    const auth = useSelector((state: RootState) => state.authReducer);
+    defaultValues,
+}: Props<Inputs>) {
+    //const auth = useSelector((state: RootState) => state.authReducer);
     const [nonFieldErrors, setNonFieldErrors] = React.useState<string[]>([]);
 
     const schemaBase: any = {};
@@ -58,17 +58,13 @@ function GenericForm<Inputs, ReturnType>({
         setError,
     } = useForm<Inputs>({
         resolver: yupResolver(yup.object().shape(schemaBase)),
+        // @ts-expect-error
+        defaultValues: defaultValues,
     });
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {
-            const res = await axios.post<ReturnType>(
-                apiSubmit,
-                data,
-                getTokenRequestConfig(auth.token)
-            );
-
-            sucessfullySubmitted(res.data);
+            submit(data as unknown as Inputs);
         } catch (err: any | AxiosError<DjangoErrors<Inputs>>) {
             if (axios.isAxiosError(err)) {
                 const error: AxiosError<DjangoErrors<Inputs>> = err;
