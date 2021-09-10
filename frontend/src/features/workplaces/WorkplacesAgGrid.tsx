@@ -21,7 +21,11 @@ import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine-dark.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 
-const WorkplacesAgGrid = () => {
+interface Props {
+    gridRef: React.Ref<>;
+}
+
+const WorkplacesAgGrid = ({ gridRef }: Props) => {
     const workplaces = useSelector(workplaceSelectors.selectAll);
     const theme = useTheme();
 
@@ -37,11 +41,13 @@ const WorkplacesAgGrid = () => {
                 style={{ minHeight: 50, width: "100%", overflow: "hidden" }}
             >
                 <AgGridReact
+                    ref={gridRef}
                     rowData={workplaces}
                     rowSelection="multiple"
                     pagination
                     paginationPageSize={10}
                     domLayout="autoHeight"
+                    onGridReady={(params) => {}}
                 >
                     <AgGridColumn
                         checkboxSelection

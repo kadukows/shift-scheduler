@@ -1,7 +1,6 @@
 import * as React from "react";
 import * as yup from "yup";
 
-import { Workplace } from "../workplaceSlice";
 import GenericForm, { Field } from "../../genericForm/GenericForm";
 
 export interface Inputs {

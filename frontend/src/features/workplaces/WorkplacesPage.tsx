@@ -22,10 +22,18 @@ import WorkplaceForm from "./workplaceForm/WorkplaceForm";
 import WorkplaceFormAsGenericForm, {
     Inputs as WorkplaceFormInputs,
 } from "./workplaceForm/WorkplaceFormAsGenericForm";
-import { Workplace, addWorkplace } from "../workplaces/workplaceSlice";
+import WorkplaceDeleteForm, {
+    Inputs as WorkplaceDeleteFormInputs,
+} from "./workplaceForm/WorkplaceDeleteForm";
+import {
+    Workplace,
+    addWorkplace,
+    removeWorkplaces,
+} from "../workplaces/workplaceSlice";
 import { addAlert } from "../alerts/alertsSlice";
 import { getTokenRequestConfig } from "../helpers";
 import { RootState } from "../../store";
+import { AgGridReact } from "ag-grid-react";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -37,12 +45,18 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const newWorkplaceFormId = "new-workplace-form";
+const deleteWorkplaceFormId = "delete-workplace-form";
 
 const WorkplacesPage = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const auth = useSelector((state: RootState) => state.authReducer);
     const [newModalOpen, setNewModalOpen] = React.useState(false);
+    const [deleteModalState, setDeleteModalState] = React.useState({
+        open: false,
+        ids: [] as number[],
+    });
+    const gridRef = React.useRef<typeof AgGridReact>(null);
 
     const newWorkplaceSubmitted = async (inputs: WorkplaceFormInputs) => {
         const res = await axios.post<Workplace>(
@@ -61,20 +75,44 @@ const WorkplacesPage = () => {
         setNewModalOpen(false);
     };
 
+    const deleteWorkplacesSubmitted = async ({
+        ids,
+    }: WorkplaceDeleteFormInputs) => {
+        for (const id of ids) {
+            try {
+                await axios.delete(
+                    `/api/workplace/${id}/`,
+                    getTokenRequestConfig(auth.token)
+                );
+            } catch (err) {
+                // pass
+            }
+        }
+
+        dispatch(removeWorkplaces(ids));
+        dispatch(
+            addAlert({
+                type: "info",
+                message: "Sucessfully deleted workplaces.",
+            })
+        );
+    };
+
     return (
         <>
             <Dialog open={newModalOpen} onClose={() => setNewModalOpen(false)}>
                 <DialogTitle>Add a workplace</DialogTitle>
                 <DialogContent>
-                    <WorkplaceFormAsGenericForm
-                        formId={newWorkplaceFormId}
-                        submit={newWorkplaceSubmitted}
+                    <WorkplaceDeleteForm
+                        formId={deleteWorkplaceFormId}
+                        submit={deleteWorkplaces}
+                        ids={[]}
                     />
                 </DialogContent>
                 <DialogActions>
                     <Button
                         color="primary"
-                        onClick={() => setNewModalOpen(false)}
+                        onClick={() => setDeleteModalOpen(false)}
                         variant="contained"
                     >
                         Close
@@ -83,6 +121,38 @@ const WorkplacesPage = () => {
                         color="primary"
                         type="submit"
                         form={newWorkplaceFormId}
+                        variant="contained"
+                    >
+                        Add workplace
+                    </Button>
+                </DialogActions>
+            </Dialog>
+            <Dialog
+                open={deleteModalState.open}
+                onClose={() => setDeleteModalState({ open: false, ids: [] })}
+            >
+                <DialogTitle>Remove workplaces</DialogTitle>
+                <DialogContent>
+                    <WorkplaceDeleteForm
+                        formId={deleteWorkplaceFormId}
+                        submit={deleteWorkplacesSubmitted}
+                        ids={deleteModalState.ids}
+                    />
+                </DialogContent>
+                <DialogActions>
+                    <Button
+                        color="primary"
+                        onClick={() =>
+                            setDeleteModalState({ open: false, ids: [] })
+                        }
+                        variant="contained"
+                    >
+                        Close
+                    </Button>
+                    <Button
+                        color="primary"
+                        type="submit"
+                        form={deleteWorkplaceFormId}
                         variant="contained"
                     >
                         Add workplace
@@ -98,7 +168,7 @@ const WorkplacesPage = () => {
                         </Typography>
                     </Grid>
                     <Grid item>
-                        <WorkplacesAgGrid />
+                        <WorkplacesAgGrid gridRef={gridRef} />
                     </Grid>
                     <Grid item>
                         <Grid container justifyContent="flex-end">
@@ -109,6 +179,15 @@ const WorkplacesPage = () => {
                                     onClick={() => setNewModalOpen(true)}
                                 >
                                     Add new
+                                </Button>
+                            </Grid>
+                            <Grid item>
+                                <Button
+                                    variant="contained"
+                                    color="secondary"
+                                    onClick={() => setDeleteModalOpen({open: true, ids: gridRef.current.})}
+                                >
+                                    Delete
                                 </Button>
                             </Grid>
                         </Grid>

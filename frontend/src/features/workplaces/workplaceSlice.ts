@@ -43,6 +43,7 @@ const workplaceSlice = createSlice({
         resetWorkplaces: workplaceAdapter.removeAll,
         addWorkplace: workplaceAdapter.addOne,
         removeWorkplace: workplaceAdapter.removeOne,
+        removeWorkplaces: workplaceAdapter.removeMany,
         updateWorkplace: workplaceAdapter.updateOne,
         setLoading(state, action: PayloadAction<boolean>) {
             state.loading = action.payload;
@@ -60,6 +61,7 @@ export const {
     removeWorkplace,
     updateWorkplace,
     setLoading,
+    removeWorkplaces,
 } = workplaceSlice.actions;
 export const workplaceReducer = workplaceSlice.reducer;
 
