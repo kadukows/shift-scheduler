@@ -2,6 +2,8 @@ import * as React from "react";
 import * as yup from "yup";
 
 import GenericForm, { Field } from "../../genericForm/GenericForm";
+import GenericAddOrUpdateForm from "../../genericForm/GenericAddOrUpdateForm";
+import { Workplace } from "../workplaceSlice";
 
 export interface Inputs {
     name: string;
@@ -9,8 +11,9 @@ export interface Inputs {
 
 interface Props {
     formId: string;
-    submit: (a: Inputs) => void;
-    defaultValues?: Inputs;
+    //submit: (a: Inputs) => void;
+    onSubmitted: (entity: Workplace) => void;
+    objectToModify?: Workplace;
 }
 
 const fields: Field<Inputs>[] = [
@@ -23,15 +26,16 @@ const fields: Field<Inputs>[] = [
 
 const WorkplaceFormAsGenericForm = ({
     formId,
-    submit,
-    defaultValues,
+    onSubmitted,
+    objectToModify,
 }: Props) => {
     return (
-        <GenericForm<Inputs>
+        <GenericAddOrUpdateForm<Inputs, Workplace>
             fields={fields}
-            submit={submit}
+            baseUrl="/api/workplace/"
+            onSubmitted={onSubmitted}
             formId={formId}
-            defaultValues={defaultValues ? defaultValues : undefined}
+            objectToModify={objectToModify}
         />
     );
 };

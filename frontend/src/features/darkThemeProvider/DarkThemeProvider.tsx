@@ -1,6 +1,11 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
-import { createTheme, ThemeProvider } from "@material-ui/core";
+import {
+    createTheme,
+    responsiveFontSizes,
+    ThemeProvider,
+} from "@material-ui/core";
+import blue from "@material-ui/core/colors/blue";
 
 import { RootState } from "../../store";
 
@@ -13,11 +18,20 @@ const DarkThemeProvider = ({ children }: React.PropsWithChildren<Props>) => {
 
     const theme = React.useMemo(
         () =>
-            createTheme({
-                palette: {
-                    type: darkMode ? "dark" : "light",
-                },
-            }),
+            responsiveFontSizes(
+                createTheme({
+                    palette: {
+                        type: darkMode ? "dark" : "light",
+                        primary: darkMode
+                            ? {
+                                  main: blue[700],
+                              }
+                            : {
+                                  main: blue[800],
+                              },
+                    },
+                })
+            ),
         [darkMode]
     );
 

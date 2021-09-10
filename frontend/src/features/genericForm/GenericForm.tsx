@@ -41,7 +41,6 @@ function GenericForm<Inputs>({
     formId,
     defaultValues,
 }: Props<Inputs>) {
-    //const auth = useSelector((state: RootState) => state.authReducer);
     const [nonFieldErrors, setNonFieldErrors] = React.useState<string[]>([]);
 
     const schemaBase: any = {};
@@ -64,7 +63,7 @@ function GenericForm<Inputs>({
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {
-            submit(data as unknown as Inputs);
+            await submit(data as unknown as Inputs);
         } catch (err: any | AxiosError<DjangoErrors<Inputs>>) {
             if (axios.isAxiosError(err)) {
                 const error: AxiosError<DjangoErrors<Inputs>> = err;

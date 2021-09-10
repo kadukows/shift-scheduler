@@ -21,23 +21,27 @@ import "ag-grid-community/dist/styles/ag-theme-alpine.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine-dark.css";
 import "ag-grid-community/dist/styles/ag-theme-material.css";
 
-function myBtnRenderer(props: any) {
+function btnRenderer(props: any) {
     return (
         <Button
             style={{ padding: 8 }}
-            color="secondary"
+            color="primary"
             onClick={() => props.onClick(props.value)}
         >
-            Delete
+            {props.name}
         </Button>
     );
 }
 
 interface Props {
     onClickCellDeletion: (id: number) => void;
+    onClickCellUpdate: (id: number) => void;
 }
 
-const WorkplacesAgGrid = ({ onClickCellDeletion }: Props) => {
+const WorkplacesAgGrid = ({
+    onClickCellDeletion,
+    onClickCellUpdate,
+}: Props) => {
     const workplaces = useSelector(workplaceSelectors.selectAll);
     const theme = useTheme();
 
@@ -59,7 +63,7 @@ const WorkplacesAgGrid = ({ onClickCellDeletion }: Props) => {
                     paginationPageSize={10}
                     domLayout="autoHeight"
                     frameworkComponents={{
-                        myBtnRenderer,
+                        btnRenderer,
                     }}
                 >
                     <AgGridColumn
@@ -77,11 +81,22 @@ const WorkplacesAgGrid = ({ onClickCellDeletion }: Props) => {
                     ></AgGridColumn>
                     <AgGridColumn
                         flex={1}
+                        headerName="Update"
+                        field="id"
+                        cellRenderer="btnRenderer"
+                        cellRendererParams={{
+                            onClick: onClickCellUpdate,
+                            name: "Update",
+                        }}
+                    />
+                    <AgGridColumn
+                        flex={1}
                         headerName="Delete"
                         field="id"
-                        cellRenderer="myBtnRenderer"
+                        cellRenderer="btnRenderer"
                         cellRendererParams={{
                             onClick: onClickCellDeletion,
+                            name: "Delete",
                         }}
                     />
                 </AgGridReact>
