@@ -1,5 +1,11 @@
+import * as React from "react";
 import * as ReactHookForm from "react-hook-form";
-import { AxiosRequestConfig, AxiosError } from "axios";
+import axios, { AxiosRequestConfig, AxiosError } from "axios";
+import { observer } from "redux-observers";
+import { ThunkAction, AnyAction } from "@reduxjs/toolkit";
+import { TextField } from "@material-ui/core";
+
+import { RootState } from "../store";
 
 export function getTokenRequestConfig(token: string): AxiosRequestConfig {
     return {
@@ -44,3 +50,82 @@ export function handleErrors<Inputs>(
 export const combineClx = (lhs: string, rhs: string) => {
     return `${lhs} ${rhs}`;
 };
+
+interface WithLastModified {
+    last_modified: string;
+}
+
+export const sortByLastModified = (
+    lhs: WithLastModified,
+    rhs: WithLastModified
+) => Date.parse(rhs.last_modified) - Date.parse(lhs.last_modified);
+
+export const makeDispatchActionWhenAuthedObserver = (
+    setAction: any,
+    resetAction: any
+) => {
+    return observer(
+        (state: RootState) => state.authReducer.authenticated,
+        (dispatch, current, previous) => {
+            if (previous === false && current === true) {
+                dispatch(setAction());
+            } else if (previous === true && current == false) {
+                dispatch(resetAction());
+            }
+        }
+    );
+};
+
+export const getApiGenericThunkAction = (
+    setLoading: (a: boolean) => any,
+    setEntities: (a: any) => any,
+    apiUrl: string
+) => {
+    return (): ThunkAction<void, RootState, unknown, AnyAction> =>
+        async (dispatch, getState) => {
+            dispatch(setLoading(true));
+
+            try {
+                const res = await axios.get(
+                    apiUrl,
+                    getTokenRequestConfig(getState().authReducer.token)
+                );
+                dispatch(setEntities(res.data));
+            } finally {
+                dispatch(setLoading(false));
+            }
+        };
+};
+
+export interface MyTextFieldProps<Inputs> {
+    errors: ReactHookForm.FormState<Inputs>["errors"];
+    name: keyof Inputs;
+    isSubmitting: boolean;
+    register: ReactHookForm.UseFormRegister<Inputs>;
+}
+
+export function MyTextField<Inputs>({
+    isSubmitting,
+    register,
+    name,
+    errors,
+    ...rest
+}: Omit<React.ComponentProps<typeof TextField>, "variant"> &
+    MyTextFieldProps<Inputs>) {
+    return (
+        // @ts-ignore
+        <TextField
+            variant="outlined"
+            // @ts-ignore
+            error={!!errors[name]}
+            // @ts-ignore
+            helperText={errors[name]?.message}
+            fullWidth
+            disabled={isSubmitting}
+            label={name.charAt(0).toUpperCase() + name.slice(1)}
+            {...rest}
+            // @ts-ignore
+            {...register(name)}
+        />
+    );
+}

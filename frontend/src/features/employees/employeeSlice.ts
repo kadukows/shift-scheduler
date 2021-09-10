@@ -8,8 +8,12 @@ import {
 import axios from "axios";
 import { observer } from "redux-observers";
 
-import { getTokenRequestConfig } from "../helpers";
-import { RootState } from "../../store";
+import {
+    getApiGenericThunkAction,
+    getTokenRequestConfig,
+    makeDispatchActionWhenAuthedObserver,
+    sortByLastModified,
+} from "../helpers";
 
 interface Employee {
     id: number;
@@ -20,7 +24,7 @@ interface Employee {
 }
 
 const employeeAdapter = createEntityAdapter<Employee>({
-    selectId: (employee) => employee.id,
+    sortComparer: sortByLastModified,
 });
 
 interface EmployeeState
@@ -39,6 +43,7 @@ const employeeSlice = createSlice({
     reducers: {
         addEmployee: employeeAdapter.addOne,
         setEmployees: employeeAdapter.setAll,
+        resetEmployees: employeeAdapter.removeAll,
         removeEmployee: employeeAdapter.removeOne,
         updateEmployee: employeeAdapter.updateOne,
         setLoading(state, action: PayloadAction<boolean>) {
@@ -47,33 +52,22 @@ const employeeSlice = createSlice({
     },
 });
 
-export const { setEmployees, removeEmployee, updateEmployee, setLoading } =
-    employeeSlice.actions;
+export const {
+    setEmployees,
+    resetEmployees,
+    removeEmployee,
+    updateEmployee,
+    setLoading,
+} = employeeSlice.actions;
 export const employeeReducer = employeeSlice.reducer;
 
-export const getEmployees =
-    (): ThunkAction<void, RootState, unknown, AnyAction> =>
-    async (dispatch, getState) => {
-        dispatch(setLoading(true));
+export const getEmployees = getApiGenericThunkAction(
+    setLoading,
+    setEmployees,
+    "/api/employee/"
+);
 
-        try {
-            const res = await axios.get<Employee[]>(
-                "/api/employee/",
-                getTokenRequestConfig(getState().authReducer.token)
-            );
-
-            dispatch(setEmployees(res.data));
-        } finally {
-            dispatch(setLoading(false));
-        }
-    };
-
-export const employeeObserver = observer(
-    (state: RootState) => state.authReducer.authenticated,
-    (dispatch, current, previous) => {
-        if (previous === false && current === true) {
-            // @ts-expect-error
-            dispatch(getEmployees());
-        }
-    }
+export const employeeObserver = makeDispatchActionWhenAuthedObserver(
+    getEmployees,
+    resetEmployees
 );

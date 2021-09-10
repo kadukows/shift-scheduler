@@ -7,7 +7,7 @@ import {
 } from "@reduxjs/toolkit";
 
 export interface Alert {
-    type: "warning" | "info";
+    type: "warning" | "info" | "success";
     message: string;
 }
 

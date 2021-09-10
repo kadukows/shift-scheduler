@@ -46,6 +46,12 @@ class WorkplaceSerializer(serializers.ModelSerializer):
         fields = ['id', 'name', 'last_modified']
         read_only_fields = ['id', 'last_modified']
 
+    def validate_name(self, value):
+        if value == 'foobar_workplace':
+            raise serializers.ValidationError("Can't be equal to 'foobar_workplace'")
+
+        return value
+
     def create(self, validated_data):
         return Workplace.objects.create(owner=self.context['request'].user, **validated_data)
 

@@ -21,7 +21,7 @@ import {
 import { Lock } from "@material-ui/icons";
 import { yupResolver } from "@hookform/resolvers/yup";
 
-import { DjangoErrors, handleErrors } from "../helpers";
+import { DjangoErrors, handleErrors, MyTextField } from "../helpers";
 import { addAlert } from "../alerts/alertsSlice";
 import { tryAuthWithToken } from "../auth/authSlice";
 
@@ -32,13 +32,6 @@ interface Inputs {
     password: string;
 }
 
-interface MyFieldProps {
-    errors: FormState<Inputs>["errors"];
-    name: keyof Inputs;
-    isSubmitting: boolean;
-    register: UseFormRegister<Inputs>;
-}
-
 const schema = yup.object().shape({
     username: yup.string().required(),
     password: yup.string().required(),
@@ -46,29 +39,9 @@ const schema = yup.object().shape({
 
 const useStyles = makeStyles((theme) => ({
     paper: {
-        padding: theme.spacing(1),
+        padding: theme.spacing(2),
     },
 }));
-
-const MyTextField = ({
-    isSubmitting,
-    register,
-    name,
-    errors,
-    ...rest
-}: Omit<React.ComponentProps<typeof TextField>, "variant"> & MyFieldProps) => {
-    return (
-        <TextField
-            variant="outlined"
-            error={!!errors[name]}
-            helperText={errors[name]?.message}
-            fullWidth
-            disabled={isSubmitting}
-            {...rest}
-            {...register(name)}
-        />
-    );
-};
 
 const LoginForm = (props: Props) => {
     const [nonFieldErrors, setNonFieldErrors] = React.useState<Array<string>>(
@@ -118,7 +91,7 @@ const LoginForm = (props: Props) => {
         }
     };
 
-    const textFieldProps: Omit<MyFieldProps, "name"> = {
+    const textFieldProps = {
         errors,
         isSubmitting,
         register,

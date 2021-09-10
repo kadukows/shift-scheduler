@@ -12,6 +12,8 @@ import IndexPage from "./features/index/IndexPage";
 import LoginForm from "./features/login/LoginForm";
 import LogoutPage from "./features/auth/LogoutPage";
 import TryAuthWithCurrentToken from "./features/auth/TryAuthWithCurrentToken";
+import WorkplacesPage from "./features/workplaces/WorkplacesPage";
+import NewWorkplacePage from "./features/workplaces/workplaceForm/NewWorkplacePage";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -46,6 +48,14 @@ const App = () => {
                                     <Route exact path="/logout">
                                         <LogoutPage />
                                     </Route>
+                                    <Route exact path="/workplaces">
+                                        <WorkplacesPage />
+                                    </Route>
+                                    {/*
+                                    <Route exact path="/workplaces/new">
+                                        <NewWorkplacePage />
+                                    </Route>
+                                    */}
                                 </Switch>
                             </Grid>
                         </Grid>
