@@ -16,7 +16,8 @@ import { useSelector, useDispatch } from "react-redux";
 import WorkplacesGrid from "./WorkplacesGrid";
 import WorkplacesAgGrid from "./WorkplacesAgGrid";
 import WorkplaceForm from "./workplaceForm/WorkplaceForm";
-import { Workplace } from "../workplaces/workplaceSlice";
+import WorkplaceFormAsGenericForm from "./workplaceForm/WorkplaceFormAsGenericForm";
+import { Workplace, addWorkplace } from "../workplaces/workplaceSlice";
 import { addAlert } from "../alerts/alertsSlice";
 
 const useStyles = makeStyles((theme) => ({
@@ -27,6 +28,8 @@ const useStyles = makeStyles((theme) => ({
         padding: theme.spacing(1),
     },
 }));
+
+const newWorkplaceFormId = "new-workplace-form";
 
 const WorkplacesPage = () => {
     const classes = useStyles();
@@ -40,19 +43,18 @@ const WorkplacesPage = () => {
                 message: `Sucessfully added a workplace: "${workplace.name}"`,
             })
         );
+        dispatch(addWorkplace(workplace));
         setNewModalOpen(false);
     };
-
-    const newWorkplaceFormId = "new-workplace-form";
 
     return (
         <>
             <Dialog open={newModalOpen} onClose={() => setNewModalOpen(false)}>
                 <DialogTitle>Add a workplace</DialogTitle>
                 <DialogContent>
-                    <WorkplaceForm
+                    <WorkplaceFormAsGenericForm
                         formId={newWorkplaceFormId}
-                        onSubmitted={newWorkplaceSubmitted}
+                        sucessfullySubmitted={newWorkplaceSubmitted}
                     />
                 </DialogContent>
                 <DialogActions>
