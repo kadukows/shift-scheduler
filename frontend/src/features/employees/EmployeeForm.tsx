@@ -1,7 +1,8 @@
 import * as React from "react";
 import * as yup from "yup";
 
-import GenericForm, { Field } from "../genericForm/GenericForm";
+import GenericForm from "../genericForm/GenericForm";
+import { FieldData } from "../genericForm/fieldInstance/Field";
 import GenericAddOrUpdateForm from "../genericForm/GenericAddOrUpdateForm";
 import { Employee, employeeSelectors } from "../employees/employeeSlice";
 import { Workplace, workplaceSelectors } from "../workplaces/workplaceSlice";
@@ -18,7 +19,7 @@ interface Props {
     objectToModify?: Employee;
 }
 
-const fields: Field<Inputs, Workplace>[] = [
+const fields: FieldData<Inputs, Workplace>[] = [
     {
         type: "string",
         name: "first_name",
@@ -38,7 +39,7 @@ const fields: Field<Inputs, Workplace>[] = [
         validation: yup.string().required(),
         entitySelector: workplaceSelectors.selectAll,
         entityToString: (workplace) => workplace.name,
-    } as Field<Inputs, Workplace>,
+    } as FieldData<Inputs, Workplace>,
 ];
 
 const EmployeeForm = ({ formId, onSubmitted, objectToModify }: Props) => {

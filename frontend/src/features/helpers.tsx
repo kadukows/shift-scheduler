@@ -104,6 +104,8 @@ type MyTextFieldProps<Inputs> = {
     register: ReactHookForm.UseFormRegister<Inputs>;
 } & Omit<React.ComponentProps<typeof TextField>, "variant">;
 
+export const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
+
 export function MyTextField<Inputs>({
     isSubmitting,
     register,
@@ -120,7 +122,6 @@ export function MyTextField<Inputs>({
             helperText={errors[name as keyof Inputs]?.message}
             fullWidth
             disabled={isSubmitting}
-            label={name.charAt(0).toUpperCase() + name.slice(1)}
             {...rest}
             // @ts-ignore
             {...register(name)}

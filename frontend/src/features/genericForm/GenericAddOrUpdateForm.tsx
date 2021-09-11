@@ -2,7 +2,8 @@ import * as React from "react";
 import axios, { AxiosResponse } from "axios";
 import { useSelector } from "react-redux";
 
-import GenericForm, { Field } from "./GenericForm";
+import GenericForm from "./GenericForm";
+import { FieldData } from "./fieldInstance/Field";
 import { RootState } from "../../store";
 import { getTokenRequestConfig, WithId } from "../helpers";
 
@@ -11,7 +12,7 @@ interface Props<
     EntityToAdd extends WithId & Inputs,
     EntityOnFields extends WithId
 > {
-    fields: Field<Inputs, EntityOnFields>[];
+    fields: FieldData<Inputs, EntityOnFields>[];
     baseUrl: string;
     onSubmitted: (entity: EntityToAdd) => void;
     formId: string;

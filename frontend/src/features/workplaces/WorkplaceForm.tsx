@@ -1,7 +1,8 @@
 import * as React from "react";
 import * as yup from "yup";
 
-import GenericForm, { Field } from "../genericForm/GenericForm";
+import GenericForm from "../genericForm/GenericForm";
+import { FieldData } from "../genericForm/fieldInstance/Field";
 import GenericAddOrUpdateForm from "../genericForm/GenericAddOrUpdateForm";
 import { Workplace } from "./workplaceSlice";
 
@@ -16,7 +17,7 @@ interface Props {
     objectToModify?: Workplace;
 }
 
-const fields: Field<Inputs, Workplace>[] = [
+const fields: FieldData<Inputs, Workplace>[] = [
     {
         type: "string",
         name: "name",
