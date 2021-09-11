@@ -20,7 +20,13 @@ import GenericAddOrUpdateForm from "../genericForm/GenericAddOrUpdateForm";
 import EmployeeAgGrid from "./EmployeeAgGrid";
 import EmployeeForm from "./EmployeeForm";
 
-import { Employee, addEmployee } from "./employeeSlice";
+import {
+    Employee,
+    addEmployee,
+    updateEmployee,
+    employeeSelectors,
+    removeEmployee,
+} from "./employeeSlice";
 import { addAlert } from "../alerts/alertsSlice";
 import { getTokenRequestConfig } from "../helpers";
 import { RootState } from "../../store";
@@ -39,31 +45,75 @@ const useStyles = makeStyles((theme) => ({
 
 const formIds = {
     newEmployee: "new-employee-form-id",
+    updateEmployee: "update-employee-form-id",
 };
 
-const WorkplacesPage = () => {
+const employeeToString = (employee: Employee) =>
+    employee ? `${employee.first_name} ${employee.last_name}` : "";
+
+const EmployeePage = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
+    const employeesById = useSelector(employeeSelectors.selectEntities);
     const auth = useSelector((state: RootState) => state.authReducer);
-    const [newModalOpen, setNewModalOpen] = React.useState(false);
-    //const workplacesById = useSelector(workplaceSelectors.selectEntities);
-    /*
     const [newModalOpen, setNewModalOpen] = React.useState(false);
     const [updateModalOpen, setUpdateModelOpen] = React.useState(false);
     const [updateModalId, setUpdateModalId] = React.useState<number>(null);
     const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
-    const [deletedWorkplaceId, setDeletedWorkplaceId] =
+    const [deletedEmployeeId, setDeletedEmployeeId] =
         React.useState<number>(null);
-    */
+
     const newEmployeeOnSubmitted = (employee: Employee) => {
         dispatch(
             addAlert({
                 type: "success",
-                message: `Sucessfully created a employee: "${employee.first_name} ${employee.last_name}"`,
+                message: `Sucessfully created a employee: "${employeeToString(
+                    employee
+                )}"`,
             })
         );
         dispatch(addEmployee(employee));
         setNewModalOpen(false);
+    };
+
+    const updateEmployeeOnSubmitted = (employee: Employee) => {
+        dispatch(
+            addAlert({
+                type: "info",
+                message: `Successfully updated an employee: "${employee.first_name} ${employee.last_name}"`,
+            })
+        );
+        dispatch(
+            updateEmployee({
+                id: employee.id,
+                changes: employee,
+            })
+        );
+
+        setUpdateModelOpen(false);
+    };
+
+    const deleteEmployeeById = async () => {
+        try {
+            await axios.delete(
+                `/api/employee/${deletedEmployeeId}/`,
+                getTokenRequestConfig(auth.token)
+            );
+        } catch (err) {
+            // pass
+        }
+
+        dispatch(
+            addAlert({
+                type: "info",
+                message: `Sucessfully deleted "${employeeToString(
+                    employeesById[deletedEmployeeId]
+                )}".`,
+            })
+        );
+
+        dispatch(removeEmployee(deletedEmployeeId));
+        setDeleteModalOpen(false);
     };
 
     return (
@@ -94,17 +144,17 @@ const WorkplacesPage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-            {/*
+
             <Dialog
                 open={updateModalOpen}
                 onClose={() => setUpdateModelOpen(false)}
             >
-                <DialogTitle>Update workplace</DialogTitle>
+                <DialogTitle>Update employee</DialogTitle>
                 <DialogContent className={classes.dialog}>
-                    <WorkplaceForm
-                        formId={updateWorkplaceFormId}
-                        onSubmitted={updateWorkplaceSubmitted}
-                        objectToModify={workplacesById[updateModalId]}
+                    <EmployeeForm
+                        formId={formIds.updateEmployee}
+                        onSubmitted={updateEmployeeOnSubmitted}
+                        objectToModify={employeesById[updateModalId]}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -118,10 +168,10 @@ const WorkplacesPage = () => {
                     <Button
                         color="primary"
                         type="submit"
-                        form={updateWorkplaceFormId}
+                        form={formIds.updateEmployee}
                         variant="contained"
                     >
-                        Add workplace
+                        Add Employee
                     </Button>
                 </DialogActions>
             </Dialog>
@@ -133,7 +183,7 @@ const WorkplacesPage = () => {
                 <DialogTitle>Remove workplaces</DialogTitle>
                 <DialogContent>
                     Are you sure you want to delete "
-                    {workplacesById[deletedWorkplaceId]?.name}"?
+                    {employeeToString(employeesById[deletedEmployeeId])}"?
                 </DialogContent>
                 <DialogActions>
                     <Button
@@ -146,7 +196,7 @@ const WorkplacesPage = () => {
                     <Button
                         color="primary"
                         type="submit"
-                        onClick={deleteWorkplaceById}
+                        onClick={deleteEmployeeById}
                         variant="contained"
                     >
                         Delete
@@ -154,7 +204,6 @@ const WorkplacesPage = () => {
                 </DialogActions>
             </Dialog>
 
-            */}
             <Paper className={classes.paper} elevation={3}>
                 <Grid container direction="column" spacing={2}>
                     <Grid item>
@@ -166,10 +215,12 @@ const WorkplacesPage = () => {
                     <Grid item>
                         <EmployeeAgGrid
                             onClickCellDeletion={(id) => {
-                                alert(`Cell deletion ${id}`);
+                                setDeletedEmployeeId(id);
+                                setDeleteModalOpen(true);
                             }}
                             onClickCellUpdate={(id) => {
-                                alert(`Update cell ${id}`);
+                                setUpdateModalId(id);
+                                setUpdateModelOpen(true);
                             }}
                         />
                     </Grid>
@@ -192,4 +243,4 @@ const WorkplacesPage = () => {
     );
 };
 
-export default WorkplacesPage;
+export default EmployeePage;

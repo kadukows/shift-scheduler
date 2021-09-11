@@ -58,7 +58,7 @@ class WorkplaceSerializer(serializers.ModelSerializer):
 
 class EmployeeSerializer(ReadOnlyUponActionSerializerMixin, serializers.ModelSerializer):
     action_to_ro_fields = {
-        'update': ["workplace"]
+        #'update': ["workplace"]
     }
 
     class Meta:

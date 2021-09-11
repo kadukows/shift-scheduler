@@ -1,8 +1,15 @@
-import { MenuItem } from "@material-ui/core";
+import {
+    MenuItem,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+} from "@material-ui/core";
 import * as React from "react";
 import { useSelector } from "react-redux";
-import { RootState } from "../../../store";
+import { Controller, Control } from "react-hook-form";
 
+import { RootState } from "../../../store";
 import { MyTextField, capitalize, WithId } from "../../helpers";
 import {
     StringYupValidationBuilderObject,
@@ -26,6 +33,7 @@ export interface ChooseObjectIdFieldData<Inputs, Entity extends WithId> {
 interface ChooseObjectIdFieldProps<Inputs, Entity extends WithId>
     extends BaseFieldProps<Inputs> {
     field: ChooseObjectIdFieldData<Inputs, Entity>;
+    control: Control<Inputs>;
 }
 
 /**
@@ -33,29 +41,40 @@ interface ChooseObjectIdFieldProps<Inputs, Entity extends WithId>
  */
 
 const ChooseObjectIdField = <Inputs, Entity extends WithId>({
-    errors,
-    register,
-    isSubmitting,
     field,
+    control,
 }: ChooseObjectIdFieldProps<Inputs, Entity>) => {
     const entities = useSelector(field.entitySelector);
 
     return (
-        <MyTextField<Inputs>
-            errors={errors}
-            name={field.name as keyof Inputs & string}
-            isSubmitting={isSubmitting}
-            register={register}
-            label={field.label ? field.label : capitalize(field.name as string)}
-            select
-            value=""
-        >
-            {entities.map((entity) => (
-                <MenuItem key={entity.id} value={entity.id}>
-                    {field.entityToString(entity)}
-                </MenuItem>
-            ))}
-        </MyTextField>
+        <Controller
+            control={control}
+            // @ts-expect-error
+            name={field.name}
+            // @ts-ignore
+            defaultValue=""
+            render={({
+                field: { onChange, onBlur, value, name, ref },
+                fieldState: { invalid, isTouched, isDirty, error },
+            }) => (
+                <TextField
+                    variant="outlined"
+                    label={field.label}
+                    fullWidth
+                    error={invalid}
+                    helperText={error?.message}
+                    onChange={onChange}
+                    value={value}
+                    select
+                >
+                    {entities.map((entity) => (
+                        <MenuItem key={entity.id} value={entity.id}>
+                            {field.entityToString(entity)}
+                        </MenuItem>
+                    ))}
+                </TextField>
+            )}
+        />
     );
 };
 

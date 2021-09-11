@@ -36,6 +36,7 @@ function GenericForm<Inputs, Entity extends WithId>({
         handleSubmit,
         formState: { errors, isSubmitting },
         setError,
+        control,
     } = useForm<Inputs>({
         resolver: yupResolver(yup.object().shape(schemaBase)),
         // @ts-expect-error
@@ -73,7 +74,7 @@ function GenericForm<Inputs, Entity extends WithId>({
             <Grid container direction="column" spacing={2}>
                 {fields.map((field) => (
                     <Grid item key={i++}>
-                        <Field field={field} {...baseProps} />
+                        <Field control={control} field={field} {...baseProps} />
                     </Grid>
                 ))}
                 {isSubmitting && (
