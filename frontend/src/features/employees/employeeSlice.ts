@@ -5,17 +5,15 @@ import {
     ThunkAction,
     AnyAction,
 } from "@reduxjs/toolkit";
-import axios from "axios";
-import { observer } from "redux-observers";
 
 import {
     getApiGenericThunkAction,
-    getTokenRequestConfig,
     makeDispatchActionWhenAuthedObserver,
     sortByLastModified,
 } from "../helpers";
+import { RootState } from "../../store";
 
-interface Employee {
+export interface Employee {
     id: number;
     last_name: string;
     first_name: string;
@@ -52,7 +50,11 @@ const employeeSlice = createSlice({
     },
 });
 
+export const employeeSelectors = employeeAdapter.getSelectors(
+    (state: RootState) => state.employeeReducer
+);
 export const {
+    addEmployee,
     setEmployees,
     resetEmployees,
     removeEmployee,

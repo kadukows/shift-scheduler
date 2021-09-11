@@ -4,43 +4,44 @@ import { useSelector } from "react-redux";
 
 import GenericForm, { Field } from "./GenericForm";
 import { RootState } from "../../store";
-import { getTokenRequestConfig } from "../helpers";
+import { getTokenRequestConfig, WithId } from "../helpers";
 
-interface HasId {
-    id: number;
-}
-
-interface Props<Inputs, Entity> {
-    fields: Field<Inputs>[];
+interface Props<
+    Inputs,
+    EntityToAdd extends WithId & Inputs,
+    EntityOnFields extends WithId
+> {
+    fields: Field<Inputs, EntityOnFields>[];
     baseUrl: string;
-    onSubmitted: (entity: Entity) => void;
+    onSubmitted: (entity: EntityToAdd) => void;
     formId: string;
-    objectToModify?: Entity;
+    objectToModify?: EntityToAdd;
 }
 
 const GenericAddOrUpdateForm = <
     Inputs extends unknown,
-    Entity extends HasId & Inputs
+    EntityToAdd extends WithId & Inputs,
+    EntityOnFields extends WithId
 >({
     fields,
     baseUrl,
     formId,
     objectToModify,
     onSubmitted,
-}: Props<Inputs, Entity>) => {
+}: Props<Inputs, EntityToAdd, EntityOnFields>) => {
     const auth = useSelector((state: RootState) => state.authReducer);
 
     const submit = async (inputs: Inputs) => {
-        let res: AxiosResponse<Entity> = null;
+        let res: AxiosResponse<EntityToAdd> = null;
 
         if (!objectToModify) {
-            res = await axios.post<Entity>(
+            res = await axios.post<EntityToAdd>(
                 baseUrl,
                 inputs,
                 getTokenRequestConfig(auth.token)
             );
         } else {
-            res = await axios.put<Entity>(
+            res = await axios.put<EntityToAdd>(
                 `${baseUrl}${objectToModify.id}/`,
                 inputs,
                 getTokenRequestConfig(auth.token)

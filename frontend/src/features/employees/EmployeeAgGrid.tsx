@@ -12,9 +12,8 @@ import {
 } from "@material-ui/core";
 import { AgGridColumn, AgGridReact } from "ag-grid-react";
 
+import { employeeSelectors } from "./employeeSlice";
 import { workplaceSelectors } from "../workplaces/workplaceSlice";
-import { RootState } from "../../store";
-import WorkplaceForm from "./WorkplaceForm";
 
 import "ag-grid-community/dist/styles/ag-grid.css";
 import "ag-grid-community/dist/styles/ag-theme-alpine.css";
@@ -42,7 +41,9 @@ const WorkplacesAgGrid = ({
     onClickCellDeletion,
     onClickCellUpdate,
 }: Props) => {
-    const workplaces = useSelector(workplaceSelectors.selectAll);
+    const employees = useSelector(employeeSelectors.selectAll);
+    const employeesById = useSelector(employeeSelectors.selectEntities);
+    const workplacesById = useSelector(workplaceSelectors.selectEntities);
     const theme = useTheme();
 
     const agGridClass =
@@ -57,7 +58,7 @@ const WorkplacesAgGrid = ({
                 style={{ minHeight: 50, width: "100%", overflow: "hidden" }}
             >
                 <AgGridReact
-                    rowData={workplaces}
+                    rowData={employees}
                     rowSelection="multiple"
                     pagination
                     paginationPageSize={10}
@@ -73,14 +74,25 @@ const WorkplacesAgGrid = ({
                     ></AgGridColumn>
                     <AgGridColumn field="id" width={50}></AgGridColumn>
                     <AgGridColumn
-                        field="name"
                         sortable
                         filter
                         resizable={true}
                         flex={5}
+                        valueGetter={(params) =>
+                            `${params.data.first_name} ${params.data.last_name}`
+                        }
                     ></AgGridColumn>
                     <AgGridColumn
-                        flex={1}
+                        sortable
+                        filter
+                        resizable={true}
+                        flex={5}
+                        valueGetter={(params) =>
+                            workplacesById[params.data.workplace]?.name
+                        }
+                    />
+                    <AgGridColumn
+                        width={90}
                         headerName="Update"
                         field="id"
                         cellRenderer="btnRenderer"
@@ -90,7 +102,7 @@ const WorkplacesAgGrid = ({
                         }}
                     />
                     <AgGridColumn
-                        flex={1}
+                        width={90}
                         headerName="Delete"
                         field="id"
                         cellRenderer="btnRenderer"

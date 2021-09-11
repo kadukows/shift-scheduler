@@ -97,35 +97,39 @@ export const getApiGenericThunkAction = (
         };
 };
 
-export interface MyTextFieldProps<Inputs> {
+type MyTextFieldProps<Inputs> = {
     errors: ReactHookForm.FormState<Inputs>["errors"];
     name: keyof Inputs;
     isSubmitting: boolean;
     register: ReactHookForm.UseFormRegister<Inputs>;
-}
+} & Omit<React.ComponentProps<typeof TextField>, "variant">;
 
 export function MyTextField<Inputs>({
     isSubmitting,
     register,
     name,
     errors,
+    children,
     ...rest
-}: Omit<React.ComponentProps<typeof TextField>, "variant"> &
-    MyTextFieldProps<Inputs>) {
+}: React.PropsWithChildren<MyTextFieldProps<Inputs>>) {
     return (
-        // @ts-ignore
         <TextField
             variant="outlined"
-            // @ts-ignore
-            error={!!errors[name]}
-            // @ts-ignore
-            helperText={errors[name]?.message}
+            error={(name as keyof Inputs) in errors}
+            // @ts-expect-error
+            helperText={errors[name as keyof Inputs]?.message}
             fullWidth
             disabled={isSubmitting}
             label={name.charAt(0).toUpperCase() + name.slice(1)}
             {...rest}
             // @ts-ignore
             {...register(name)}
-        />
+        >
+            {children}
+        </TextField>
     );
+}
+
+export interface WithId {
+    id: number;
 }

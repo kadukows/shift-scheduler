@@ -50,6 +50,7 @@ const NoAuthLink = ({ ButtonStyled, children }: LinksProps) => (
 const AuthLink = ({ ButtonStyled, children }: LinksProps) => (
     <>
         <ButtonStyled to="/workplaces">Workplaces</ButtonStyled>
+        <ButtonStyled to="/employees">Employees</ButtonStyled>
         {children}
         <ButtonStyled to="/logout">Logout</ButtonStyled>
     </>

@@ -17,16 +17,10 @@ import { Link as RouterLink } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 
 import GenericAddOrUpdateForm from "../genericForm/GenericAddOrUpdateForm";
-import WorkplacesAgGrid from "./WorkplacesAgGrid";
-import WorkplaceForm, { Inputs as WorkplaceFormInputs } from "./WorkplaceForm";
-import {
-    Workplace,
-    addWorkplace,
-    removeWorkplaces,
-    workplaceSelectors,
-    removeWorkplace,
-    updateWorkplace,
-} from "../workplaces/workplaceSlice";
+import EmployeeAgGrid from "./EmployeeAgGrid";
+import EmployeeForm from "./EmployeeForm";
+
+import { Employee, addEmployee } from "./employeeSlice";
 import { addAlert } from "../alerts/alertsSlice";
 import { getTokenRequestConfig } from "../helpers";
 import { RootState } from "../../store";
@@ -43,67 +37,33 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-const newWorkplaceFormId = "new-workplace-form";
-const updateWorkplaceFormId = "update-workplace-form";
+const formIds = {
+    newEmployee: "new-employee-form-id",
+};
 
 const WorkplacesPage = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
     const auth = useSelector((state: RootState) => state.authReducer);
-    const workplacesById = useSelector(workplaceSelectors.selectEntities);
+    const [newModalOpen, setNewModalOpen] = React.useState(false);
+    //const workplacesById = useSelector(workplaceSelectors.selectEntities);
+    /*
     const [newModalOpen, setNewModalOpen] = React.useState(false);
     const [updateModalOpen, setUpdateModelOpen] = React.useState(false);
     const [updateModalId, setUpdateModalId] = React.useState<number>(null);
     const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
     const [deletedWorkplaceId, setDeletedWorkplaceId] =
         React.useState<number>(null);
-
-    const newWorkplaceOnSubmitted = (workplace: Workplace) => {
+    */
+    const newEmployeeOnSubmitted = (employee: Employee) => {
         dispatch(
             addAlert({
                 type: "success",
-                message: `Sucessfully created a workplace: "${workplace.name}"`,
+                message: `Sucessfully created a employee: "${employee.first_name} ${employee.last_name}"`,
             })
         );
-        dispatch(addWorkplace(workplace));
+        dispatch(addEmployee(employee));
         setNewModalOpen(false);
-    };
-
-    const updateWorkplaceSubmitted = (workplace: Workplace) => {
-        dispatch(
-            addAlert({
-                type: "info",
-                message: `Successfuly updated a workplace: "${workplace.name}"`,
-            })
-        );
-        dispatch(
-            updateWorkplace({
-                id: workplace.id,
-                changes: workplace,
-            })
-        );
-        setUpdateModelOpen(false);
-    };
-
-    const deleteWorkplaceById = async () => {
-        try {
-            await axios.delete(
-                `/api/workplace/${deletedWorkplaceId}/`,
-                getTokenRequestConfig(auth.token)
-            );
-        } catch (err) {
-            // pass
-        }
-
-        dispatch(
-            addAlert({
-                type: "info",
-                message: `Sucessfully deleted "${workplacesById[deletedWorkplaceId]?.name}".`,
-            })
-        );
-
-        dispatch(removeWorkplace(deletedWorkplaceId));
-        setDeleteModalOpen(false);
     };
 
     return (
@@ -111,9 +71,9 @@ const WorkplacesPage = () => {
             <Dialog open={newModalOpen} onClose={() => setNewModalOpen(false)}>
                 <DialogTitle>Add a workplace</DialogTitle>
                 <DialogContent className={classes.dialog}>
-                    <WorkplaceForm
-                        formId={newWorkplaceFormId}
-                        onSubmitted={newWorkplaceOnSubmitted}
+                    <EmployeeForm
+                        formId={formIds.newEmployee}
+                        onSubmitted={newEmployeeOnSubmitted}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -127,14 +87,14 @@ const WorkplacesPage = () => {
                     <Button
                         color="primary"
                         type="submit"
-                        form={newWorkplaceFormId}
+                        form={formIds.newEmployee}
                         variant="contained"
                     >
                         Add workplace
                     </Button>
                 </DialogActions>
             </Dialog>
-
+            {/*
             <Dialog
                 open={updateModalOpen}
                 onClose={() => setUpdateModelOpen(false)}
@@ -194,22 +154,22 @@ const WorkplacesPage = () => {
                 </DialogActions>
             </Dialog>
 
+            */}
             <Paper className={classes.paper} elevation={3}>
                 <Grid container direction="column" spacing={2}>
                     <Grid item>
                         <Typography variant="h5" component="h5">
-                            Your Workplaces <i className="fas fa-briefcase" />
+                            Your Employees{" "}
+                            <i className="fas fa-people-arrows"></i>
                         </Typography>
                     </Grid>
                     <Grid item>
-                        <WorkplacesAgGrid
+                        <EmployeeAgGrid
                             onClickCellDeletion={(id) => {
-                                setDeletedWorkplaceId(id);
-                                setDeleteModalOpen(true);
+                                alert(`Cell deletion ${id}`);
                             }}
                             onClickCellUpdate={(id) => {
-                                setUpdateModalId(id);
-                                setUpdateModelOpen(true);
+                                alert(`Update cell ${id}`);
                             }}
                         />
                     </Grid>

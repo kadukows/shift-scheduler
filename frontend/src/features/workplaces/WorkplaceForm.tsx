@@ -1,9 +1,9 @@
 import * as React from "react";
 import * as yup from "yup";
 
-import GenericForm, { Field } from "../../genericForm/GenericForm";
-import GenericAddOrUpdateForm from "../../genericForm/GenericAddOrUpdateForm";
-import { Workplace } from "../workplaceSlice";
+import GenericForm, { Field } from "../genericForm/GenericForm";
+import GenericAddOrUpdateForm from "../genericForm/GenericAddOrUpdateForm";
+import { Workplace } from "./workplaceSlice";
 
 export interface Inputs {
     name: string;
@@ -16,7 +16,7 @@ interface Props {
     objectToModify?: Workplace;
 }
 
-const fields: Field<Inputs>[] = [
+const fields: Field<Inputs, Workplace>[] = [
     {
         type: "string",
         name: "name",
@@ -24,13 +24,9 @@ const fields: Field<Inputs>[] = [
     },
 ];
 
-const WorkplaceFormAsGenericForm = ({
-    formId,
-    onSubmitted,
-    objectToModify,
-}: Props) => {
+const WorkplaceForm = ({ formId, onSubmitted, objectToModify }: Props) => {
     return (
-        <GenericAddOrUpdateForm<Inputs, Workplace>
+        <GenericAddOrUpdateForm<Inputs, Workplace, any>
             fields={fields}
             baseUrl="/api/workplace/"
             onSubmitted={onSubmitted}
@@ -40,4 +36,4 @@ const WorkplaceFormAsGenericForm = ({
     );
 };
 
-export default WorkplaceFormAsGenericForm;
+export default WorkplaceForm;
