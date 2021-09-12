@@ -10,6 +10,10 @@ import {
     employeeReducer,
     employeeObserver,
 } from "./features/employees/employeeSlice";
+import {
+    scheduleReducer,
+    scheduleObserver,
+} from "./features/schedules/scheduleSlice";
 
 import { observe } from "redux-observers";
 
@@ -20,9 +24,10 @@ export const store = configureStore({
         authReducer,
         workplaceReducer,
         employeeReducer,
+        scheduleReducer,
     },
 });
 
 export type RootState = ReturnType<typeof store.getState>;
 
-observe(store, [workplaceObserver, employeeObserver]);
+observe(store, [workplaceObserver, employeeObserver, scheduleObserver]);

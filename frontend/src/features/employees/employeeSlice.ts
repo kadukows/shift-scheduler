@@ -61,6 +61,7 @@ export const {
     updateEmployee,
     setLoading,
 } = employeeSlice.actions;
+
 export const employeeReducer = employeeSlice.reducer;
 
 export const getEmployees = getApiGenericThunkAction(

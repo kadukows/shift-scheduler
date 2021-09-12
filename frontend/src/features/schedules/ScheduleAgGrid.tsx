@@ -12,7 +12,7 @@ import {
 } from "@material-ui/core";
 import { AgGridColumn, AgGridReact } from "ag-grid-react";
 
-import { employeeSelectors } from "./employeeSlice";
+import { scheduleSelectors } from "./scheduleSlice";
 import { workplaceSelectors } from "../workplaces/workplaceSlice";
 
 import "ag-grid-community/dist/styles/ag-grid.css";
@@ -37,8 +37,8 @@ interface Props {
     onClickCellUpdate: (id: number) => void;
 }
 
-const EmployeeAgGrid = ({ onClickCellDeletion, onClickCellUpdate }: Props) => {
-    const employees = useSelector(employeeSelectors.selectAll);
+const ScheduleAgGrid = ({ onClickCellDeletion, onClickCellUpdate }: Props) => {
+    const schedules = useSelector(scheduleSelectors.selectAll);
     const workplacesById = useSelector(workplaceSelectors.selectEntities);
     const theme = useTheme();
 
@@ -54,7 +54,7 @@ const EmployeeAgGrid = ({ onClickCellDeletion, onClickCellUpdate }: Props) => {
                 style={{ minHeight: 50, width: "100%", overflow: "hidden" }}
             >
                 <AgGridReact
-                    rowData={employees}
+                    rowData={schedules}
                     rowSelection="multiple"
                     pagination
                     paginationPageSize={10}
@@ -74,15 +74,15 @@ const EmployeeAgGrid = ({ onClickCellDeletion, onClickCellUpdate }: Props) => {
                         filter
                         resizable={true}
                         flex={5}
-                        valueGetter={(params) =>
-                            `${params.data.first_name} ${params.data.last_name}`
-                        }
+                        headerName="Date"
+                        field="month_year"
                     ></AgGridColumn>
                     <AgGridColumn
                         sortable
                         filter
                         resizable={true}
                         flex={5}
+                        headerName="Workplace"
                         valueGetter={(params) =>
                             workplacesById[params.data.workplace]?.name
                         }
@@ -113,4 +113,4 @@ const EmployeeAgGrid = ({ onClickCellDeletion, onClickCellUpdate }: Props) => {
     );
 };
 
-export default EmployeeAgGrid;
+export default ScheduleAgGrid;

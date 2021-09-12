@@ -13,19 +13,15 @@ import {
 } from "@material-ui/core";
 import { useSelector, useDispatch } from "react-redux";
 
-import EmployeeAgGrid from "./EmployeeAgGrid";
-import EmployeeForm from "./EmployeeForm";
+//import EmployeeAgGrid from "./EmployeeAgGrid";
+//import EmployeeForm from "./EmployeeForm";
+import ScheduleAgGrid from "./ScheduleAgGrid";
 
-import {
-    Employee,
-    addEmployee,
-    updateEmployee,
-    employeeSelectors,
-    removeEmployee,
-} from "./employeeSlice";
+import { addSchedule, Schedule } from "./scheduleSlice";
 import { addAlert } from "../alerts/alertsSlice";
 import { getTokenRequestConfig } from "../helpers";
 import { RootState } from "../../store";
+import ScheduleForm from "./ScheduleForm";
 
 const useStyles = makeStyles((theme) => ({
     paper: {
@@ -40,38 +36,37 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 const formIds = {
-    newEmployee: "new-employee-form-id",
-    updateEmployee: "update-employee-form-id",
+    newSchedule: "new-schedule-form-id",
+    updateSchedule: "update-schedule-form-id",
 };
 
-const employeeToString = (employee: Employee) =>
-    employee ? `${employee.first_name} ${employee.last_name}` : "";
-
-const EmployeePage = () => {
+const SchedulePage = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    const employeesById = useSelector(employeeSelectors.selectEntities);
+    //const employeesById = useSelector(employeeSelectors.selectEntities);
     const auth = useSelector((state: RootState) => state.authReducer);
+
     const [newModalOpen, setNewModalOpen] = React.useState(false);
+    /*
     const [updateModalOpen, setUpdateModelOpen] = React.useState(false);
     const [updateModalId, setUpdateModalId] = React.useState<number>(null);
     const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
     const [deletedEmployeeId, setDeletedEmployeeId] =
         React.useState<number>(null);
+    */
 
-    const newEmployeeOnSubmitted = (employee: Employee) => {
+    const newScheduleSubmitted = (schedule: Schedule) => {
         dispatch(
             addAlert({
                 type: "success",
-                message: `Sucessfully created a employee: "${employeeToString(
-                    employee
-                )}"`,
+                message: `Sucessfully created a new schedule.`,
             })
         );
-        dispatch(addEmployee(employee));
+        dispatch(addSchedule(schedule));
         setNewModalOpen(false);
     };
 
+    /*
     const updateEmployeeOnSubmitted = (employee: Employee) => {
         dispatch(
             addAlert({
@@ -111,15 +106,16 @@ const EmployeePage = () => {
         dispatch(removeEmployee(deletedEmployeeId));
         setDeleteModalOpen(false);
     };
+    */
 
     return (
         <>
             <Dialog open={newModalOpen} onClose={() => setNewModalOpen(false)}>
                 <DialogTitle>Add a workplace</DialogTitle>
                 <DialogContent className={classes.dialog}>
-                    <EmployeeForm
-                        formId={formIds.newEmployee}
-                        onSubmitted={newEmployeeOnSubmitted}
+                    <ScheduleForm
+                        formId={formIds.newSchedule}
+                        onSubmitted={newScheduleSubmitted}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -133,14 +129,14 @@ const EmployeePage = () => {
                     <Button
                         color="primary"
                         type="submit"
-                        form={formIds.newEmployee}
+                        form={formIds.newSchedule}
                         variant="contained"
                     >
                         Add workplace
                     </Button>
                 </DialogActions>
             </Dialog>
-
+            {/*
             <Dialog
                 open={updateModalOpen}
                 onClose={() => setUpdateModelOpen(false)}
@@ -199,24 +195,23 @@ const EmployeePage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+            */}
 
             <Paper className={classes.paper} elevation={3}>
                 <Grid container direction="column" spacing={2}>
                     <Grid item>
                         <Typography variant="h5" component="h5">
-                            Your Employees{" "}
+                            Your Schedules{" "}
                             <i className="fas fa-people-arrows"></i>
                         </Typography>
                     </Grid>
                     <Grid item>
-                        <EmployeeAgGrid
+                        <ScheduleAgGrid
                             onClickCellDeletion={(id) => {
-                                setDeletedEmployeeId(id);
-                                setDeleteModalOpen(true);
+                                alert("Delete");
                             }}
                             onClickCellUpdate={(id) => {
-                                setUpdateModalId(id);
-                                setUpdateModelOpen(true);
+                                alert("Update");
                             }}
                         />
                     </Grid>
@@ -239,4 +234,4 @@ const EmployeePage = () => {
     );
 };
 
-export default EmployeePage;
+export default SchedulePage;

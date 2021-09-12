@@ -51,6 +51,7 @@ const AuthLink = ({ ButtonStyled, children }: LinksProps) => (
     <>
         <ButtonStyled to="/workplaces">Workplaces</ButtonStyled>
         <ButtonStyled to="/employees">Employees</ButtonStyled>
+        <ButtonStyled to="/schedules">Schedule</ButtonStyled>
         {children}
         <ButtonStyled to="/logout">Logout</ButtonStyled>
     </>

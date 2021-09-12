@@ -6,32 +6,28 @@ import { FieldData } from "../genericForm/fieldInstance/Field";
 import GenericAddOrUpdateForm from "../genericForm/GenericAddOrUpdateForm";
 import { Employee, employeeSelectors } from "../employees/employeeSlice";
 import { Workplace, workplaceSelectors } from "../workplaces/workplaceSlice";
+import { Schedule } from "./scheduleSlice";
 
 export interface Inputs {
-    first_name: string;
-    last_name: string;
+    month_year: string;
     workplace: number;
 }
 
 interface Props {
     formId: string;
-    onSubmitted: (entity: Employee) => void;
-    objectToModify?: Employee;
+    onSubmitted: (entity: Schedule) => void;
+    objectToModify?: Schedule;
 }
 
 const fields: FieldData<Inputs, Workplace>[] = [
+    /*
     {
-        type: "string",
-        name: "first_name",
-        label: "First name",
+        type: "Datetime",
+        name: "month_year",
+        label: "Date",
         validation: yup.string().required().min(2),
     },
-    {
-        type: "string",
-        name: "last_name",
-        label: "Last name",
-        validation: yup.string().required().min(2),
-    },
+    */
     {
         type: "choose_object",
         name: "workplace",
@@ -40,14 +36,14 @@ const fields: FieldData<Inputs, Workplace>[] = [
         //
         entitySelector: workplaceSelectors.selectAll,
         entityToString: (workplace) => workplace.name,
-    } as FieldData<Inputs, Workplace>,
+    },
 ];
 
-const EmployeeForm = ({ formId, onSubmitted, objectToModify }: Props) => {
+const ScheduleForm = ({ formId, onSubmitted, objectToModify }: Props) => {
     return (
-        <GenericAddOrUpdateForm<Inputs, Employee, Workplace>
+        <GenericAddOrUpdateForm<Inputs, Schedule, Workplace>
             fields={fields}
-            baseUrl="/api/employee/"
+            baseUrl="/api/schedule/"
             onSubmitted={onSubmitted}
             formId={formId}
             objectToModify={objectToModify}
@@ -55,4 +51,4 @@ const EmployeeForm = ({ formId, onSubmitted, objectToModify }: Props) => {
     );
 };
 
-export default EmployeeForm;
+export default ScheduleForm;
