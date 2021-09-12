@@ -11,7 +11,7 @@ import { BaseFieldProps } from "./fieldInstance/BaseFieldProps";
 
 interface Props<Inputs, Entity extends WithId> {
     fields: FieldData<Inputs, Entity>[];
-    submit: (a: Inputs) => void;
+    submit: (a: any) => void;
     formId: string;
     defaultValues?: Inputs;
 }
@@ -31,6 +31,8 @@ function GenericForm<Inputs, Entity extends WithId>({
 
     const fieldNames: (keyof Inputs)[] = fields.map((field) => field.name);
 
+    console.log("DefaultValues", defaultValues);
+
     const {
         register,
         handleSubmit,
@@ -45,7 +47,7 @@ function GenericForm<Inputs, Entity extends WithId>({
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {
-            await submit(data as unknown as Inputs);
+            await submit(data as any);
         } catch (err: any | AxiosError<DjangoErrors<Inputs>>) {
             if (axios.isAxiosError(err)) {
                 const error: AxiosError<DjangoErrors<Inputs>> = err;

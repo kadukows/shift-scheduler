@@ -2,6 +2,8 @@ import * as React from "react";
 import { Provider } from "react-redux";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import { CssBaseline, makeStyles, Container, Grid } from "@material-ui/core";
+import { MuiPickersUtilsProvider } from "@material-ui/pickers";
+import DateFnsUtils from "@date-io/date-fns";
 
 import { store } from "./store";
 
@@ -30,39 +32,41 @@ const App = () => {
             {/* This component tries to authenticate the user upon site loading (with localStorage "token"). */}
             <TryAuthWithCurrentToken />
             <DarkThemeProvider>
-                <CssBaseline />
-                <Router>
-                    <Navbar />
-                    <Container className={classes.container}>
-                        <Grid container spacing={2} direction="column">
-                            <Grid item>
-                                <AlertsList />
+                <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <CssBaseline />
+                    <Router>
+                        <Navbar />
+                        <Container className={classes.container}>
+                            <Grid container spacing={2} direction="column">
+                                <Grid item>
+                                    <AlertsList />
+                                </Grid>
+                                <Grid item>
+                                    <Switch>
+                                        <Route exact path="/">
+                                            <IndexPage />
+                                        </Route>
+                                        <Route exact path="/login">
+                                            <LoginForm />
+                                        </Route>
+                                        <Route exact path="/logout">
+                                            <LogoutPage />
+                                        </Route>
+                                        <Route exact path="/workplaces">
+                                            <WorkplacesPage />
+                                        </Route>
+                                        <Route exact path="/employees">
+                                            <EmployeePage />
+                                        </Route>
+                                        <Route exact path="/schedules">
+                                            <SchedulePage />
+                                        </Route>
+                                    </Switch>
+                                </Grid>
                             </Grid>
-                            <Grid item>
-                                <Switch>
-                                    <Route exact path="/">
-                                        <IndexPage />
-                                    </Route>
-                                    <Route exact path="/login">
-                                        <LoginForm />
-                                    </Route>
-                                    <Route exact path="/logout">
-                                        <LogoutPage />
-                                    </Route>
-                                    <Route exact path="/workplaces">
-                                        <WorkplacesPage />
-                                    </Route>
-                                    <Route exact path="/employees">
-                                        <EmployeePage />
-                                    </Route>
-                                    <Route exact path="/schedules">
-                                        <SchedulePage />
-                                    </Route>
-                                </Switch>
-                            </Grid>
-                        </Grid>
-                    </Container>
-                </Router>
+                        </Container>
+                    </Router>
+                </MuiPickersUtilsProvider>
             </DarkThemeProvider>
         </Provider>
     );

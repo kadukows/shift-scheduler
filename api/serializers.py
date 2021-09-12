@@ -76,7 +76,7 @@ class EmployeeSerializer(ReadOnlyUponActionSerializerMixin, serializers.ModelSer
 
 class ScheduleSerializer(ReadOnlyUponActionSerializerMixin, serializers.ModelSerializer):
     action_to_ro_fields = {
-        'update': ['workplace', 'month_year']
+        #'update': ['workplace', 'month_year']
     }
 
     month_year = serializers.DateField(format='%m.%Y', input_formats=['%m.%Y'])

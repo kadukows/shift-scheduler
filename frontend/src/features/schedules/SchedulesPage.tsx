@@ -17,7 +17,12 @@ import { useSelector, useDispatch } from "react-redux";
 //import EmployeeForm from "./EmployeeForm";
 import ScheduleAgGrid from "./ScheduleAgGrid";
 
-import { addSchedule, Schedule } from "./scheduleSlice";
+import {
+    addSchedule,
+    Schedule,
+    scheduleSelectors,
+    updateSchedule,
+} from "./scheduleSlice";
 import { addAlert } from "../alerts/alertsSlice";
 import { getTokenRequestConfig } from "../helpers";
 import { RootState } from "../../store";
@@ -44,12 +49,14 @@ const SchedulePage = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
     //const employeesById = useSelector(employeeSelectors.selectEntities);
+    const schedulesById = useSelector(scheduleSelectors.selectEntities);
     const auth = useSelector((state: RootState) => state.authReducer);
 
     const [newModalOpen, setNewModalOpen] = React.useState(false);
-    /*
+
     const [updateModalOpen, setUpdateModelOpen] = React.useState(false);
     const [updateModalId, setUpdateModalId] = React.useState<number>(null);
+    /*
     const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
     const [deletedEmployeeId, setDeletedEmployeeId] =
         React.useState<number>(null);
@@ -66,24 +73,23 @@ const SchedulePage = () => {
         setNewModalOpen(false);
     };
 
-    /*
-    const updateEmployeeOnSubmitted = (employee: Employee) => {
+    const updateScheduleOnSubmitted = (schedule: Schedule) => {
         dispatch(
             addAlert({
                 type: "info",
-                message: `Successfully updated an employee: "${employee.first_name} ${employee.last_name}"`,
+                message: `Successfully updated a schedule`,
             })
         );
         dispatch(
-            updateEmployee({
-                id: employee.id,
-                changes: employee,
+            updateSchedule({
+                id: schedule.id,
+                changes: schedule,
             })
         );
 
         setUpdateModelOpen(false);
     };
-
+    /*
     const deleteEmployeeById = async () => {
         try {
             await axios.delete(
@@ -111,7 +117,7 @@ const SchedulePage = () => {
     return (
         <>
             <Dialog open={newModalOpen} onClose={() => setNewModalOpen(false)}>
-                <DialogTitle>Add a workplace</DialogTitle>
+                <DialogTitle>Add a schedule</DialogTitle>
                 <DialogContent className={classes.dialog}>
                     <ScheduleForm
                         formId={formIds.newSchedule}
@@ -132,21 +138,21 @@ const SchedulePage = () => {
                         form={formIds.newSchedule}
                         variant="contained"
                     >
-                        Add workplace
+                        Add schedule
                     </Button>
                 </DialogActions>
             </Dialog>
-            {/*
+
             <Dialog
                 open={updateModalOpen}
                 onClose={() => setUpdateModelOpen(false)}
             >
-                <DialogTitle>Update employee</DialogTitle>
+                <DialogTitle>Update schedule</DialogTitle>
                 <DialogContent className={classes.dialog}>
-                    <EmployeeForm
-                        formId={formIds.updateEmployee}
-                        onSubmitted={updateEmployeeOnSubmitted}
-                        objectToModify={employeesById[updateModalId]}
+                    <ScheduleForm
+                        formId={formIds.updateSchedule}
+                        onSubmitted={updateScheduleOnSubmitted}
+                        objectToModify={schedulesById[updateModalId]}
                     />
                 </DialogContent>
                 <DialogActions>
@@ -160,14 +166,14 @@ const SchedulePage = () => {
                     <Button
                         color="primary"
                         type="submit"
-                        form={formIds.updateEmployee}
+                        form={formIds.updateSchedule}
                         variant="contained"
                     >
-                        Add Employee
+                        Update schedule
                     </Button>
                 </DialogActions>
             </Dialog>
-
+            {/*
             <Dialog
                 open={deleteModalOpen}
                 onClose={() => setDeleteModalOpen(false)}
@@ -211,7 +217,8 @@ const SchedulePage = () => {
                                 alert("Delete");
                             }}
                             onClickCellUpdate={(id) => {
-                                alert("Update");
+                                setUpdateModalId(id);
+                                setUpdateModelOpen(true);
                             }}
                         />
                     </Grid>
