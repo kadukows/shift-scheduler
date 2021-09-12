@@ -19,6 +19,7 @@ import ScheduleAgGrid from "./ScheduleAgGrid";
 
 import {
     addSchedule,
+    removeSchedule,
     Schedule,
     scheduleSelectors,
     updateSchedule,
@@ -56,11 +57,8 @@ const SchedulePage = () => {
 
     const [updateModalOpen, setUpdateModelOpen] = React.useState(false);
     const [updateModalId, setUpdateModalId] = React.useState<number>(null);
-    /*
     const [deleteModalOpen, setDeleteModalOpen] = React.useState(false);
-    const [deletedEmployeeId, setDeletedEmployeeId] =
-        React.useState<number>(null);
-    */
+    const [deletedModalId, setDeletedModalId] = React.useState<number>(null);
 
     const newScheduleSubmitted = (schedule: Schedule) => {
         dispatch(
@@ -89,11 +87,11 @@ const SchedulePage = () => {
 
         setUpdateModelOpen(false);
     };
-    /*
-    const deleteEmployeeById = async () => {
+
+    const deleteScheduleById = async () => {
         try {
             await axios.delete(
-                `/api/employee/${deletedEmployeeId}/`,
+                `/api/schedule/${deletedModalId}/`,
                 getTokenRequestConfig(auth.token)
             );
         } catch (err) {
@@ -103,16 +101,13 @@ const SchedulePage = () => {
         dispatch(
             addAlert({
                 type: "info",
-                message: `Sucessfully deleted "${employeeToString(
-                    employeesById[deletedEmployeeId]
-                )}".`,
+                message: `Sucessfully deleted schedule.`,
             })
         );
 
-        dispatch(removeEmployee(deletedEmployeeId));
+        dispatch(removeSchedule(deletedModalId));
         setDeleteModalOpen(false);
     };
-    */
 
     return (
         <>
@@ -173,15 +168,14 @@ const SchedulePage = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
-            {/*
+
             <Dialog
                 open={deleteModalOpen}
                 onClose={() => setDeleteModalOpen(false)}
             >
-                <DialogTitle>Remove workplaces</DialogTitle>
+                <DialogTitle>Remove schedule</DialogTitle>
                 <DialogContent>
-                    Are you sure you want to delete "
-                    {employeeToString(employeesById[deletedEmployeeId])}"?
+                    Are you sure you want to delete this schedule?
                 </DialogContent>
                 <DialogActions>
                     <Button
@@ -194,27 +188,27 @@ const SchedulePage = () => {
                     <Button
                         color="primary"
                         type="submit"
-                        onClick={deleteEmployeeById}
+                        onClick={deleteScheduleById}
                         variant="contained"
                     >
                         Delete
                     </Button>
                 </DialogActions>
             </Dialog>
-            */}
 
             <Paper className={classes.paper} elevation={3}>
                 <Grid container direction="column" spacing={2}>
                     <Grid item>
                         <Typography variant="h5" component="h5">
                             Your Schedules{" "}
-                            <i className="fas fa-people-arrows"></i>
+                            <i className="far fa-calendar-check" />
                         </Typography>
                     </Grid>
                     <Grid item>
                         <ScheduleAgGrid
                             onClickCellDeletion={(id) => {
-                                alert("Delete");
+                                setDeletedModalId(id);
+                                setDeleteModalOpen(true);
                             }}
                             onClickCellUpdate={(id) => {
                                 setUpdateModalId(id);
