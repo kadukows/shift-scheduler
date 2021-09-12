@@ -3,7 +3,7 @@ import * as yup from "yup";
 import { useSelector } from "react-redux";
 import { Controller, Control } from "react-hook-form";
 import { DatePicker, DatePickerView } from "@material-ui/pickers";
-//import {} from "date-fns"
+import { parse, format } from "date-fns";
 
 import { RootState } from "../../../store";
 import { WithId, MyTextField } from "../../helpers";
@@ -22,10 +22,11 @@ export interface DateFieldData<Inputs> {
     type: "date";
     name: keyof Inputs;
     label?: string;
+    // this validates date as string
     validation: DateYupValidationBuilderType;
     //
     views: DatePickerView[];
-    format?: string;
+    format: string;
 }
 
 interface DateFieldDataProps<Inputs> extends BaseFieldProps<Inputs> {
@@ -36,7 +37,7 @@ interface DateFieldDataProps<Inputs> extends BaseFieldProps<Inputs> {
 /**
  *  Component definition
  */
-const defaultVal = new Date("01/01/1999");
+//const defaultVal = new Date("01/01/1999");
 
 const DateField = <Inputs extends unknown>({
     field,
@@ -53,21 +54,22 @@ const DateField = <Inputs extends unknown>({
             render={({
                 field: { onChange, onBlur, value, name, ref },
                 fieldState: { invalid, isTouched, isDirty, error },
-            }) => {
-                console.log("value", value);
-
-                return (
-                    <DatePicker
-                        label={field.label}
-                        fullWidth
-                        error={invalid}
-                        helperText={error?.message}
-                        views={field.views}
-                        value={value}
-                        onChange={onChange}
-                    />
-                );
-            }}
+            }) => (
+                <DatePicker
+                    label={field.label}
+                    fullWidth
+                    error={invalid}
+                    helperText={error?.message}
+                    views={field.views}
+                    //
+                    ref={ref}
+                    name={name}
+                    value={parse(value, field.format, new Date())}
+                    onChange={(date: Date) => {
+                        onChange(format(date, field.format));
+                    }}
+                />
+            )}
         />
     );
 };

@@ -24,14 +24,19 @@ interface Props {
     objectToModify?: Schedule;
 }
 
+function parseDate(value: any, originalValue: string) {
+    return parse(originalValue, "MM.yyyy", new Date());
+}
+
 const fields: FieldData<Inputs, Workplace>[] = [
     {
         type: "date",
         name: "month_year",
         label: "Date",
-        validation: yup.date().required(),
+        validation: yup.string().required() as any,
         //
         views: ["month", "year"],
+        format: "MM.yyyy",
     },
     {
         type: "choose_object",
@@ -44,53 +49,12 @@ const fields: FieldData<Inputs, Workplace>[] = [
     },
 ];
 
-const baseUrl = "/api/schedule/";
-
-const ScheduleForm = ({ formId, onSubmitted, objectToModify }: Props) => {
-    const auth = useSelector((state: RootState) => state.authReducer);
-
-    const defaultValues = objectToModify
-        ? {
-              ...objectToModify,
-              month_year: parse(
-                  objectToModify.month_year,
-                  "MM.yyyy",
-                  new Date()
-              ),
-          }
-        : undefined;
-
+const ScheduleForm = (props: Props) => {
     return (
-        <GenericForm<Inputs, Workplace>
+        <GenericAddOrUpdateForm
             fields={fields}
-            formId={formId}
-            // @ts-ignore
-            defaultValues={defaultValues}
-            submit={async (inputs: Inputs & { month_year: Date }) => {
-                let res: AxiosResponse<Schedule> = null;
-
-                const data = {
-                    ...inputs,
-                    month_year: format(inputs.month_year as Date, "MM.yyyy"),
-                };
-
-                if (!objectToModify) {
-                    res = await axios.post<Schedule>(
-                        baseUrl,
-                        data,
-                        getTokenRequestConfig(auth.token)
-                    );
-                } else {
-                    //throw new Error("NYI");
-                    res = await axios.put<Schedule>(
-                        baseUrl + `${objectToModify.id}/`,
-                        data,
-                        getTokenRequestConfig(auth.token)
-                    );
-                }
-
-                onSubmitted(res.data);
-            }}
+            baseUrl="/api/schedule/"
+            {...props}
         />
     );
 };
