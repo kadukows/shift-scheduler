@@ -1,3 +1,9 @@
 export const ItemTypes = {
-    DRAGGABLETHING: "DRAGGABLETHING",
+    COLORSQUARE: "COLORSQUARE",
 };
+
+export namespace ItemTypesPassed {
+    export interface COLORSQUARE {
+        color: string;
+    }
+}

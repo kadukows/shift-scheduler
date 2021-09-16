@@ -1,7 +1,10 @@
 import * as React from "react";
+import { useDrag } from "react-dnd";
 import { useDispatch, useSelector } from "react-redux";
+import { Paper } from "@material-ui/core";
 
 import { RootState } from "../../store";
+import { ItemTypes, ItemTypesPassed } from "../dndTypes/DndTypes";
 import { setChosenColor } from "./draggableThingsSlice";
 
 const MyDiv = ({ style }: any) => (
@@ -20,10 +23,13 @@ interface ColorSquareProps {
 
 const ColorSquare = ({ color }: ColorSquareProps) => {
     const dispatch = useDispatch();
-    const selected =
-        useSelector(
-            (state: RootState) => state.draggableThingsReducer.chosenColor
-        ) === color;
+    const [{ isDragging }, drag] = useDrag(() => ({
+        type: ItemTypes.COLORSQUARE,
+        item: { color } as ItemTypesPassed.COLORSQUARE,
+        collect: (monitor) => ({
+            isDragging: monitor.isDragging(),
+        }),
+    }));
 
     return (
         <div
@@ -31,20 +37,23 @@ const ColorSquare = ({ color }: ColorSquareProps) => {
                 width: "100%",
                 height: "100%",
                 backgroundColor: color,
-                border: selected ? "3px solid yellow" : "3px dotted white",
+                border: "1px solid black",
+                opacity: isDragging ? 0.4 : 1.0,
             }}
-            onClick={() => dispatch(setChosenColor(color))}
+            ref={drag}
         />
     );
 };
 
 const DraggableThingsDrawer = () => {
     return (
-        <div className="drawer-container">
-            <ColorSquare color="#0074D9" />
-            <ColorSquare color="#85144b" />
-            <ColorSquare color="#3D9970" />
-        </div>
+        <Paper style={{ padding: "1rem" }}>
+            <div className="drawer-container">
+                <ColorSquare color="#0074D9" />
+                <ColorSquare color="#85144b" />
+                <ColorSquare color="#3D9970" />
+            </div>
+        </Paper>
     );
 };
 

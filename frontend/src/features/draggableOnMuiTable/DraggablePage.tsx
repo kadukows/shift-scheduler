@@ -6,7 +6,12 @@ import DraggableMuiTable from "./DraggableMuiTable";
 
 const DraggablePage = () => {
     return (
-        <Grid container spacing={2} justifyContent="space-around">
+        <Grid
+            container
+            spacing={2}
+            justifyContent="space-around"
+            alignContent="center"
+        >
             <Grid item>
                 <DraggableThingsDrawer />
             </Grid>
