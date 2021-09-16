@@ -1,4 +1,3 @@
-import { Restaurant } from "@material-ui/icons";
 import {
     createSlice,
     PayloadAction,

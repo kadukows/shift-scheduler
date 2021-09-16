@@ -14,6 +14,7 @@ import {
     scheduleReducer,
     scheduleObserver,
 } from "./features/schedules/scheduleSlice";
+import { draggableThingsReducer } from "./features/draggableOnMuiTable/draggableThingsSlice";
 
 import { observe } from "redux-observers";
 
@@ -25,6 +26,7 @@ export const store = configureStore({
         workplaceReducer,
         employeeReducer,
         scheduleReducer,
+        draggableThingsReducer,
     },
 });
 

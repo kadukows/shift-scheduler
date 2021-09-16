@@ -17,6 +17,9 @@ import TryAuthWithCurrentToken from "./features/auth/TryAuthWithCurrentToken";
 import WorkplacesPage from "./features/workplaces/WorkplacesPage";
 import EmployeePage from "./features/employees/EmployeePage";
 import SchedulePage from "./features/schedules/SchedulesPage";
+import { DndProvider } from "react-dnd";
+import { HTML5Backend } from "react-dnd-html5-backend";
+import DraggablePage from "./features/draggableOnMuiTable/DraggablePage";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -29,45 +32,50 @@ const App = () => {
 
     return (
         <Provider store={store}>
-            {/* This component tries to authenticate the user upon site loading (with localStorage "token"). */}
-            <TryAuthWithCurrentToken />
-            <DarkThemeProvider>
-                <MuiPickersUtilsProvider utils={DateFnsUtils}>
-                    <CssBaseline />
-                    <Router>
-                        <Navbar />
-                        <Container className={classes.container}>
-                            <Grid container spacing={2} direction="column">
-                                <Grid item>
-                                    <AlertsList />
+            <DndProvider backend={HTML5Backend}>
+                {/* This component tries to authenticate the user upon site loading (with localStorage "token"). */}
+                <TryAuthWithCurrentToken />
+                <DarkThemeProvider>
+                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                        <CssBaseline />
+                        <Router>
+                            <Navbar />
+                            <Container className={classes.container}>
+                                <Grid container spacing={2} direction="column">
+                                    <Grid item>
+                                        <AlertsList />
+                                    </Grid>
+                                    <Grid item>
+                                        <Switch>
+                                            <Route exact path="/">
+                                                <IndexPage />
+                                            </Route>
+                                            <Route exact path="/login">
+                                                <LoginForm />
+                                            </Route>
+                                            <Route exact path="/logout">
+                                                <LogoutPage />
+                                            </Route>
+                                            <Route exact path="/workplaces">
+                                                <WorkplacesPage />
+                                            </Route>
+                                            <Route exact path="/employees">
+                                                <EmployeePage />
+                                            </Route>
+                                            <Route exact path="/schedules">
+                                                <SchedulePage />
+                                            </Route>
+                                            <Route exact path="/draggables">
+                                                <DraggablePage />
+                                            </Route>
+                                        </Switch>
+                                    </Grid>
                                 </Grid>
-                                <Grid item>
-                                    <Switch>
-                                        <Route exact path="/">
-                                            <IndexPage />
-                                        </Route>
-                                        <Route exact path="/login">
-                                            <LoginForm />
-                                        </Route>
-                                        <Route exact path="/logout">
-                                            <LogoutPage />
-                                        </Route>
-                                        <Route exact path="/workplaces">
-                                            <WorkplacesPage />
-                                        </Route>
-                                        <Route exact path="/employees">
-                                            <EmployeePage />
-                                        </Route>
-                                        <Route exact path="/schedules">
-                                            <SchedulePage />
-                                        </Route>
-                                    </Switch>
-                                </Grid>
-                            </Grid>
-                        </Container>
-                    </Router>
-                </MuiPickersUtilsProvider>
-            </DarkThemeProvider>
+                            </Container>
+                        </Router>
+                    </MuiPickersUtilsProvider>
+                </DarkThemeProvider>
+            </DndProvider>
         </Provider>
     );
 };
