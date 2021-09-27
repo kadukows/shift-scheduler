@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link as RouterLink } from "react-router-dom";
+import { Link as RouterLink, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
 import {
     makeStyles,
@@ -30,6 +30,7 @@ const useStyles = makeStyles((theme) => ({
     appbarSpacer: theme.mixins.toolbar,
 }));
 
+/*
 const MyButton = (
     props: React.ComponentProps<typeof Button> &
         React.ComponentProps<typeof RouterLink>
@@ -38,6 +39,7 @@ const MyButton = (
         <Button color="inherit" component={RouterLink} {...props} />
     </Grid>
 );
+*/
 
 type LinksProps = React.PropsWithChildren<{ ButtonStyled: React.ElementType }>;
 
@@ -52,6 +54,7 @@ const AuthLink = ({ ButtonStyled, children }: LinksProps) => (
         <ButtonStyled to="/workplaces">Workplaces</ButtonStyled>
         <ButtonStyled to="/employees">Employees</ButtonStyled>
         <ButtonStyled to="/schedules">Schedule</ButtonStyled>
+        {/*<ButtonStyled to="/planner">Planner</ButtonStyled>*/}
         {children}
         <ButtonStyled to="/logout">Logout</ButtonStyled>
     </>
@@ -65,11 +68,13 @@ const Navbar = (props: Props) => {
         className,
         ...rest
     }: React.ComponentProps<typeof Button> &
-        React.ComponentProps<typeof RouterLink>) => (
+        React.ComponentProps<typeof NavLink>) => (
         <Button
             color="inherit"
-            component={RouterLink}
+            component={NavLink}
             className={combineClx(classes.menuButton, className)}
+            activeClassName="Mui-disabled"
+            exact
             {...rest}
         />
     );

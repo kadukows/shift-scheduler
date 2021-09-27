@@ -49,7 +49,7 @@ const formIds = {
 const SchedulePage = () => {
     const classes = useStyles();
     const dispatch = useDispatch();
-    //const employeesById = useSelector(employeeSelectors.selectEntities);
+
     const schedulesById = useSelector(scheduleSelectors.selectEntities);
     const auth = useSelector((state: RootState) => state.authReducer);
 

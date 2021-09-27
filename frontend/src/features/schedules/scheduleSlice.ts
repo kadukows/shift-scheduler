@@ -2,14 +2,11 @@ import {
     createSlice,
     createEntityAdapter,
     PayloadAction,
-    ThunkAction,
-    AnyAction,
 } from "@reduxjs/toolkit";
 
 import {
     getApiGenericThunkAction,
     makeDispatchActionWhenAuthedObserver,
-    sortByLastModified,
 } from "../helpers";
 import { RootState } from "../../store";
 
@@ -25,10 +22,12 @@ const scheduleAdapter = createEntityAdapter<Schedule>();
 interface ScheduleState
     extends ReturnType<typeof scheduleAdapter.getInitialState> {
     loading: boolean;
+    loaded: boolean;
 }
 
 const initialState: ScheduleState = {
     loading: false,
+    loaded: false,
     ...scheduleAdapter.getInitialState(),
 };
 
@@ -44,6 +43,10 @@ const scheduleSlice = createSlice({
         updateSchedule: scheduleAdapter.updateOne,
         //
         setLoading(state, action: PayloadAction<boolean>) {
+            if (state.loading === true && action.payload === false) {
+                state.loaded = true;
+            }
+
             state.loading = action.payload;
         },
     },

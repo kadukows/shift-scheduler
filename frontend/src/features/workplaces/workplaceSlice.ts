@@ -28,10 +28,12 @@ const workplaceAdapter = createEntityAdapter<Workplace>({
 interface WorkplaceState
     extends ReturnType<typeof workplaceAdapter.getInitialState> {
     loading: boolean;
+    loaded: boolean;
 }
 
 const initialState: WorkplaceState = {
     loading: false,
+    loaded: false,
     ...workplaceAdapter.getInitialState(),
 };
 
@@ -46,6 +48,10 @@ const workplaceSlice = createSlice({
         removeWorkplaces: workplaceAdapter.removeMany,
         updateWorkplace: workplaceAdapter.updateOne,
         setLoading(state, action: PayloadAction<boolean>) {
+            if (state.loading === true && action.payload === false) {
+                state.loaded = true;
+            }
+
             state.loading = action.payload;
         },
     },

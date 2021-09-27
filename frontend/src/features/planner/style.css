@@ -1,0 +1,8 @@
+.planner-board {
+    display: grid;
+    grid-gap: 1em;
+}
+
+.planner-board-paper {
+    padding: 16px;
+}

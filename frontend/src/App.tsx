@@ -21,6 +21,8 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import DraggablePage from "./features/draggableOnMuiTable/DraggablePage";
 import PrivateRoute from "./features/auth/PrivateRote";
+import PlannerBoard from "./features/planner/PlannerBoard";
+import PlannerLoader from "./features/planner/PlannerLoader";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -74,6 +76,9 @@ const App = () => {
                                                 path="/schedules"
                                             >
                                                 <SchedulePage />
+                                            </PrivateRoute>
+                                            <PrivateRoute path="/planner/:schedule_id">
+                                                <PlannerLoader />
                                             </PrivateRoute>
                                             <PrivateRoute
                                                 exact

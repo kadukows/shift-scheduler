@@ -16,6 +16,7 @@ import {
 } from "./features/schedules/scheduleSlice";
 import { draggableThingsReducer } from "./features/draggableOnMuiTable/draggableThingsSlice";
 import { roleReducer, roleObserver } from "./features/roles/rolesSlice";
+import { shiftReducer, shiftObserver } from "./features/shifts/shiftSlice";
 
 import { observe } from "redux-observers";
 
@@ -29,6 +30,7 @@ export const store = configureStore({
         scheduleReducer,
         draggableThingsReducer,
         roleReducer,
+        shiftReducer,
     },
 });
 
@@ -39,4 +41,5 @@ observe(store, [
     employeeObserver,
     scheduleObserver,
     roleObserver,
+    shiftObserver,
 ]);

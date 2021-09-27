@@ -32,12 +32,15 @@ class Schedule(LastModifiedBaseModel):
     month_year: date = models.DateField(null=False)  # we only need a month and a year
 
     def __str__(self):
-        return f'{self.workplace} - {self.month_year.strftime("%m.%Y")}'
+        return f'{self.workplace} -- {self.month_year.strftime("%m.%Y")}'
 
 
 class Role(LastModifiedBaseModel):
     name: str = models.CharField(max_length=128, null=False)
     workplace: Workplace = models.ForeignKey(Workplace, on_delete=models.CASCADE, related_name='roles', null=False)
+
+    def __str__(self):
+        return f'{self.name} -- {self.workplace}'
 
 
 class Shift(LastModifiedBaseModel):
@@ -46,3 +49,6 @@ class Shift(LastModifiedBaseModel):
     time_to: datetime = models.DateTimeField(null=False)
     employee: Employee = models.ForeignKey(Employee, on_delete=models.CASCADE, related_name='shifts', null=False)
     role: Role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name='shifts', null=False)
+
+    def __str__(self):
+        return f'{self.employee} -- {self.role.name} -- {self.schedule}'
