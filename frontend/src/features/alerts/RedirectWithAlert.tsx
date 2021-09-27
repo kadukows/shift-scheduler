@@ -4,18 +4,17 @@ import { Redirect } from "react-router-dom";
 
 import { Alert, addAlert } from "./alertsSlice";
 
-interface Props {
+interface Props extends React.ComponentProps<typeof Redirect> {
     alert: Alert;
-    to: string;
 }
 
-const RedirectWithAlert = ({ alert, to }: Props) => {
+const RedirectWithAlert = ({ alert, ...rest }: Props) => {
     const dispatch = useDispatch();
     React.useEffect(() => {
         dispatch(addAlert(alert));
     }, []);
 
-    return <Redirect to={to} />;
+    return <Redirect {...rest} />;
 };
 
 export default RedirectWithAlert;

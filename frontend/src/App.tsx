@@ -20,6 +20,7 @@ import SchedulePage from "./features/schedules/SchedulesPage";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import DraggablePage from "./features/draggableOnMuiTable/DraggablePage";
+import PrivateRoute from "./features/auth/PrivateRote";
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -56,18 +57,30 @@ const App = () => {
                                             <Route exact path="/logout">
                                                 <LogoutPage />
                                             </Route>
-                                            <Route exact path="/workplaces">
+                                            <PrivateRoute
+                                                exact
+                                                path="/workplaces"
+                                            >
                                                 <WorkplacesPage />
-                                            </Route>
-                                            <Route exact path="/employees">
+                                            </PrivateRoute>
+                                            <PrivateRoute
+                                                exact
+                                                path="/employees"
+                                            >
                                                 <EmployeePage />
-                                            </Route>
-                                            <Route exact path="/schedules">
+                                            </PrivateRoute>
+                                            <PrivateRoute
+                                                exact
+                                                path="/schedules"
+                                            >
                                                 <SchedulePage />
-                                            </Route>
-                                            <Route exact path="/draggables">
+                                            </PrivateRoute>
+                                            <PrivateRoute
+                                                exact
+                                                path="/draggables"
+                                            >
                                                 <DraggablePage />
-                                            </Route>
+                                            </PrivateRoute>
                                         </Switch>
                                     </Grid>
                                 </Grid>

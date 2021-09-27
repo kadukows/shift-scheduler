@@ -11,12 +11,17 @@ import { getTokenRequestConfig } from "../helpers";
 
 interface AuthState {
     loading: boolean;
+    loaded: boolean;
     authenticated: boolean;
     token: string;
 }
 
 const initialState: AuthState = {
     loading: false,
+    // if there is token on the local storage, than we fire an action upon site laoding
+    // to load potential user from server
+    // when this action ends, we can safely say that we loaded: either authenticated or not
+    loaded: localStorage.getItem("token") ? false : true,
     authenticated: false,
     token: localStorage.getItem("token"),
 };
@@ -26,6 +31,11 @@ const authSlice = createSlice({
     initialState,
     reducers: {
         setLoading(state, action: PayloadAction<boolean>) {
+            // safe to assume that we loaded, either authenticated or not
+            if (state.loading === true && action.payload === false) {
+                state.loaded = true;
+            }
+
             state.loading = action.payload;
         },
         setAuthenticated(state, action: PayloadAction<boolean>) {
