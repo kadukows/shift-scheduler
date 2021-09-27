@@ -1,0 +1,56 @@
+@startuml
+skinparam linetype ortho
+'skinparam linetype polyline
+left to right direction
+!theme spacelab
+
+
+together {
+
+entity User {
+    id: number
+}
+
+entity Workplace {
+    id: number
+    name: string
+    owner: user_id
+}
+
+}
+
+together {
+
+entity Employee {
+    id: number
+    workplace: workplace_id
+    bound_to: user_id
+    bounding_key: string
+    last_name: string
+    first_name: string
+}
+
+entity Schedule {
+    id: number
+    workplace: workplace_id
+    month_year: Date
+}
+
+}
+
+entity Shift {
+    id: number
+    schedule: schedule_id
+    from: datetime
+    to: datetime
+    employee: employee_id
+}
+
+User ||--o{ Workplace
+User ||--o{ Employee
+Workplace ||-r-o{ Employee
+Workplace }o--|| Schedule
+Schedule }o--|| Shift
+Employee }o--|| Shift
+
+@enduml
