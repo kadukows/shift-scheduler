@@ -9,12 +9,13 @@ from rest_framework.authtoken.views import ObtainAuthToken
 from rest_framework.authtoken.models import Token
 
 from .serializers import (
+    RoleSerializer,
     ScheduleSerializer,
     ShiftSerializer,
     UserSerializer,
     WorkplaceSerializer,
     EmployeeSerializer)
-from .models import Employee, Schedule, Workplace, Shift
+from .models import Employee, Schedule, Workplace, Shift, Role
 from .helpers import LastModifiedHeaderMixin
 
 
@@ -89,3 +90,13 @@ class ShiftViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         return Shift.objects.filter(schedule__workplace__owner=self.request.user).all()
+
+
+class RoleViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
+    serializer_class = RoleSerializer
+    queryset = Role.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get_queryset(self):
+        return Role.objects.filter(workplace__owner=self.request.user).all()

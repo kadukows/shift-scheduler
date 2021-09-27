@@ -1,9 +1,7 @@
 @startuml
 skinparam linetype ortho
-'skinparam linetype polyline
 left to right direction
 !theme spacelab
-
 
 together {
 
@@ -36,6 +34,12 @@ entity Schedule {
     month_year: Date
 }
 
+entity Role {
+    id: number
+    name: string
+    workplace: workplace_id
+}
+
 }
 
 entity Shift {
@@ -44,13 +48,16 @@ entity Shift {
     from: datetime
     to: datetime
     employee: employee_id
+    role: role_id
 }
 
 User ||--o{ Workplace
 User ||--o{ Employee
-Workplace ||-r-o{ Employee
-Workplace }o--|| Schedule
-Schedule }o--|| Shift
-Employee }o--|| Shift
+Workplace ||--o{ Employee
+Workplace ||--o{ Schedule
+Workplace ||--o{ Role
+Schedule ||--o{ Shift
+Employee ||--o{ Shift
+Role ||--o{ Shift
 
 @enduml

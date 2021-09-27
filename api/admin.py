@@ -1,9 +1,6 @@
 from django.contrib import admin
 
-from .models import Workplace, Schedule, Shift, Employee
+from .models import Workplace, Schedule, Shift, Employee, Role
 
 
-admin.site.register(Workplace)
-admin.site.register(Schedule)
-admin.site.register(Shift)
-admin.site.register(Employee)
+admin.site.register([Workplace, Schedule, Shift, Employee, Role])

@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 from rest_framework.authtoken.views import obtain_auth_token
 
 from .views import (
-    UserViewSet, WorkplaceViewSet, EmployeeViewSet, ScheduleViewSet, ShiftViewSet)
+    UserViewSet, WorkplaceViewSet, EmployeeViewSet, ScheduleViewSet, ShiftViewSet, RoleViewSet)
 
 router = DefaultRouter()
 router.register(r'user', UserViewSet)
@@ -13,6 +13,7 @@ router.register(r'workplace', WorkplaceViewSet)
 router.register(r'employee', EmployeeViewSet)
 router.register(r'schedule', ScheduleViewSet)
 router.register(r'shift', ShiftViewSet)
+router.register(r'role', RoleViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),
