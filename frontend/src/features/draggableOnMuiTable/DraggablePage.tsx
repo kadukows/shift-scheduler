@@ -2,7 +2,7 @@ import * as React from "react";
 import { Grid } from "@material-ui/core";
 
 import DraggableThingsDrawer from "./DraggableThingsDrawer";
-import DraggableMuiTable from "./DraggableMuiTable";
+import DragOnFieldsGrid from "./DragOnFieldsTable";
 
 const DraggablePage = () => {
     return (
@@ -16,7 +16,7 @@ const DraggablePage = () => {
                 <DraggableThingsDrawer />
             </Grid>
             <Grid item>
-                <DraggableMuiTable />
+                <DragOnFieldsGrid />
             </Grid>
         </Grid>
     );

@@ -30,17 +30,6 @@ const useStyles = makeStyles((theme) => ({
     appbarSpacer: theme.mixins.toolbar,
 }));
 
-/*
-const MyButton = (
-    props: React.ComponentProps<typeof Button> &
-        React.ComponentProps<typeof RouterLink>
-) => (
-    <Grid item>
-        <Button color="inherit" component={RouterLink} {...props} />
-    </Grid>
-);
-*/
-
 type LinksProps = React.PropsWithChildren<{ ButtonStyled: React.ElementType }>;
 
 const NoAuthLink = ({ ButtonStyled, children }: LinksProps) => (
@@ -88,6 +77,7 @@ const Navbar = (props: Props) => {
             <div className={classes.root}>
                 <AppBar position="absolute">
                     <Toolbar>
+                        {/*
                         <IconButton
                             edge="start"
                             color="inherit"
@@ -95,6 +85,10 @@ const Navbar = (props: Props) => {
                         >
                             <MenuIcon />
                         </IconButton>
+                        */}
+                        <MyButton to="/draggables">
+                            <MenuIcon />
+                        </MyButton>
 
                         <MyButton to="/">Index</MyButton>
                         <Links>
