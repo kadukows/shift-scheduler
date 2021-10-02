@@ -11,7 +11,8 @@ const PlannerLoader = (props: Props) => {
     const predicate = (state: ReturnType<typeof useSlice>) =>
         state.scheduleReducer.loaded &&
         state.workplaceReducer.loaded &&
-        state.shiftReducer.loaded;
+        state.shiftReducer.loaded &&
+        state.employeeReducer.loaded;
 
     return (
         <Loader useSlice={useSlice} precondition={predicate}>

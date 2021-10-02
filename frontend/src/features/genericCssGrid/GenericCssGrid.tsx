@@ -1,4 +1,3 @@
-import { RowCtrl } from "ag-grid-community";
 import * as React from "react";
 
 export interface ItemOnGrid<Tx, Ty> {
@@ -50,10 +49,8 @@ function generateCssForGrid<Tx, Ty>(
         gridTemplateRows: rowCssArray.join(" "),
         gridTemplateColumns: colCssArray.join(" "),
         display: "grid",
-        width: "100%",
-        height: "100%",
-        flexGrow: 1,
         gap: "1em",
+        overflowX: "auto",
     };
 }
 

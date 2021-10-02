@@ -28,10 +28,12 @@ const employeeAdapter = createEntityAdapter<Employee>({
 interface EmployeeState
     extends ReturnType<typeof employeeAdapter.getInitialState> {
     loading: boolean;
+    loaded: boolean;
 }
 
 const initialState: EmployeeState = {
     loading: false,
+    loaded: false,
     ...employeeAdapter.getInitialState(),
 };
 
@@ -45,6 +47,10 @@ const employeeSlice = createSlice({
         removeEmployee: employeeAdapter.removeOne,
         updateEmployee: employeeAdapter.updateOne,
         setLoading(state, action: PayloadAction<boolean>) {
+            if (state.loading === true && action.payload === false) {
+                state.loaded = true;
+            }
+
             state.loading = action.payload;
         },
     },

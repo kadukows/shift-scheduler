@@ -20,10 +20,12 @@ const roleAdapter = createEntityAdapter<Role>();
 
 interface RoleState extends ReturnType<typeof roleAdapter.getInitialState> {
     loading: boolean;
+    loaded: boolean;
 }
 
 const initialState = {
     loading: false,
+    loaded: false,
     ...roleAdapter.getInitialState(),
 };
 
@@ -39,6 +41,10 @@ const roleSlice = createSlice({
         updateRole: roleAdapter.updateOne,
         //
         setLoading(state, action: PayloadAction<boolean>) {
+            if (state.loading === true && action.payload === false) {
+                state.loaded = true;
+            }
+
             state.loading = action.payload;
         },
     },

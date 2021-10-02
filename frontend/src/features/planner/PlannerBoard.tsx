@@ -27,7 +27,8 @@ function getWeek(schedule: Schedule, idx: number): Date[] {
     }
 
     let result: Date[] = [];
-    for (let i = 0; i < 7; ++i) {
+    const currentMonth = date.getMonth();
+    for (let i = 0; i < 30 && currentMonth === date.getMonth(); ++i) {
         result.push(new Date(date));
         date.setDate(date.getDate() + 1);
     }
@@ -52,18 +53,14 @@ const PlannerBoard = ({ schedule }: Props) => {
 
             return (
                 compareAsc(week[0], parsed) === -1 &&
-                compareAsc(parsed, week[6]) === -1
+                compareAsc(parsed, week[week.length - 1]) === -1
             );
         });
 
     console.log(shifts);
 
     const employeesId = new Set<number>(shifts.map((shift) => shift.employee));
-    /*
-    const employees = [...employeesId].map(
-        (employeeId) => employeeById[employeeId]
-    );
-    */
+
     const employees = useSelector(employeeSelectors.selectAll).filter(
         (employee) => employee.workplace === workplace.id
     );
@@ -78,43 +75,61 @@ const PlannerBoard = ({ schedule }: Props) => {
                 Planner for schedule: {workplace.name} -- {schedule.month_year}
             </Typography>
 
-            <AnnotatedGenericCssGrid<Date, Employee>
-                x={{
-                    cells: week,
-                    getId: (date: Date) => date.getDate(),
+            <div
+                style={{
+                    display: "flex",
                 }}
-                y={{
-                    cells: employees,
-                    getId: (employee) => employee.id,
-                }}
-                annotateX={(date) => (
-                    <Paper
-                        style={{
-                            padding: "8px",
-                            textAlign: "center",
+            >
+                <div
+                    style={{
+                        width: 0,
+                        flex: "1 1 100%",
+                    }}
+                >
+                    <AnnotatedGenericCssGrid<Date, Employee>
+                        x={{
+                            cells: week,
+                            getId: (date: Date) => date.getDate(),
                         }}
-                    >
-                        <Typography>{format(date, "dd.MM, EEEE")}</Typography>
-                    </Paper>
-                )}
-                annotateY={(employee) => (
-                    <div
-                        style={{ verticalAlign: "center", textAlign: "center" }}
-                    >{`${employee.first_name} ${employee.last_name}`}</div>
-                )}
-                items={shifts.map((shift) => ({
-                    children: (
-                        <div style={{ textAlign: "center" }}>
-                            {format(new Date(shift.time_from), "H:mm")} --{" "}
-                            {format(new Date(shift.time_to), "H:mm")}
-                            <br />
-                            {rolesById[shift.role].name}
-                        </div>
-                    ),
-                    xStart: new Date(shift.time_from),
-                    yStart: employeeById[shift.employee],
-                }))}
-            />
+                        y={{
+                            cells: employees,
+                            getId: (employee) => employee.id,
+                        }}
+                        annotateX={(date) => (
+                            <Paper
+                                style={{
+                                    padding: "8px",
+                                    textAlign: "center",
+                                }}
+                            >
+                                <Typography>
+                                    {format(date, "dd.MM, EEEE")}
+                                </Typography>
+                            </Paper>
+                        )}
+                        annotateY={(employee) => (
+                            <div
+                                style={{
+                                    verticalAlign: "center",
+                                    textAlign: "center",
+                                }}
+                            >{`${employee.first_name} ${employee.last_name}`}</div>
+                        )}
+                        items={shifts.map((shift) => ({
+                            children: (
+                                <div style={{ textAlign: "center" }}>
+                                    {format(new Date(shift.time_from), "H:mm")}{" "}
+                                    -- {format(new Date(shift.time_to), "H:mm")}
+                                    <br />
+                                    {rolesById[shift.role].name}
+                                </div>
+                            ),
+                            xStart: new Date(shift.time_from),
+                            yStart: employeeById[shift.employee],
+                        }))}
+                    />
+                </div>
+            </div>
         </Paper>
     );
 };
