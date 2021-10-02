@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <style>
+            .container {
+                display: flex;
+                flex-direction: column;
+                align-content: center;
+            }
+
+            .container-prime {
+                display: flex;
+                justify-content: center;
+            }
+
+            .my-grid {
+                display: grid;
+                grid-template-columns: repeat(50, 1fr);
+                grid-template-rows: 1fr;
+                gap: 2em;
+                overflow-x: auto;
+                border: 3px solid black;
+            }
+        </style>
+        <title>test</title>
+    </head>
+    <body>
+        <div class="container">
+            <div class="container-prime" >
+                <h3>
+                    Some header (maybe alerts)
+                </h3>
+            </div>
+            <div class="container-prime">
+                <button id="bt1">
+                    Hej
+                </button>
+            </div>
+            <div class="container-prime">
+                <div class="my-grid">
+                    <h1>Hello</h1>
+                    <h1>Hello</h1>
+                    <h1>Hello</h1>
+                    <h1>Hello</h1>
+                    <h1>Hello</h1>
+                    <h1>g</h1>
+                    <h1>g</h1>
+                    <h1>Hello</h1>
+                    <h1>Hello</h1>
+                    <h1>Hello</h1>
+                    <h1>Hello</h1>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

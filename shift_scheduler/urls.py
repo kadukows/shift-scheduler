@@ -20,5 +20,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/', include('api.urls')),
     path('api-auth/', include('rest_framework.urls')),
-    path('', include('frontend.urls'))
+    path('', include('frontend.urls')),
+    path('test_doodles/', include('test_doodles.urls'))
 ]

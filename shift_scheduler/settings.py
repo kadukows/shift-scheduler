@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'api',
     'frontend',
+    'test_doodles'
 ]
 
 MIDDLEWARE = [
