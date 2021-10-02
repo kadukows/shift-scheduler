@@ -3,29 +3,22 @@ from datetime import date
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from .models import Schedule, Workplace
-from .serializers import ScheduleSerializer
+from ..serializers import ScheduleSerializer
+from ..models import Schedule, Workplace
 
+from .helpers import RequestMock, ViewMock
 
 
 
 class ScheduleSerializerTests(TestCase):
-    class RequestMock:
-        def __init__(self, user):
-            self.user = user
-
-    class ViewMock:
-        def __init__(self, action):
-            self.action = action
-
     def setUp(self):
         user = User.objects.create_user('foo', 'email@domain.com', 'foo')
         workplace = Workplace.objects.create(name="Test work location", owner=user)
         self.schedule = Schedule.objects.create(workplace=workplace, month_year=date(1990, 1, 1))
 
         self.context = {
-            'request': self.RequestMock(user),
-            'view': self.ViewMock('create')
+            'request': RequestMock(user),
+            'view': ViewMock('create')
         }
 
     def test_schedule_serializer_deserializers_and_saves(self):
