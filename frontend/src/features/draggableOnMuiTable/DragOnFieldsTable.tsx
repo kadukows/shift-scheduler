@@ -13,11 +13,11 @@ import "./style.css";
 
 const gridDefinition: GridDefinition<number, number> = {
     x: {
-        cells: [0, 1, 2],
+        cells: [42, -1, 80],
         getId: (a) => a,
     },
     y: {
-        cells: [0, 1, 2],
+        cells: [66, 111, 555],
         getId: (a) => a,
     },
 };
@@ -27,9 +27,9 @@ const DragOnFieldsGrid = () => {
     for (let x = 0; x < 3; ++x) {
         for (let y = 0; y < 3; ++y) {
             itemsOnGrid.push({
-                children: <DragOnField key={x * 3 + y} idx={x * 3 + y} />,
-                xStart: x,
-                yStart: y,
+                children: <DragOnField idx={x * 3 + y} />,
+                xStart: gridDefinition.x.cells[x],
+                yStart: gridDefinition.y.cells[y],
             });
         }
     }

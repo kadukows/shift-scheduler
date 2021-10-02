@@ -19,7 +19,7 @@ export interface GridDefinition<Tx, Ty> {
     y: GridDimensionDefinition<Ty>;
 }
 
-interface Props<Tx, Ty> extends GridDefinition<Tx, Ty> {
+export interface Props<Tx, Ty> extends GridDefinition<Tx, Ty> {
     items: ItemOnGrid<Tx, Ty>[];
 }
 
@@ -37,7 +37,6 @@ function generateDimensionArray<T>(
     for (const cell of def.cells) {
         result.push(`[${unique_key}-${def.getId(cell)}] 1fr`);
     }
-
     return result;
 }
 
@@ -69,11 +68,9 @@ function generateGridItems<Tx, Ty>(
         yEnd,
         children,
     }: ItemOnGrid<Tx, Ty>) => {
-        const gridArea = `${getIdY(yStart)} / ${getIdX(xStart)} / ${
-            yEnd ? getIdY(yEnd) : "span 1"
-        } / ${xEnd ? getIdX(xEnd) : "span 1"}`;
-
-        console.log(gridArea);
+        const gridArea = `row-${getIdY(yStart)} / col-${getIdX(xStart)} / ${
+            yEnd ? `row-${getIdY(yEnd)}` : "span 1"
+        } / ${xEnd ? `col-${getIdX(xEnd)}` : "span 1"}`;
 
         return (
             <div
