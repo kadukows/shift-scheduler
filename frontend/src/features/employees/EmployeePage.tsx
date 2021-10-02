@@ -115,7 +115,7 @@ const EmployeePage = () => {
     return (
         <>
             <Dialog open={newModalOpen} onClose={() => setNewModalOpen(false)}>
-                <DialogTitle>Add a workplace</DialogTitle>
+                <DialogTitle>Add a employee</DialogTitle>
                 <DialogContent className={classes.dialog}>
                     <EmployeeForm
                         formId={formIds.newEmployee}
@@ -136,7 +136,7 @@ const EmployeePage = () => {
                         form={formIds.newEmployee}
                         variant="contained"
                     >
-                        Add workplace
+                        Add employee
                     </Button>
                 </DialogActions>
             </Dialog>

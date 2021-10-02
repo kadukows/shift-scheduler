@@ -37,19 +37,11 @@ function GenericForm<Inputs, Entity extends WithId>({
         formState: { errors, isSubmitting },
         setError,
         control,
-        watch,
     } = useForm<Inputs>({
         resolver: yupResolver(yup.object().shape(schemaBase)),
         // @ts-expect-error
         defaultValues,
     });
-
-    React.useEffect(() => {
-        const subscription = watch((value, { name, type }) =>
-            console.log(value, name, type)
-        );
-        return () => subscription.unsubscribe();
-    }, [watch]);
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {

@@ -2,7 +2,7 @@ import * as React from "react";
 import { useRouteMatch } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Typography, Paper } from "@material-ui/core";
-import { parse, format } from "date-fns";
+import { parse, format, compareAsc } from "date-fns";
 
 import { RootState } from "../../store";
 import { Schedule } from "../schedules/scheduleSlice";
@@ -10,6 +10,9 @@ import { workplaceSelectors } from "../workplaces/workplaceSlice";
 import HeaderDay from "./HeaderDay";
 import { shiftSelectors } from "../shifts/shiftSlice";
 import { employeeSelectors } from "../employees/employeeSlice";
+import AnnotatedGenericCssGrid from "../genericCssGrid/AnnotatedGenericCssGrid";
+import { Employee } from "../employees/employeeSlice";
+import { roleSelectors } from "../roles/rolesSlice";
 
 interface Props {
     schedule: Schedule;
@@ -38,32 +41,32 @@ const PlannerBoard = ({ schedule }: Props) => {
     );
 
     const employeeById = useSelector(employeeSelectors.selectEntities);
+    const rolesById = useSelector(roleSelectors.selectEntities);
 
     const week = getWeek(schedule, 1);
-    const from = Date.parse(format(week[0], "dd.MM.yyyy"));
-    const to = Date.parse(format(week[6], "dd.MM.yyyy") + " 23:59:59");
 
     const shifts = useSelector(shiftSelectors.selectAll)
         .filter((shift) => shift.schedule === schedule.id)
         .filter((shift) => {
-            const parsed = Date.parse(shift.time_from);
-            return from <= parsed && parsed <= to;
+            const parsed = new Date(shift.time_from);
+
+            return (
+                compareAsc(week[0], parsed) === -1 &&
+                compareAsc(parsed, week[6]) === -1
+            );
         });
 
     console.log(shifts);
 
-    //const noOfRows = [1, 2, 3];
-    const gridTemplateRows = `
-        [days] auto
-        ${noOfRows.map((no) => `[row-${no}] 1fr`).join("\n")}
-    `;
-
-    const gridTemplateColumns = `
-        [employees] 3em
-        ${week.map((date) => `[day-${date.getDate()}] 1fr`).join("\n")}
-    `;
-
-    console.log(gridTemplateRows, gridTemplateColumns);
+    const employeesId = new Set<number>(shifts.map((shift) => shift.employee));
+    /*
+    const employees = [...employeesId].map(
+        (employeeId) => employeeById[employeeId]
+    );
+    */
+    const employees = useSelector(employeeSelectors.selectAll).filter(
+        (employee) => employee.workplace === workplace.id
+    );
 
     return (
         <Paper className="planner-board-paper" elevation={3}>
@@ -74,24 +77,44 @@ const PlannerBoard = ({ schedule }: Props) => {
             >
                 Planner for schedule: {workplace.name} -- {schedule.month_year}
             </Typography>
-            <div
-                className="planner-board"
-                style={{
-                    gridTemplateColumns,
-                    gridTemplateRows,
+
+            <AnnotatedGenericCssGrid<Date, Employee>
+                x={{
+                    cells: week,
+                    getId: (date: Date) => date.getDate(),
                 }}
-            >
-                {week.map((date) => (
-                    <HeaderDay
-                        key={date.getDate()}
-                        date={date}
+                y={{
+                    cells: employees,
+                    getId: (employee) => employee.id,
+                }}
+                annotateX={(date) => (
+                    <Paper
                         style={{
-                            gridRow: "days",
-                            gridColumn: `day-${date.getDate()}`,
+                            padding: "8px",
+                            textAlign: "center",
                         }}
-                    />
-                ))}
-            </div>
+                    >
+                        <Typography>{format(date, "dd.MM, EEEE")}</Typography>
+                    </Paper>
+                )}
+                annotateY={(employee) => (
+                    <div
+                        style={{ verticalAlign: "center", textAlign: "center" }}
+                    >{`${employee.first_name} ${employee.last_name}`}</div>
+                )}
+                items={shifts.map((shift) => ({
+                    children: (
+                        <div style={{ textAlign: "center" }}>
+                            {format(new Date(shift.time_from), "H:mm")} --{" "}
+                            {format(new Date(shift.time_to), "H:mm")}
+                            <br />
+                            {rolesById[shift.role].name}
+                        </div>
+                    ),
+                    xStart: new Date(shift.time_from),
+                    yStart: employeeById[shift.employee],
+                }))}
+            />
         </Paper>
     );
 };

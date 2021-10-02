@@ -40,7 +40,9 @@ function generateDimensionArray<T>(
     return result;
 }
 
-function generateCssForGrid<Tx, Ty>(definition: GridDefinition<Tx, Ty>) {
+function generateCssForGrid<Tx, Ty>(
+    definition: GridDefinition<Tx, Ty>
+): React.ComponentProps<"div">["style"] {
     const rowCssArray = generateDimensionArray("row", definition.y);
     const colCssArray = generateDimensionArray("col", definition.x);
 
@@ -51,6 +53,7 @@ function generateCssForGrid<Tx, Ty>(definition: GridDefinition<Tx, Ty>) {
         width: "100%",
         height: "100%",
         flexGrow: 1,
+        gap: "1em",
     };
 }
 

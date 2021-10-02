@@ -16,6 +16,7 @@ export interface Shift {
     employee: number;
     time_from: string;
     time_to: string;
+    role: number;
 }
 
 const shiftAdapter = createEntityAdapter<Shift>();

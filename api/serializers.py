@@ -92,7 +92,7 @@ class ScheduleSerializer(ReadOnlyUponActionSerializerMixin, serializers.ModelSer
 class ShiftSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shift
-        fields = ['id', 'schedule', 'employee', 'time_from', 'time_to', 'last_modified']
+        fields = ['id', 'schedule', 'employee', 'time_from', 'time_to', 'last_modified', 'role']
         read_only_fields = ['id']
 
     def validate_schedule(self, value: Schedule):
