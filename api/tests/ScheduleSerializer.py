@@ -27,8 +27,6 @@ class ScheduleSerializerTests(TestCase):
         self.assertEqual(serialized['id'], self.schedule.id)
         self.assertEqual(serialized['workplace'], self.schedule.workplace.id)
 
-        print(self.context)
-
         deserialized = ScheduleSerializer(context=self.context, data=serialized)
         deserialized.is_valid()
         new_schedule = deserialized.save()

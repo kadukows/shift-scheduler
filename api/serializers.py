@@ -56,11 +56,7 @@ class WorkplaceSerializer(serializers.ModelSerializer):
         return Workplace.objects.create(owner=self.context['request'].user, **validated_data)
 
 
-class EmployeeSerializer(ReadOnlyUponActionSerializerMixin, serializers.ModelSerializer):
-    action_to_ro_fields = {
-        #'update': ["workplace"]
-    }
-
+class EmployeeSerializer(serializers.ModelSerializer):
     class Meta:
         model = Employee
         fields = ['id', 'last_name', 'workplace', 'first_name', 'last_modified']
