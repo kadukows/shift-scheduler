@@ -36,7 +36,15 @@ const DragOnFieldsGrid = () => {
 
     return (
         <Paper style={{ padding: "1rem", width: "300px", height: "300px" }}>
-            <GenericCssGrid items={itemsOnGrid} {...gridDefinition} />
+            <GenericCssGrid
+                items={itemsOnGrid}
+                style={{
+                    width: "100%",
+                    height: "100%",
+                    gap: "1em",
+                }}
+                {...gridDefinition}
+            />
         </Paper>
     );
 };

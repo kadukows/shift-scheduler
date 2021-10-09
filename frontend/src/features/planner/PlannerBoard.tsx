@@ -102,7 +102,7 @@ const PlannerBoard = ({ schedule }: Props) => {
                                     textAlign: "center",
                                 }}
                             >
-                                <Typography>
+                                <Typography noWrap>
                                     {format(date, "dd.MM, EEEE")}
                                 </Typography>
                             </Paper>
@@ -127,6 +127,12 @@ const PlannerBoard = ({ schedule }: Props) => {
                             xStart: new Date(shift.time_from),
                             yStart: employeeById[shift.employee],
                         }))}
+                        style={{
+                            overflowX: "auto",
+                            width: "100%",
+                            height: "100%",
+                            gap: "1em",
+                        }}
                     />
                 </div>
             </div>

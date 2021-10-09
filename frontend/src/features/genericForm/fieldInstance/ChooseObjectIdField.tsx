@@ -1,7 +1,4 @@
-import {
-    MenuItem,
-    TextField,
-} from "@material-ui/core";
+import { MenuItem, TextField } from "@material-ui/core";
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { Controller, Control } from "react-hook-form";
@@ -59,6 +56,7 @@ const ChooseObjectIdField = <Inputs, Entity extends WithId>({
                     label={field.label}
                     fullWidth
                     error={invalid}
+                    //@ts-ignore
                     helperText={error?.message}
                     onChange={onChange}
                     value={value}

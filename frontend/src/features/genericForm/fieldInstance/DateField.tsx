@@ -59,9 +59,9 @@ const DateField = <Inputs extends unknown>({
                     label={field.label}
                     fullWidth
                     error={invalid}
+                    //@ts-ignore
                     helperText={error?.message}
                     views={field.views}
-                    //
                     ref={ref}
                     name={name}
                     value={parse(value, field.format, new Date())}

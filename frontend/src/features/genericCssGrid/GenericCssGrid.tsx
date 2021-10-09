@@ -18,15 +18,27 @@ export interface GridDefinition<Tx, Ty> {
     y: GridDimensionDefinition<Ty>;
 }
 
-export interface Props<Tx, Ty> extends GridDefinition<Tx, Ty> {
+export interface Props<Tx, Ty>
+    extends GridDefinition<Tx, Ty>,
+        React.ComponentProps<"div"> {
     items: ItemOnGrid<Tx, Ty>[];
 }
 
-const GenericCssGrid = <Tx, Ty>({ x, y, items }: Props<Tx, Ty>) => {
-    const css = generateCssForGrid({ x, y });
+const GenericCssGrid = <Tx, Ty>({ x, y, items, ...rest }: Props<Tx, Ty>) => {
+    const { style, ...restWoStyle } = rest;
 
-    return <div style={css}>{generateGridItems(items, x.getId, y.getId)}</div>;
+    const newStyle: any = { ...generateCssForGrid({ x, y }), ...style };
+
+    return (
+        <div style={newStyle} {...restWoStyle}>
+            {generateGridItems(items, x.getId, y.getId)}
+        </div>
+    );
 };
+
+/**
+ *
+ */
 
 function generateDimensionArray<T>(
     unique_key: string,
@@ -49,8 +61,6 @@ function generateCssForGrid<Tx, Ty>(
         gridTemplateRows: rowCssArray.join(" "),
         gridTemplateColumns: colCssArray.join(" "),
         display: "grid",
-        gap: "1em",
-        overflowX: "auto",
     };
 }
 

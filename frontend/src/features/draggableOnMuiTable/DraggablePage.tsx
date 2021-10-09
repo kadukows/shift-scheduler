@@ -60,6 +60,11 @@ const DraggablePage = () => {
                         )}
                         annotateY={(y: number) => `Annotated y: ${y}`}
                         {...gridDefinition}
+                        style={{
+                            gap: "1em",
+                            width: "100%",
+                            height: "100%",
+                        }}
                     />
                 </Grid>
             </Grid>

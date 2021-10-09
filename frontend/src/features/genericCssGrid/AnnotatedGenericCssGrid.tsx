@@ -23,6 +23,7 @@ const AnnotatedGenericCssGrid = <Tx, Ty>({
     items,
     annotateX,
     annotateY,
+    ...rest
 }: Props<Tx, Ty>) => {
     const annotationCell: AnnotationCell = { type: "ANNOTATION_TYPE" };
     const annotatedCellsX = [annotationCell, ...x.cells];
@@ -89,6 +90,7 @@ const AnnotatedGenericCssGrid = <Tx, Ty>({
         <GenericCssGrid<Tx | AnnotationCell, Ty | AnnotationCell>
             items={itemsOnGrid}
             {...gridDefinition}
+            {...rest}
         />
     );
 };
