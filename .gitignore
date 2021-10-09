@@ -4,3 +4,5 @@ __pycache__
 node_modules
 base.js
 package-lock.json
+.coverage
+htmlcov/

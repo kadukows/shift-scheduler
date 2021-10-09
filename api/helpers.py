@@ -29,8 +29,6 @@ class ReadOnlyUponActionSerializerMixin:
         extra_kwargs = serializers.ModelSerializer.get_extra_kwargs(self)
         action = self.context['view'].action
 
-        print(f'get_extra_kwargs with action: {action}')
-
         if action in self.action_to_ro_fields:
             for field in self.action_to_ro_fields[action]:
                 print(f'adding read_only to field {field}')

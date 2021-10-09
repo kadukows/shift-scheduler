@@ -16,13 +16,6 @@ class UserSerializer(serializers.ModelSerializer):
             'password': {'write_only': True}
         }
 
-    def validate_username(self, value):
-        # debug
-        if value == 'foobar':
-            raise serializers.ValidationError("Can't be equal to 'foobar'")
-
-        return value
-
     def create(self, validated_data):
         user: User = User.objects.create(
             username=validated_data['username']
@@ -32,13 +25,6 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
-
-    def update(self, instance: User, validated_data):
-        if 'password' in validated_data:
-            instance.set_password(validated_data.pop('password'))
-
-        return super(UserSerializer, self).update(instance, validated_data)
-
 
 class WorkplaceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -70,7 +56,7 @@ class EmployeeSerializer(serializers.ModelSerializer):
         return value
 
 
-class ScheduleSerializer(ReadOnlyUponActionSerializerMixin, serializers.ModelSerializer):
+class ScheduleSerializer(serializers.ModelSerializer):
     month_year = serializers.DateField(format='%m.%Y', input_formats=['%m.%Y'])
     class Meta:
         model = Schedule
@@ -105,15 +91,30 @@ class ShiftSerializer(serializers.ModelSerializer):
 
         return value
 
+    def validate_role(self, value: Role):
+        '''check if role belongs to owned workplace'''
+        if value.workplace.owner != self.context['request'].user:
+            raise serializers.ValidationError("Role not found")
+
+        return value
+
+    def validate(self, data):
+        workplace = data['schedule'].workplace
+
+        if (workplace != data['employee'].workplace
+            or workplace != data['role'].workplace):
+                raise serializers.ValidationError("Mixing of schedule and/or employee and/or role from different workplaces is not permitted")
+
+        return data
 
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
-        fields = ['id', 'workplace', 'name']
-        read_only_fields = ['id']
+        fields = ['id', 'workplace', 'name', 'last_modified']
+        read_only_fields = ['id', 'last_modified']
 
-    def validate_workplace(self, value: Role):
-        if value.workplace.owner != self.context['request'].user:
+    def validate_workplace(self, value: Workplace):
+        if value.owner != self.context['request'].user:
             raise serializers.ValidationError("Workplace not found")
 
         return value
