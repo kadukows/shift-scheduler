@@ -11,8 +11,10 @@ import HeaderDay from "./HeaderDay";
 import { shiftSelectors } from "../shifts/shiftSlice";
 import { employeeSelectors } from "../employees/employeeSlice";
 import AnnotatedGenericCssGrid from "../genericCssGrid/AnnotatedGenericCssGrid";
+import { Props as GenericCssGridProps } from "../genericCssGrid/GenericCssGrid";
 import { Employee } from "../employees/employeeSlice";
 import { roleSelectors } from "../roles/rolesSlice";
+import ItemFactory, { Indices } from "./items/ItemFactory";
 
 interface Props {
     schedule: Schedule;
@@ -57,13 +59,47 @@ const PlannerBoard = ({ schedule }: Props) => {
             );
         });
 
-    console.log(shifts);
-
-    const employeesId = new Set<number>(shifts.map((shift) => shift.employee));
-
     const employees = useSelector(employeeSelectors.selectAll).filter(
         (employee) => employee.workplace === workplace.id
     );
+
+    const dayToEmployeeToShift: any = {};
+    for (const day of week) {
+        const employeeToShift: any = {};
+        for (const employee of employees) {
+            employeeToShift[employee.id] = null;
+        }
+        dayToEmployeeToShift[day.getDate()] = employeeToShift;
+    }
+
+    for (const shift of shifts) {
+        dayToEmployeeToShift[new Date(shift.time_from).getDate()][
+            shift.employee
+        ] = shift;
+    }
+
+    const items: GenericCssGridProps<Date, Employee>["items"] = [];
+
+    for (const day of week) {
+        for (const employee of employees) {
+            const indices = {
+                date: day,
+                secondIdx: "Employee",
+                employee: employee,
+            } as Indices;
+
+            const shift = dayToEmployeeToShift[day.getDate()][employee.id];
+
+            items.push({
+                children: <ItemFactory indices={indices} shift={shift} />,
+
+                xStart: day,
+                xEnd: shift ? new Date(shift.time_to) : undefined,
+
+                yStart: employee,
+            });
+        }
+    }
 
     return (
         <Paper className="planner-board-paper" elevation={3}>
@@ -115,23 +151,14 @@ const PlannerBoard = ({ schedule }: Props) => {
                                 }}
                             >{`${employee.first_name} ${employee.last_name}`}</div>
                         )}
-                        items={shifts.map((shift) => ({
-                            children: (
-                                <div style={{ textAlign: "center" }}>
-                                    {format(new Date(shift.time_from), "H:mm")}{" "}
-                                    -- {format(new Date(shift.time_to), "H:mm")}
-                                    <br />
-                                    {rolesById[shift.role].name}
-                                </div>
-                            ),
-                            xStart: new Date(shift.time_from),
-                            yStart: employeeById[shift.employee],
-                        }))}
+                        items={items}
                         style={{
                             overflowX: "auto",
                             width: "100%",
                             height: "100%",
-                            gap: "1em",
+                            gap: "8px",
+                            marginBottom: "24px",
+                            paddingBottom: "24px",
                         }}
                     />
                 </div>

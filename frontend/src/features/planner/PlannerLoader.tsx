@@ -12,7 +12,8 @@ const PlannerLoader = (props: Props) => {
         state.scheduleReducer.loaded &&
         state.workplaceReducer.loaded &&
         state.shiftReducer.loaded &&
-        state.employeeReducer.loaded;
+        state.employeeReducer.loaded &&
+        state.roleReducer.loaded;
 
     return (
         <Loader useSlice={useSlice} precondition={predicate}>
