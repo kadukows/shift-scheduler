@@ -1,7 +1,7 @@
 import { MenuItem, TextField } from "@material-ui/core";
 import * as React from "react";
 import { useSelector } from "react-redux";
-import { Controller, Control } from "react-hook-form";
+import { Controller, Control, useFormContext } from "react-hook-form";
 
 import { RootState } from "../../../store";
 import { MyTextField, capitalize, WithId } from "../../helpers";
@@ -20,7 +20,7 @@ export interface ChooseObjectIdFieldData<Inputs, Entity extends WithId> {
     label?: string;
     validation: StringYupValidationBuilderObject;
 
-    entitySelector: (state: RootState) => Entity[];
+    entitySelector: (state: RootState, getValues: any) => Entity[];
     entityToString: (a: Entity) => string;
 }
 
@@ -38,7 +38,10 @@ const ChooseObjectIdField = <Inputs, Entity extends WithId>({
     field,
     control,
 }: ChooseObjectIdFieldProps<Inputs, Entity>) => {
-    const entities = useSelector(field.entitySelector);
+    const { getValues } = useFormContext();
+    const entities = useSelector((state: RootState) =>
+        field.entitySelector(state, getValues)
+    );
 
     return (
         <Controller

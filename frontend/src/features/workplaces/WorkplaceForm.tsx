@@ -12,7 +12,6 @@ export interface Inputs {
 
 interface Props {
     formId: string;
-    //submit: (a: Inputs) => void;
     onSubmitted: (entity: Workplace) => void;
     objectToModify?: Workplace;
 }

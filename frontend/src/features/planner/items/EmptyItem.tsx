@@ -8,6 +8,8 @@ interface Props {
 }
 
 const EmptyItem = ({ indices }: Props) => {
+    const [entered, setEntered] = React.useState(false);
+
     return (
         <div
             style={{
@@ -16,9 +18,11 @@ const EmptyItem = ({ indices }: Props) => {
                 backgroundColor: "gray",
                 border: "1px solid gray",
                 borderRadius: "16px",
-                opacity: "20%",
+                opacity: entered ? 0.4 : 0.2,
             }}
-        ></div>
+            onMouseEnter={() => setEntered(true)}
+            onMouseLeave={() => setEntered(false)}
+        />
     );
 };
 

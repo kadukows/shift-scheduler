@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as yup from "yup";
 import axios, { AxiosError } from "axios";
-import { useForm, SubmitHandler } from "react-hook-form";
+import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
 import { FormHelperText, Grid, LinearProgress } from "@material-ui/core";
 
 import { DjangoErrors, handleErrors, WithId } from "../helpers";
@@ -31,17 +31,19 @@ function GenericForm<Inputs, Entity extends WithId>({
 
     const fieldNames: (keyof Inputs)[] = fields.map((field) => field.name);
 
+    const methods = useForm<Inputs>({
+        resolver: yupResolver(yup.object().shape(schemaBase)),
+        // @ts-expect-error
+        defaultValues,
+    });
+
     const {
         register,
         handleSubmit,
         formState: { errors, isSubmitting },
         setError,
         control,
-    } = useForm<Inputs>({
-        resolver: yupResolver(yup.object().shape(schemaBase)),
-        // @ts-expect-error
-        defaultValues,
-    });
+    } = methods;
 
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {
@@ -70,26 +72,32 @@ function GenericForm<Inputs, Entity extends WithId>({
     };
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} id={formId}>
-            <Grid container direction="column" spacing={2}>
-                {fields.map((field) => (
-                    <Grid item key={i++}>
-                        <Field control={control} field={field} {...baseProps} />
-                    </Grid>
-                ))}
-                {isSubmitting && (
-                    <Grid item>
-                        <LinearProgress />
-                    </Grid>
-                )}
-                {nonFieldErrors &&
-                    nonFieldErrors.map((error) => (
+        <FormProvider {...methods}>
+            <form onSubmit={handleSubmit(onSubmit)} id={formId}>
+                <Grid container direction="column" spacing={2}>
+                    {fields.map((field) => (
                         <Grid item key={i++}>
-                            <FormHelperText error>{error}</FormHelperText>
+                            <Field
+                                control={control}
+                                field={field}
+                                {...baseProps}
+                            />
                         </Grid>
                     ))}
-            </Grid>
-        </form>
+                    {isSubmitting && (
+                        <Grid item>
+                            <LinearProgress />
+                        </Grid>
+                    )}
+                    {nonFieldErrors &&
+                        nonFieldErrors.map((error) => (
+                            <Grid item key={i++}>
+                                <FormHelperText error>{error}</FormHelperText>
+                            </Grid>
+                        ))}
+                </Grid>
+            </form>
+        </FormProvider>
     );
 }
 
