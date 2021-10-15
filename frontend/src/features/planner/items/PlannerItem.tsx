@@ -7,6 +7,7 @@ import { roleSelectors } from "../../roles/rolesSlice";
 import { Shift } from "../../shifts/shiftSlice";
 import { Indices } from "./ItemFactory";
 import { employeeSelectors } from "../../employees/employeeSlice";
+import ItemBase from "./ItemBase";
 
 interface Props {
     indices: Indices;
@@ -24,15 +25,7 @@ const PlannerItem = ({ shift, indices }: Props) => {
     };
 
     return (
-        <div
-            style={{
-                width: "100%",
-                height: "100%",
-                backgroundColor: "rgba(128, 128, 128, 0.4)",
-                border: "1px solid rgba(128, 128, 128, 0.4)",
-                borderRadius: "16px",
-            }}
-        >
+        <ItemBase className="planner-items-planner planner-items-hoverable">
             <Typography noWrap align="center">
                 {format(new Date(shift.time_from), "H:mm")} --{" "}
                 {format(new Date(shift.time_to), "H:mm")}
@@ -41,7 +34,7 @@ const PlannerItem = ({ shift, indices }: Props) => {
                     ? rolesById[shift.role].name
                     : getEmployeeString(shift.employee)}
             </Typography>
-        </div>
+        </ItemBase>
     );
 };
 
