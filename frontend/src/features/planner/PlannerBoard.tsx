@@ -88,7 +88,7 @@ const PlannerBoard = ({ schedule }: Props) => {
             const indices = {
                 date: day,
                 secondIdx: "Employee",
-                employee: employee,
+                payload: employee,
             } as Indices;
 
             const shift = dayToEmployeeToShift[day.getDate()][employee.id];
@@ -105,7 +105,12 @@ const PlannerBoard = ({ schedule }: Props) => {
     }
 
     return (
-        <EventProvider events={[EventTypes.EMPTY_FIELD_W_EMPLOYEE_CLICKED]}>
+        <EventProvider
+            events={[
+                EventTypes.EMPTY_FIELD_CLICKED,
+                EventTypes.NON_EMPTY_FIELD_CLICKED,
+            ]}
+        >
             <Paper className="planner-board-paper" elevation={3}>
                 <Typography
                     variant="h5"

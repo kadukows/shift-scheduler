@@ -1,44 +1,61 @@
 import * as React from "react";
 
+type StringToFunctions = {
+    [n: string]: ((...a: any) => void)[];
+};
+
+/**
+ *
+ */
+
+export interface EventContextValueType {
+    eventToCallbacks: StringToFunctions;
+    setEventToCallbacks: (a: StringToFunctions) => void;
+}
+
+const initialValue: EventContextValueType = {
+    eventToCallbacks: {},
+    setEventToCallbacks: (a) => {},
+};
+
+const EventContext = React.createContext(initialValue);
+
+/**
+ *
+ */
+
 interface PropsBase {
     events: string[];
 }
 
 type Props = React.PropsWithChildren<PropsBase>;
 
-export interface EventContextValueType {
-    eventToCallbacks: {
-        [n: string]: ((...a: any) => void)[];
-    };
-}
-
-const initialValue: EventContextValueType = {
-    eventToCallbacks: {},
-};
-
-const EventContext = React.createContext(initialValue);
-
 function EventProvider({ children, events }: Props) {
-    const eventToCallbacks: EventContextValueType["eventToCallbacks"] = {};
-    for (const event of events) {
-        eventToCallbacks[event] = [];
-    }
-
-    const value: EventContextValueType = { eventToCallbacks };
+    const [eventToCallbacks, setEventToCallbacks] = React.useState(
+        generateInitialStringToFunctionsMap(events)
+    );
 
     return (
-        <EventContext.Provider value={value}>{children}</EventContext.Provider>
+        <EventContext.Provider
+            value={{ eventToCallbacks, setEventToCallbacks }}
+        >
+            {children}
+        </EventContext.Provider>
     );
 }
 
 export default EventProvider;
 
-export const useSignal = (event: string) => {
-    const value = React.useContext(EventContext);
+/**
+ * Custom hooks for use with EventProvider
+ */
 
-    if (event in value.eventToCallbacks) {
+export const useSignal = (event: string) => {
+    const { eventToCallbacks } = React.useContext(EventContext);
+
+    if (event in eventToCallbacks) {
         return (...args: any[]) => {
-            for (const callback of value.eventToCallbacks[event]) {
+            for (const callback of eventToCallbacks[event]) {
                 callback(...args);
             }
         };
@@ -49,18 +66,37 @@ export const useSignal = (event: string) => {
 };
 
 export const useSlot = (event: string, callback: (...a: any) => void) => {
-    const value = React.useContext(EventContext);
+    const { eventToCallbacks, setEventToCallbacks } =
+        React.useContext(EventContext);
 
     React.useEffect(() => {
-        if (event in value.eventToCallbacks) {
-            value.eventToCallbacks[event].push(callback);
-            return () => {
-                value.eventToCallbacks[event] = value.eventToCallbacks[
-                    event
-                ].filter((el) => el != callback);
-            };
+        if (event in eventToCallbacks) {
+            setEventToCallbacks({
+                ...eventToCallbacks,
+                [event]: [...eventToCallbacks[event], callback],
+            });
+
+            return () =>
+                setEventToCallbacks({
+                    ...eventToCallbacks,
+                    [event]: eventToCallbacks[event].filter(
+                        (el) => el != callback
+                    ),
+                });
         } else {
             console.warn("useSlot(): event unknown: ", event);
         }
-    }, [callback]);
+    }, []);
+};
+
+/**
+ * helper functions
+ */
+
+const generateInitialStringToFunctionsMap = (events: string[]) => {
+    const result: StringToFunctions = {};
+    for (const event of events) {
+        result[event] = [];
+    }
+    return result;
 };
