@@ -11,12 +11,12 @@ interface IndicesBase {
     date: Date;
 }
 
-interface EmployeeIndices extends IndicesBase {
+export interface EmployeeIndices extends IndicesBase {
     secondIdx: "Employee";
     employee: Employee;
 }
 
-interface RoleIndices extends IndicesBase {
+export interface RoleIndices extends IndicesBase {
     secondIdx: "Role";
     role: Role;
 }

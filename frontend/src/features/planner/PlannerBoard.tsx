@@ -15,6 +15,9 @@ import { Props as GenericCssGridProps } from "../genericCssGrid/GenericCssGrid";
 import { Employee } from "../employees/employeeSlice";
 import { roleSelectors } from "../roles/rolesSlice";
 import ItemFactory, { Indices } from "./items/ItemFactory";
+import ClickedEmptyFieldWithEmployeeWidget from "./items/ClickedEmptyFieldWithEmployeeWidget";
+import EventProvider from "../eventProvider/EventProvider";
+import EventTypes from "./EventTypes";
 
 interface Props {
     schedule: Schedule;
@@ -102,68 +105,72 @@ const PlannerBoard = ({ schedule }: Props) => {
     }
 
     return (
-        <Paper className="planner-board-paper" elevation={3}>
-            <Typography
-                variant="h5"
-                component="h5"
-                style={{ marginBottom: 16 }}
-            >
-                Planner for schedule: {workplace.name} -- {schedule.month_year}
-            </Typography>
+        <EventProvider events={[EventTypes.EMPTY_FIELD_W_EMPLOYEE_CLICKED]}>
+            <Paper className="planner-board-paper" elevation={3}>
+                <Typography
+                    variant="h5"
+                    component="h5"
+                    style={{ marginBottom: 16 }}
+                >
+                    Planner for schedule: {workplace.name} --{" "}
+                    {schedule.month_year}
+                </Typography>
+                <ClickedEmptyFieldWithEmployeeWidget />
 
-            <div
-                style={{
-                    display: "flex",
-                }}
-            >
                 <div
                     style={{
-                        width: 0,
-                        flex: "1 1 100%",
+                        display: "flex",
                     }}
                 >
-                    <AnnotatedGenericCssGrid<Date, Employee>
-                        x={{
-                            cells: week,
-                            getId: (date: Date) => date.getDate(),
-                        }}
-                        y={{
-                            cells: employees,
-                            getId: (employee) => employee.id,
-                        }}
-                        annotateX={(date) => (
-                            <Paper
-                                style={{
-                                    padding: "8px",
-                                    textAlign: "center",
-                                }}
-                            >
-                                <Typography noWrap>
-                                    {format(date, "dd.MM, EEEE")}
-                                </Typography>
-                            </Paper>
-                        )}
-                        annotateY={(employee) => (
-                            <div
-                                style={{
-                                    verticalAlign: "center",
-                                    textAlign: "center",
-                                }}
-                            >{`${employee.first_name} ${employee.last_name}`}</div>
-                        )}
-                        items={items}
+                    <div
                         style={{
-                            overflowX: "auto",
-                            width: "100%",
-                            height: "100%",
-                            gap: "8px",
-                            marginBottom: "24px",
-                            paddingBottom: "24px",
+                            width: 0,
+                            flex: "1 1 100%",
                         }}
-                    />
+                    >
+                        <AnnotatedGenericCssGrid<Date, Employee>
+                            x={{
+                                cells: week,
+                                getId: (date: Date) => date.getDate(),
+                            }}
+                            y={{
+                                cells: employees,
+                                getId: (employee) => employee.id,
+                            }}
+                            annotateX={(date) => (
+                                <Paper
+                                    style={{
+                                        padding: "8px",
+                                        textAlign: "center",
+                                    }}
+                                >
+                                    <Typography noWrap>
+                                        {format(date, "dd.MM, EEEE")}
+                                    </Typography>
+                                </Paper>
+                            )}
+                            annotateY={(employee) => (
+                                <div
+                                    style={{
+                                        verticalAlign: "center",
+                                        textAlign: "center",
+                                    }}
+                                >{`${employee.first_name} ${employee.last_name}`}</div>
+                            )}
+                            items={items}
+                            style={{
+                                overflowX: "auto",
+                                width: "100%",
+                                height: "100%",
+                                gap: "8px",
+                                marginBottom: "24px",
+                                paddingBottom: "24px",
+                            }}
+                        />
+                    </div>
                 </div>
-            </div>
-        </Paper>
+            </Paper>
+        </EventProvider>
     );
 };
 
