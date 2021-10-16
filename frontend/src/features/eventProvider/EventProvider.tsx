@@ -1,44 +1,103 @@
 import * as React from "react";
 
+type StringToFunctions = {
+    [n: string]: ((...a: any) => void)[];
+};
+
+/**
+ *
+ */
+
+enum EventProviderActionKind {
+    ADD_CALLBACK = "ADD_CALLBACK",
+    REMOVE_CALLBACK = "REMOVE_CALLBACK",
+}
+
+interface EventProviderAction {
+    type: EventProviderActionKind;
+    payload: {
+        event: string;
+        callback: (...a: any) => void;
+    };
+}
+
+type EventProviderState = StringToFunctions;
+
+function eventProviderReducer(
+    state: EventProviderState,
+    action: EventProviderAction
+) {
+    const {
+        type,
+        payload: { event, callback },
+    } = action;
+    switch (type) {
+        case EventProviderActionKind.ADD_CALLBACK:
+            return {
+                ...state,
+                [event]: [...state[event], callback],
+            };
+        case EventProviderActionKind.REMOVE_CALLBACK:
+            return {
+                ...state,
+                [event]: state[event].filter((el) => el !== callback),
+            };
+        default:
+            return state;
+    }
+}
+
+/**
+ *
+ */
+
+export interface EventContextValueType {
+    eventToCallbacks: StringToFunctions;
+    dispatch: React.Dispatch<EventProviderAction>;
+}
+
+const initialValue: EventContextValueType = {
+    eventToCallbacks: {},
+    dispatch: null,
+};
+
+const EventContext = React.createContext(initialValue);
+
+/**
+ *
+ */
+
 interface PropsBase {
     events: string[];
 }
 
 type Props = React.PropsWithChildren<PropsBase>;
 
-export interface EventContextValueType {
-    eventToCallbacks: {
-        [n: string]: ((...a: any) => void)[];
-    };
-}
-
-const initialValue: EventContextValueType = {
-    eventToCallbacks: {},
-};
-
-const EventContext = React.createContext(initialValue);
-
 function EventProvider({ children, events }: Props) {
-    const eventToCallbacks: EventContextValueType["eventToCallbacks"] = {};
-    for (const event of events) {
-        eventToCallbacks[event] = [];
-    }
-
-    const value: EventContextValueType = { eventToCallbacks };
+    const [state, dispatch] = React.useReducer(
+        eventProviderReducer,
+        generateInitialStringToFunctionsMap(events)
+    );
 
     return (
-        <EventContext.Provider value={value}>{children}</EventContext.Provider>
+        <EventContext.Provider value={{ eventToCallbacks: state, dispatch }}>
+            {children}
+        </EventContext.Provider>
     );
 }
 
 export default EventProvider;
 
-export const useSignal = (event: string) => {
-    const value = React.useContext(EventContext);
+/**
+ * Custom hooks for use with EventProvider
+ */
 
-    if (event in value.eventToCallbacks) {
+export const useSignal = (event: string) => {
+    const { eventToCallbacks } = React.useContext(EventContext);
+
+    if (event in eventToCallbacks) {
         return (...args: any[]) => {
-            for (const callback of value.eventToCallbacks[event]) {
+            for (const callback of eventToCallbacks[event]) {
                 callback(...args);
             }
         };
@@ -48,19 +107,45 @@ export const useSignal = (event: string) => {
     }
 };
 
-export const useSlot = (event: string, callback: (...a: any) => void) => {
-    const value = React.useContext(EventContext);
+export const useSlot = (
+    event: string,
+    callback: (...a: any) => void,
+    depends: React.DependencyList = []
+) => {
+    const { eventToCallbacks, dispatch } = React.useContext(EventContext);
 
     React.useEffect(() => {
-        if (event in value.eventToCallbacks) {
-            value.eventToCallbacks[event].push(callback);
-            return () => {
-                value.eventToCallbacks[event] = value.eventToCallbacks[
-                    event
-                ].filter((el) => el != callback);
-            };
+        if (event in eventToCallbacks) {
+            dispatch({
+                type: EventProviderActionKind.ADD_CALLBACK,
+                payload: {
+                    event,
+                    callback,
+                },
+            });
+
+            return () =>
+                dispatch({
+                    type: EventProviderActionKind.REMOVE_CALLBACK,
+                    payload: {
+                        event,
+                        callback,
+                    },
+                });
         } else {
             console.warn("useSlot(): event unknown: ", event);
         }
-    }, [callback]);
+    }, depends);
+};
+
+/**
+ * helper functions
+ */
+
+const generateInitialStringToFunctionsMap = (events: string[]) => {
+    const result: StringToFunctions = {};
+    for (const event of events) {
+        result[event] = [];
+    }
+    return result;
 };

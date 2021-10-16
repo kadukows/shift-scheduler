@@ -13,12 +13,12 @@ interface IndicesBase {
 
 export interface EmployeeIndices extends IndicesBase {
     secondIdx: "Employee";
-    employee: Employee;
+    payload: Employee;
 }
 
 export interface RoleIndices extends IndicesBase {
     secondIdx: "Role";
-    role: Role;
+    payload: Role;
 }
 
 export type Indices = RoleIndices | EmployeeIndices;

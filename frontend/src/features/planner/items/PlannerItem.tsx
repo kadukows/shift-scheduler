@@ -8,6 +8,8 @@ import { Shift } from "../../shifts/shiftSlice";
 import { Indices } from "./ItemFactory";
 import { employeeSelectors } from "../../employees/employeeSlice";
 import ItemBase from "./ItemBase";
+import { useSignal } from "../../eventProvider/EventProvider";
+import EventTypes, { CallbackTypes } from "../EventTypes";
 
 interface Props {
     indices: Indices;
@@ -20,12 +22,20 @@ const PlannerItem = ({ shift, indices }: Props) => {
 
     const getEmployeeString = (employee_id: number) => {
         const employee = employeesById[employee_id];
-
         return `${employee.first_name} ${employee.last_name}`;
     };
 
+    const signal = useSignal(
+        EventTypes.NON_EMPTY_FIELD_CLICKED
+    ) as CallbackTypes.NON_EMPTY_FIELD_CLICKED;
+
     return (
-        <ItemBase className="planner-items-planner planner-items-hoverable">
+        <ItemBase
+            className="planner-items-planner planner-items-hoverable"
+            onClick={() =>
+                signal(indices.date, indices.secondIdx, indices.payload, shift)
+            }
+        >
             <Typography noWrap align="center">
                 {format(new Date(shift.time_from), "H:mm")} --{" "}
                 {format(new Date(shift.time_to), "H:mm")}
