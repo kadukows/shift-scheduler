@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Employee } from "../../employees/employeeSlice";
+import { employeeToString } from "../../employees/helpers";
 
 import { useSlot } from "../../eventProvider/EventProvider";
 import EventTypes, { CallbackTypes } from "../EventTypes";
@@ -14,7 +15,7 @@ const ClickedEmptyFieldWithEmployeeWidget = (props: Props) => {
     useSlot(EventTypes.EMPTY_FIELD_CLICKED, ((date, secondIdx, payload) => {
         setDate(date);
         setEmployee(payload as Employee);
-        setIsEmptyField(false);
+        setIsEmptyField(true);
     }) as CallbackTypes.EMPTY_FIELD_CLICKED);
 
     useSlot(EventTypes.NON_EMPTY_FIELD_CLICKED, ((
@@ -25,17 +26,14 @@ const ClickedEmptyFieldWithEmployeeWidget = (props: Props) => {
     ) => {
         setDate(date);
         setEmployee(payload as Employee);
-        setIsEmptyField(true);
+        setIsEmptyField(false);
     }) as CallbackTypes.NON_EMPTY_FIELD_CLICKED);
 
     return (
         <p>
-            {/*
-            Date: {date ? date.toISOString() : "null"}, employee:{" "}
-            {employee ? employee.first_name + " " + employee.last_name : "null"}
-            , is empty field: {isEmptyField}
-            */}
-            {`Date: ${date}, employee: ${employee}, is empty field: ${isEmptyField}`}
+            {`Date: ${date}, employee: ${employeeToString(
+                employee
+            )}, is empty field: ${isEmptyField}`}
         </p>
     );
 };
