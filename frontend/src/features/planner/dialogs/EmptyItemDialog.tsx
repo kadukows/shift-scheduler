@@ -32,44 +32,55 @@ interface Props {
 interface Inputs {
     time_from: string;
     time_to: string;
-    role: number;
+    role?: number;
+    employee?: number;
 }
 
 const FORM_ID = "EMPTY_ITEM_FORM_ID";
 const TIME_FORMAT = "yyyy-MM-dd'T'HH:mmX";
 
 const EmptyItemDialog = ({ schedule }: Props) => {
-    const fields = getFieldDataArray<Inputs>(schedule, "Role", TIME_FORMAT);
+    const [open, setOpen] = React.useState(false);
+    const [date, setDate] = React.useState<Date>(null);
+    const [payload, setPayload] = React.useState<Role | Employee>(null);
+    const [secondIdx, setSecondIdx] = React.useState<"Role" | "Employee">(
+        "Employee"
+    );
+
+    const fields = getFieldDataArray<Inputs>(schedule, secondIdx, TIME_FORMAT);
 
     //
 
     const auth = useSelector((state: RootState) => state.authReducer);
     const dispatch = useDispatch();
 
-    const [open, setOpen] = React.useState(false);
-    const [date, setDate] = React.useState<Date>(null);
-    const [employee, setEmployee] = React.useState<Employee>(null);
-
     //
 
     useSlot(EventTypes.EMPTY_FIELD_CLICKED, ((date, secondIdx, payload) => {
         setDate(date);
-        if (secondIdx !== "Employee") {
-            throw new Error("EmptyItemDialog: did not get an employee");
-        }
-        setEmployee(payload as Employee);
+        setPayload(payload);
+        setSecondIdx(secondIdx);
         setOpen(true);
     }) as CallbackTypes.EMPTY_FIELD_CLICKED);
 
     //
 
-    const onSubmit = async ({ time_from, time_to, role }: Inputs) => {
+    const onSubmit = async ({ time_from, time_to, role, employee }: Inputs) => {
+        const processedRoleId: number =
+            secondIdx === "Role" ? payload?.id : role;
+        const processedEmployeeId: number =
+            secondIdx === "Employee" ? payload?.id : employee;
+
+        if (processedRoleId === null || processedEmployeeId === null) {
+            throw new Error("processedRoleId or processedEmployeeId is null");
+        }
+
         const reqData = {
             time_from,
             time_to,
-            role,
+            role: processedRoleId,
             schedule: schedule.id,
-            employee: employee.id,
+            employee: processedEmployeeId,
         };
 
         const res = await axios.post<Shift>(

@@ -2,7 +2,7 @@ import * as React from "react";
 import { useRouteMatch } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Typography, Paper } from "@material-ui/core";
-import { parse, format, compareAsc } from "date-fns";
+import { parse, format, compareAsc, add, Duration } from "date-fns";
 
 import { RootState } from "../../store";
 import { Schedule } from "../schedules/scheduleSlice";
@@ -13,15 +13,25 @@ import { employeeSelectors } from "../employees/employeeSlice";
 import AnnotatedGenericCssGrid from "../genericCssGrid/AnnotatedGenericCssGrid";
 import { Props as GenericCssGridProps } from "../genericCssGrid/GenericCssGrid";
 import { Employee } from "../employees/employeeSlice";
-import { roleSelectors } from "../roles/rolesSlice";
+import { Role, roleSelectors } from "../roles/rolesSlice";
 import ItemFactory, { Indices } from "./items/ItemFactory";
 import ClickedEmptyFieldWithEmployeeWidget from "./items/ClickedEmptyFieldWithEmployeeWidget";
 import EventProvider from "../eventProvider/EventProvider";
 import EventTypes from "./EventTypes";
 import EmptyItemDialog from "./dialogs/EmptyItemDialog";
 
+export interface YIndexProvider<Item> {
+    selector: (state: RootState) => Item[];
+    annotate: (item: Item) => React.ReactNode;
+}
+
 interface Props {
     schedule: Schedule;
+    yIndexProvider: YIndexProvider<Role> | YIndexProvider<Employee>;
+    itemsGenerator: (
+        xIndices: Date[],
+        yIndices: (Role | Employee)[]
+    ) => GenericCssGridProps<Date, Role | Employee>["items"];
 }
 
 function getWeek(schedule: Schedule, idx: number): Date[] {
@@ -42,31 +52,20 @@ function getWeek(schedule: Schedule, idx: number): Date[] {
     return result;
 }
 
-const PlannerBoard = ({ schedule }: Props) => {
+const PlannerBoard = ({ schedule, yIndexProvider, itemsGenerator }: Props) => {
     const workplace = useSelector((state: RootState) =>
         workplaceSelectors.selectById(state, schedule.workplace)
     );
 
-    const employeeById = useSelector(employeeSelectors.selectEntities);
-    const rolesById = useSelector(roleSelectors.selectEntities);
-
     const week = getWeek(schedule, 1);
 
-    const shifts = useSelector(shiftSelectors.selectAll)
-        .filter((shift) => shift.schedule === schedule.id)
-        .filter((shift) => {
-            const parsed = new Date(shift.time_from);
+    const { selector, annotate } = yIndexProvider;
 
-            return (
-                compareAsc(week[0], parsed) === -1 &&
-                compareAsc(parsed, week[week.length - 1]) === -1
-            );
-        });
+    // @ts-expect-error
+    const employeesOrRoles: (Role | Employee)[] = useSelector(selector);
+    const items = itemsGenerator(week, employeesOrRoles);
 
-    const employees = useSelector(employeeSelectors.selectAll).filter(
-        (employee) => employee.workplace === workplace.id
-    );
-
+    /*
     const dayToEmployeeToShift: any = {};
     for (const day of week) {
         const employeeToShift: any = {};
@@ -98,12 +97,26 @@ const PlannerBoard = ({ schedule }: Props) => {
                 children: <ItemFactory indices={indices} shift={shift} />,
 
                 xStart: day,
-                xEnd: shift ? new Date(shift.time_to) : undefined,
+                xEnd: shift
+                    ? add(new Date(shift.time_to), { days: 1 })
+                    : undefined,
 
                 yStart: employee,
             });
         }
     }
+    */
+
+    const annotateX = (date: Date) => (
+        <Paper
+            style={{
+                padding: "8px",
+                textAlign: "center",
+            }}
+        >
+            <Typography noWrap>{format(date, "dd.MM, EEEE")}</Typography>
+        </Paper>
+    );
 
     return (
         <EventProvider
@@ -135,35 +148,17 @@ const PlannerBoard = ({ schedule }: Props) => {
                             flex: "1 1 100%",
                         }}
                     >
-                        <AnnotatedGenericCssGrid<Date, Employee>
+                        <AnnotatedGenericCssGrid<Date, Employee | Role>
                             x={{
                                 cells: week,
-                                getId: (date: Date) => date.getDate(),
+                                getId: (date) => date.getDate(),
                             }}
                             y={{
-                                cells: employees,
-                                getId: (employee) => employee.id,
+                                cells: employeesOrRoles,
+                                getId: (employeeOrRole) => employeeOrRole.id,
                             }}
-                            annotateX={(date) => (
-                                <Paper
-                                    style={{
-                                        padding: "8px",
-                                        textAlign: "center",
-                                    }}
-                                >
-                                    <Typography noWrap>
-                                        {format(date, "dd.MM, EEEE")}
-                                    </Typography>
-                                </Paper>
-                            )}
-                            annotateY={(employee) => (
-                                <div
-                                    style={{
-                                        verticalAlign: "center",
-                                        textAlign: "center",
-                                    }}
-                                >{`${employee.first_name} ${employee.last_name}`}</div>
-                            )}
+                            annotateX={annotateX}
+                            annotateY={annotate}
                             items={items}
                             style={{
                                 overflowX: "auto",

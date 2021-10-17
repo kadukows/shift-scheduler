@@ -40,9 +40,9 @@ export const getFieldDataArray = <Inputs extends Partial<BaseInputs>>(
             .selectAll(state)
             .filter((role) => role.workplace === schedule.workplace);
 
-    const selector = secondIdx === "Employee" ? employeeSelector : roleSelector;
+    const selector = secondIdx === "Employee" ? roleSelector : employeeSelector;
     const toString =
-        secondIdx === "Employee" ? employeeToString : (role: Role) => role.name;
+        secondIdx === "Employee" ? (role: Role) => role.name : employeeToString;
 
     return [
         {
@@ -65,8 +65,8 @@ export const getFieldDataArray = <Inputs extends Partial<BaseInputs>>(
         },
         {
             type: "choose_object",
-            name: secondIdx === "Employee" ? "employee" : "role",
-            label: secondIdx,
+            name: secondIdx === "Employee" ? "role" : "employee",
+            label: secondIdx === "Employee" ? "Role" : "Employee",
             validation: yup.string().required(),
             //
             entitySelector: selector,
