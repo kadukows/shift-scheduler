@@ -4,7 +4,6 @@ from django.contrib.auth.models import User
 from rest_framework import serializers
 
 from .models import Employee, Workplace, Schedule, Shift, Role
-from .helpers import ReadOnlyUponActionSerializerMixin
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -25,6 +24,7 @@ class UserSerializer(serializers.ModelSerializer):
         user.save()
 
         return user
+
 
 class WorkplaceSerializer(serializers.ModelSerializer):
     class Meta:
@@ -104,6 +104,9 @@ class ShiftSerializer(serializers.ModelSerializer):
         if (workplace != data['employee'].workplace
             or workplace != data['role'].workplace):
                 raise serializers.ValidationError("Mixing of schedule and/or employee and/or role from different workplaces is not permitted")
+
+        if data['time_from'] > data['time_to']:
+            raise serializers.ValidationError("time_from could not be greater than time_to")
 
         return data
 

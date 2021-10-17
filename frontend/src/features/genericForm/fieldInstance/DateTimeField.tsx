@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as yup from "yup";
 import { Controller, Control } from "react-hook-form";
-import { DatePicker, DatePickerView } from "@material-ui/pickers";
+import { DateTimePicker, DateTimePickerView } from "@material-ui/pickers";
 import { parse, format } from "date-fns";
 
 import { BaseFieldProps } from "./BaseFieldProps";
@@ -10,46 +10,37 @@ import { BaseFieldProps } from "./BaseFieldProps";
  * Types definitions
  */
 
-type DateYupValidationBuilderType = ReturnType<typeof yup.date>;
+type DateYupValidationBuilderType = ReturnType<typeof yup.string>;
 
-export interface DateFieldData<Inputs> {
-    type: "date";
+export interface DateTimeFieldData<Inputs> {
+    type: "datetime";
     name: keyof Inputs;
     label?: string;
-    // this validates date as string
     validation: DateYupValidationBuilderType;
     //
-    views: DatePickerView[];
+    views: DateTimePickerView[];
     format: string;
 }
 
-interface DateFieldDataProps<Inputs> extends BaseFieldProps<Inputs> {
-    field: DateFieldData<Inputs>;
+interface Props<Inputs> extends BaseFieldProps<Inputs> {
+    field: DateTimeFieldData<Inputs>;
     control: Control<Inputs>;
 }
 
-/**
- *  Component definition
- */
-//const defaultVal = new Date("01/01/1999");
-
-const DateField = <Inputs extends unknown>({
+const DateTimeField = <Inputs extends unknown>({
     field,
     control,
-}: DateFieldDataProps<Inputs>) => {
-    //return <DatePicker views={} />;
+}: Props<Inputs>) => {
     return (
         <Controller<Inputs>
             control={control}
-            // @ts-ignore
+            // @ts-expect-error
             name={field.name}
-            // @ts-ignore
-            //defaultValue={defaultVal}
             render={({
                 field: { onChange, value, name, ref },
                 fieldState: { invalid, error },
             }) => (
-                <DatePicker
+                <DateTimePicker
                     label={field.label}
                     fullWidth
                     error={invalid}
@@ -61,10 +52,11 @@ const DateField = <Inputs extends unknown>({
                     onChange={(date: Date) =>
                         onChange(format(date, field.format))
                     }
+                    ampm={false}
                 />
             )}
         />
     );
 };
 
-export default DateField;
+export default DateTimeField;

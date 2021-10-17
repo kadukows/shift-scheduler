@@ -162,3 +162,23 @@ class ShiftSerializerTests(TestCase):
                 'Role not found'
             ]
         })
+
+    def test_shift_serializer_validates_time_range(self):
+        schedule, employee, role = self.createValidData()
+        time_from = DateTime(1999, 1, 1, 8, tzinfo=timezone(timedelta(hours=0)))
+        time_to = DateTime(1999, 1, 1, 0, tzinfo=timezone(timedelta(hours=0)))
+
+        sut = self.makeSut(data={
+            'schedule': schedule.id,
+            'employee': employee.id,
+            'role': role.id,
+            'time_from': time_from.isoformat(),
+            'time_to': time_to.isoformat()
+        })
+
+        self.assertFalse(sut.is_valid())
+        self.assertDictEqual(sut.errors, {
+            'non_field_errors': [
+                'time_from could not be greater than time_to'
+            ]
+        })

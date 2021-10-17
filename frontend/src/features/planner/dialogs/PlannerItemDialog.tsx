@@ -1,11 +1,9 @@
 import * as React from "react";
 
-import
-
 interface Props {}
 
-const ShiftDialog = (props: Props) => {
+const PlannerItemDialog = (props: Props) => {
     return <div></div>;
 };
 
-export default ShiftDialog;
+export default PlannerItemDialog;

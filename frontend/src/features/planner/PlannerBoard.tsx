@@ -18,6 +18,7 @@ import ItemFactory, { Indices } from "./items/ItemFactory";
 import ClickedEmptyFieldWithEmployeeWidget from "./items/ClickedEmptyFieldWithEmployeeWidget";
 import EventProvider from "../eventProvider/EventProvider";
 import EventTypes from "./EventTypes";
+import EmptyItemDialog from "./dialogs/EmptyItemDialog";
 
 interface Props {
     schedule: Schedule;
@@ -111,6 +112,7 @@ const PlannerBoard = ({ schedule }: Props) => {
                 EventTypes.NON_EMPTY_FIELD_CLICKED,
             ]}
         >
+            <EmptyItemDialog schedule={schedule} />
             <Paper className="planner-board-paper" elevation={3}>
                 <Typography
                     variant="h5"

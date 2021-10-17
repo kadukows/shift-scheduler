@@ -7,6 +7,7 @@ import ChooseObjectIdField, {
     ChooseObjectIdFieldData,
 } from "./ChooseObjectIdField";
 import DateField, { DateFieldData } from "./DateField";
+import DateTimeField, { DateTimeFieldData } from "./DateTimeField";
 import { BaseFieldProps } from "./BaseFieldProps";
 
 /**
@@ -16,7 +17,8 @@ import { BaseFieldProps } from "./BaseFieldProps";
 export type FieldData<Inputs, Entity extends WithId> =
     | StringFieldData<Inputs>
     | ChooseObjectIdFieldData<Inputs, Entity>
-    | DateFieldData<Inputs>;
+    | DateFieldData<Inputs>
+    | DateTimeFieldData<Inputs>;
 
 interface FieldInstanceProps<Inputs, Entity extends WithId>
     extends BaseFieldProps<Inputs> {
@@ -63,6 +65,16 @@ const Field = <Inputs, Entity extends WithId>({
             const dateField = field as DateFieldData<Inputs>;
             return (
                 <DateField field={dateField} control={control} {...baseProps} />
+            );
+
+        case "datetime":
+            const dateTimeField = field as DateTimeFieldData<Inputs>;
+            return (
+                <DateTimeField
+                    field={dateTimeField}
+                    control={control}
+                    {...baseProps}
+                />
             );
     }
 

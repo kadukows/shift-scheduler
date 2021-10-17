@@ -31,7 +31,6 @@ export function handleErrors<Inputs>(
     setNonFieldError: (n: string[]) => void
 ) {
     for (const field of fields) {
-        console.log("error.data: ", error.data);
         if (field in error.data) {
             for (const msg of error.data[field]) {
                 // @ts-expect-error

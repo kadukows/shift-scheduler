@@ -11,9 +11,9 @@ import { BaseFieldProps } from "./fieldInstance/BaseFieldProps";
 
 interface Props<Inputs, Entity extends WithId> {
     fields: FieldData<Inputs, Entity>[];
-    submit: (a: any) => void;
-    formId: string;
-    defaultValues?: Inputs;
+    submit: (a: Inputs) => void;
+    formId?: string;
+    defaultValues?: Partial<Inputs>;
 }
 
 function GenericForm<Inputs, Entity extends WithId>({
