@@ -75,26 +75,26 @@ export const makeDispatchActionWhenAuthedObserver = (
     );
 };
 
-export const getApiGenericThunkAction = (
-    setLoading: (a: boolean) => any,
-    setEntities: (a: any) => any,
-    apiUrl: string
-) => {
-    return (): ThunkAction<void, RootState, unknown, AnyAction> =>
-        async (dispatch, getState) => {
-            dispatch(setLoading(true));
+export const getApiGenericThunkAction =
+    (
+        setLoading: (a: boolean) => any,
+        setEntities: (a: any) => any,
+        apiUrl: string
+    ) =>
+    (): ThunkAction<void, RootState, unknown, AnyAction> =>
+    async (dispatch, getState) => {
+        dispatch(setLoading(true));
 
-            try {
-                const res = await axios.get(
-                    apiUrl,
-                    getTokenRequestConfig(getState().authReducer.token)
-                );
-                dispatch(setEntities(res.data));
-            } finally {
-                dispatch(setLoading(false));
-            }
-        };
-};
+        try {
+            const res = await axios.get(
+                apiUrl,
+                getTokenRequestConfig(getState().authReducer.token)
+            );
+            dispatch(setEntities(res.data));
+        } finally {
+            dispatch(setLoading(false));
+        }
+    };
 
 type MyTextFieldProps<Inputs> = {
     errors: ReactHookForm.FormState<Inputs>["errors"];

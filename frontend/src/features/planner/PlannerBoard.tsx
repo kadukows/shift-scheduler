@@ -1,41 +1,30 @@
 import * as React from "react";
-import { useRouteMatch } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Typography, Paper } from "@material-ui/core";
-import { parse, format, compareAsc, add, Duration } from "date-fns";
+import { Typography, Paper, TextField, MenuItem } from "@material-ui/core";
+import * as DateFns from "date-fns";
 
 import { RootState } from "../../store";
 import { Schedule } from "../schedules/scheduleSlice";
 import { workplaceSelectors } from "../workplaces/workplaceSlice";
-import HeaderDay from "./HeaderDay";
-import { shiftSelectors } from "../shifts/shiftSlice";
+import { Shift, shiftSelectors } from "../shifts/shiftSlice";
 import { employeeSelectors } from "../employees/employeeSlice";
-import AnnotatedGenericCssGrid from "../genericCssGrid/AnnotatedGenericCssGrid";
 import { Props as GenericCssGridProps } from "../genericCssGrid/GenericCssGrid";
 import { Employee } from "../employees/employeeSlice";
+import { employeeToString } from "../employees/helpers";
 import { Role, roleSelectors } from "../roles/rolesSlice";
-import ItemFactory, { Indices } from "./items/ItemFactory";
+import ItemFactory from "./items/ItemFactory";
 import ClickedEmptyFieldWithEmployeeWidget from "./items/ClickedEmptyFieldWithEmployeeWidget";
 import EventProvider from "../eventProvider/EventProvider";
 import EventTypes from "./EventTypes";
 import EmptyItemDialog from "./dialogs/EmptyItemDialog";
-
-export interface YIndexProvider<Item> {
-    selector: (state: RootState) => Item[];
-    annotate: (item: Item) => React.ReactNode;
-}
+import PlannerGrid, { YIndexProvider, ItemsGenerator } from "./PlannerGrid";
 
 interface Props {
     schedule: Schedule;
-    yIndexProvider: YIndexProvider<Role> | YIndexProvider<Employee>;
-    itemsGenerator: (
-        xIndices: Date[],
-        yIndices: (Role | Employee)[]
-    ) => GenericCssGridProps<Date, Role | Employee>["items"];
 }
 
 function getWeek(schedule: Schedule, idx: number): Date[] {
-    let date = parse(schedule.month_year, "MM.yyyy", new Date());
+    let date = DateFns.parse(schedule.month_year, "MM.yyyy", new Date());
 
     date.setDate(date.getDate() + idx * 7);
     while (date.getDay() != 0) {
@@ -52,71 +41,22 @@ function getWeek(schedule: Schedule, idx: number): Date[] {
     return result;
 }
 
-const PlannerBoard = ({ schedule, yIndexProvider, itemsGenerator }: Props) => {
+const PlannerBoard = ({ schedule }: Props) => {
     const workplace = useSelector((state: RootState) =>
         workplaceSelectors.selectById(state, schedule.workplace)
     );
 
-    const week = getWeek(schedule, 1);
-
-    const { selector, annotate } = yIndexProvider;
-
-    // @ts-expect-error
-    const employeesOrRoles: (Role | Employee)[] = useSelector(selector);
-    const items = itemsGenerator(week, employeesOrRoles);
-
-    /*
-    const dayToEmployeeToShift: any = {};
-    for (const day of week) {
-        const employeeToShift: any = {};
-        for (const employee of employees) {
-            employeeToShift[employee.id] = null;
-        }
-        dayToEmployeeToShift[day.getDate()] = employeeToShift;
-    }
-
-    for (const shift of shifts) {
-        dayToEmployeeToShift[new Date(shift.time_from).getDate()][
-            shift.employee
-        ] = shift;
-    }
-
-    const items: GenericCssGridProps<Date, Employee>["items"] = [];
-
-    for (const day of week) {
-        for (const employee of employees) {
-            const indices = {
-                date: day,
-                secondIdx: "Employee",
-                payload: employee,
-            } as Indices;
-
-            const shift = dayToEmployeeToShift[day.getDate()][employee.id];
-
-            items.push({
-                children: <ItemFactory indices={indices} shift={shift} />,
-
-                xStart: day,
-                xEnd: shift
-                    ? add(new Date(shift.time_to), { days: 1 })
-                    : undefined,
-
-                yStart: employee,
-            });
-        }
-    }
-    */
-
-    const annotateX = (date: Date) => (
-        <Paper
-            style={{
-                padding: "8px",
-                textAlign: "center",
-            }}
-        >
-            <Typography noWrap>{format(date, "dd.MM, EEEE")}</Typography>
-        </Paper>
+    const [secondIdx, setSecondIdx] = React.useState<"Employee" | "Role">(
+        "Employee"
     );
+
+    const shifts = useSelector(shiftSelectors.selectAll).filter(
+        (shift) => shift.schedule === schedule.id
+    );
+
+    const yIndexProvider = getYIdxProvider(secondIdx, schedule);
+    const dates = getWeek(schedule, 1);
+    const itemGenerator = getItemsGenerator(secondIdx, shifts);
 
     return (
         <EventProvider
@@ -135,45 +75,168 @@ const PlannerBoard = ({ schedule, yIndexProvider, itemsGenerator }: Props) => {
                     Planner for schedule: {workplace.name} --{" "}
                     {schedule.month_year}
                 </Typography>
-                <ClickedEmptyFieldWithEmployeeWidget />
-
-                <div
-                    style={{
-                        display: "flex",
-                    }}
+                <TextField
+                    select
+                    variant="outlined"
+                    label="By"
+                    value={secondIdx}
+                    onChange={(event) =>
+                        setSecondIdx(event.target.value as "Employee" | "Role")
+                    }
                 >
-                    <div
-                        style={{
-                            width: 0,
-                            flex: "1 1 100%",
-                        }}
-                    >
-                        <AnnotatedGenericCssGrid<Date, Employee | Role>
-                            x={{
-                                cells: week,
-                                getId: (date) => date.getDate(),
-                            }}
-                            y={{
-                                cells: employeesOrRoles,
-                                getId: (employeeOrRole) => employeeOrRole.id,
-                            }}
-                            annotateX={annotateX}
-                            annotateY={annotate}
-                            items={items}
-                            style={{
-                                overflowX: "auto",
-                                width: "100%",
-                                height: "100%",
-                                gap: "8px",
-                                marginBottom: "24px",
-                                paddingBottom: "24px",
-                            }}
-                        />
-                    </div>
-                </div>
+                    <MenuItem value={"Employee"}>Employee</MenuItem>
+                    <MenuItem value={"Role"}>Role</MenuItem>
+                </TextField>
+                <PlannerGrid
+                    yIndexProvider={yIndexProvider}
+                    dates={dates}
+                    itemsGenerator={itemGenerator}
+                />
             </Paper>
         </EventProvider>
     );
 };
 
 export default PlannerBoard;
+
+//
+//
+//
+
+const getYIdxProvider = (
+    secondIdx: "Employee" | "Role",
+    schedule: Schedule
+): YIndexProvider<Role> | YIndexProvider<Employee> => {
+    if (secondIdx === "Employee") {
+        return {
+            selector: (state: RootState) =>
+                employeeSelectors
+                    .selectAll(state)
+                    .filter(
+                        (employee) => employee.workplace === schedule.workplace
+                    ),
+            annotate: (employee) => (
+                <Typography align="center">
+                    {employeeToString(employee)}
+                </Typography>
+            ),
+        } as YIndexProvider<Employee>;
+    } else {
+        return {
+            selector: (state: RootState) =>
+                roleSelectors
+                    .selectAll(state)
+                    .filter((role) => role.workplace === schedule.workplace),
+            annotate: (role) => (
+                <Typography align="center">{role.name}</Typography>
+            ),
+        } as YIndexProvider<Role>;
+    }
+};
+
+const getItemsGenerator = (
+    secondIdx: "Employee" | "Role",
+    shifts: Shift[]
+): ItemsGenerator => {
+    interface ShiftAndInterval {
+        shift: Shift;
+        interval: DateFns.Interval;
+    }
+
+    const shiftAndIntervals: ShiftAndInterval[] = shifts.map((shift) => {
+        const start = DateFns.set(Date.parse(shift.time_from), {
+            hours: 0,
+            minutes: 0,
+            seconds: 0,
+        });
+        const end = DateFns.set(Date.parse(shift.time_to), {
+            hours: 23,
+            minutes: 59,
+            seconds: 59,
+        });
+
+        const interval: Interval = { start, end };
+
+        return { shift, interval };
+    });
+
+    type TemplatedGetItemsGenerator = (
+        shiftPayloadEq: (shift: Shift, payload: Employee | Role) => boolean,
+        secondIdx: "Employee" | "Role"
+    ) => ItemsGenerator;
+
+    const templatedGetItemsGenerator: TemplatedGetItemsGenerator =
+        (shiftPayloadEq, secondIdx) => (dates, payloads) => {
+            const addedShiftsId = new Set<number>();
+            const result: GenericCssGridProps<Date, Employee | Role>["items"] =
+                [];
+
+            for (const date of dates) {
+                for (const payload of payloads) {
+                    const shiftAndInterval = shiftAndIntervals.find(
+                        ({ shift, interval }) =>
+                            DateFns.isWithinInterval(date, interval) &&
+                            shiftPayloadEq(shift, payload)
+                    );
+
+                    if (shiftAndInterval) {
+                        const { shift, interval } = shiftAndInterval;
+
+                        if (!addedShiftsId.has(shift.id)) {
+                            const children = (
+                                <ItemFactory
+                                    shift={shift}
+                                    // @ts-expect-error
+                                    indices={{
+                                        secondIdx,
+                                        payload,
+                                        date,
+                                    }}
+                                />
+                            );
+
+                            result.push({
+                                children,
+                                xStart: interval.start as Date,
+                                xEnd: DateFns.add(interval.end, { days: 1 }),
+                                yStart: payload,
+                            });
+
+                            addedShiftsId.add(shift.id);
+                        }
+                    } else {
+                        const children = (
+                            <ItemFactory
+                                // @ts-expect-error
+                                indices={{
+                                    secondIdx,
+                                    payload,
+                                    date,
+                                }}
+                            />
+                        );
+
+                        result.push({
+                            children,
+                            xStart: date,
+                            yStart: payload,
+                        });
+                    }
+                }
+            }
+
+            return result;
+        };
+
+    if (secondIdx === "Employee") {
+        return templatedGetItemsGenerator(
+            (shift, employee: Employee) => shift.employee === employee.id,
+            "Employee"
+        );
+    } else {
+        return templatedGetItemsGenerator(
+            (shift, role: Role) => shift.role === role.id,
+            "Role"
+        );
+    }
+};
