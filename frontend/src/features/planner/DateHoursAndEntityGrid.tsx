@@ -4,7 +4,9 @@ interface Props<Entity> {
     dates: Date[];
 }
 
-const DateHoursAndEntityGrid = <Entity extends unknown>(props: Props) => {
+const DateHoursAndEntityGrid = <Entity extends unknown>(
+    props: Props<Entity>
+) => {
     return;
 };
 
