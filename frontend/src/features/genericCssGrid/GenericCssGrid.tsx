@@ -27,7 +27,10 @@ export interface Props<Tx, Ty>
 const GenericCssGrid = <Tx, Ty>({ x, y, items, ...rest }: Props<Tx, Ty>) => {
     const { style, ...restWoStyle } = rest;
 
-    const newStyle: any = { ...generateCssForGrid({ x, y }), ...style };
+    const newStyle = React.useMemo(
+        () => ({ ...generateCssForGrid({ x, y }), ...style }),
+        [x, y, style]
+    );
 
     return (
         <div style={newStyle} {...restWoStyle}>
