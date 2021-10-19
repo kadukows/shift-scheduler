@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { Link as RouterLink } from "react-router-dom";
-import { Grid, Button } from "@material-ui/core";
+import { Grid, Button } from "@mui/material";
 import {
     DataGrid,
     GridCellValue,

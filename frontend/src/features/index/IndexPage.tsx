@@ -1,6 +1,8 @@
 import * as React from "react";
 import { useDispatch } from "react-redux";
-import { Paper, Typography, Button, Grid, makeStyles } from "@material-ui/core";
+import { Paper, Typography, Button, Grid } from "@mui/material";
+
+import makeStyles from '@mui/styles/makeStyles';
 
 import { addAlert } from "../alerts/alertsSlice";
 

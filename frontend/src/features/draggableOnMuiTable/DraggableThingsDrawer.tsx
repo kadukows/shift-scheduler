@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useDrag } from "react-dnd";
 import { useDispatch, useSelector } from "react-redux";
-import { Paper } from "@material-ui/core";
+import { Paper } from "@mui/material";
 
 import { RootState } from "../../store";
 import { ItemTypes, ItemTypesPassed } from "../dndTypes/DndTypes";

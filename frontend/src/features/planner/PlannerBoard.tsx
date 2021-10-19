@@ -1,6 +1,6 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
-import { Typography, Paper, TextField, MenuItem } from "@material-ui/core";
+import { Typography, Paper, TextField, MenuItem } from "@mui/material";
 import * as DateFns from "date-fns";
 
 import { RootState } from "../../store";

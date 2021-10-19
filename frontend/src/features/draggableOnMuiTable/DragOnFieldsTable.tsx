@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Table, Paper } from "@material-ui/core";
+import { Table, Paper } from "@mui/material";
 import { RootState } from "../../store";
 import { useSelector } from "react-redux";
 

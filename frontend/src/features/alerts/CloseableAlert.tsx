@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useDispatch } from "react-redux";
-import { Collapse } from "@material-ui/core";
-import { Alert as AlertMui } from "@material-ui/lab";
+import { Collapse } from "@mui/material";
+import { Alert as AlertMui } from '@mui/material';
 
 import { AlertWithId, removeAlert } from "./alertsSlice";
 

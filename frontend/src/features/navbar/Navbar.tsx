@@ -1,15 +1,9 @@
 import * as React from "react";
 import { Link as RouterLink, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
-import {
-    makeStyles,
-    AppBar,
-    Toolbar,
-    Button,
-    Grid,
-    IconButton,
-} from "@material-ui/core";
-import { Menu as MenuIcon } from "@material-ui/icons";
+import { AppBar, Toolbar, Button, Grid, IconButton } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { Menu as MenuIcon } from "@mui/icons-material";
 
 import DarkThemeToggler from "../darkThemeProvider/DarkThemeToggler";
 import { combineClx } from "../helpers";

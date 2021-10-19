@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as DateFns from "date-fns";
 import { useSelector } from "react-redux";
-import { Paper, Typography } from "@material-ui/core";
+import { Paper, Typography } from "@mui/material";
 
 import { Props as GenericCssGridProps } from "../genericCssGrid/GenericCssGrid";
 import { RootState } from "../../store";

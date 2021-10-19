@@ -1,7 +1,8 @@
 import * as React from "react";
 import { Provider } from "react-redux";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
-import { CssBaseline, makeStyles, Container, Grid } from "@material-ui/core";
+import { CssBaseline, Container, Grid } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { MuiPickersUtilsProvider } from "@material-ui/pickers";
 import DateFnsUtils from "@date-io/date-fns";
 

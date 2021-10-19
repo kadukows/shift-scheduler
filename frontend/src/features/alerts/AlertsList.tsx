@@ -2,8 +2,9 @@ import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store";
 import { AlertWithId, removeAlert } from "./alertsSlice";
-import { makeStyles, Collapse } from "@material-ui/core";
-import { Alert as AlertMui } from "@material-ui/lab";
+import { Collapse } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { Alert as AlertMui } from '@mui/material';
 
 import CloseableAlert from "./CloseableAlert";
 

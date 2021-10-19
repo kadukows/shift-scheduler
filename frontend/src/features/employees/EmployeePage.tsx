@@ -4,13 +4,13 @@ import {
     Grid,
     Typography,
     Paper,
-    makeStyles,
     Button,
     Dialog,
     DialogTitle,
     DialogActions,
     DialogContent,
-} from "@material-ui/core";
+} from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
 import { useSelector, useDispatch } from "react-redux";
 
 import EmployeeAgGrid from "./EmployeeAgGrid";

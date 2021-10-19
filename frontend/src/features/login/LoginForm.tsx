@@ -9,16 +9,9 @@ import {
     SubmitHandler,
 } from "react-hook-form";
 import { useHistory } from "react-router-dom";
-import {
-    TextField,
-    Grid,
-    Typography,
-    Paper,
-    Button,
-    makeStyles,
-    FormHelperText,
-} from "@material-ui/core";
-import { Lock } from "@material-ui/icons";
+import { TextField, Grid, Typography, Paper, Button, FormHelperText } from "@mui/material";
+import makeStyles from '@mui/styles/makeStyles';
+import { Lock } from "@mui/icons-material";
 import { yupResolver } from "@hookform/resolvers/yup";
 
 import { DjangoErrors, handleErrors, MyTextField } from "../helpers";

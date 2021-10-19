@@ -9,7 +9,7 @@ import {
     DialogTitle,
     DialogContent,
     DialogActions,
-} from "@material-ui/core";
+} from "@mui/material";
 import { AgGridColumn, AgGridReact } from "ag-grid-react";
 
 import { employeeSelectors } from "./employeeSlice";
@@ -43,7 +43,7 @@ const EmployeeAgGrid = ({ onClickCellDeletion, onClickCellUpdate }: Props) => {
     const theme = useTheme();
 
     const agGridClass =
-        theme.palette.type === "dark"
+        theme.palette.mode === "dark"
             ? "ag-theme-alpine-dark"
             : "ag-theme-alpine";
 

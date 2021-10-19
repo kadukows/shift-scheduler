@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CircularProgress, Typography, Grid } from "@material-ui/core";
+import { CircularProgress, Typography, Grid } from "@mui/material";
 
 interface Props<SliceStateType> {
     useSlice: () => SliceStateType;

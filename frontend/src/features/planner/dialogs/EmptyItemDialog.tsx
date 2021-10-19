@@ -8,7 +8,7 @@ import {
     DialogTitle,
     DialogActions,
     Button,
-} from "@material-ui/core";
+} from "@mui/material";
 
 import GenericForm from "../../genericForm/GenericForm";
 import { FieldData } from "../../genericForm/fieldInstance/Field";

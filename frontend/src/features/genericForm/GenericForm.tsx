@@ -2,7 +2,7 @@ import * as React from "react";
 import * as yup from "yup";
 import axios, { AxiosError } from "axios";
 import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
-import { FormHelperText, Grid, LinearProgress } from "@material-ui/core";
+import { FormHelperText, Grid, LinearProgress } from "@mui/material";
 
 import { DjangoErrors, handleErrors, WithId } from "../helpers";
 import { yupResolver } from "@hookform/resolvers/yup";

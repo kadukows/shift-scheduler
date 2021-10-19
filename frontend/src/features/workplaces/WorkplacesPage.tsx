@@ -4,15 +4,16 @@ import {
     Grid,
     Typography,
     Paper,
-    makeStyles,
     Button,
     Dialog,
     DialogTitle,
     DialogActions,
     DialogContent,
-} from "@material-ui/core";
+} from "@mui/material";
 
-import Icon from "@material-ui/core/Icon";
+import makeStyles from '@mui/styles/makeStyles';
+
+import Icon from "@mui/material/Icon";
 import { Link as RouterLink } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 

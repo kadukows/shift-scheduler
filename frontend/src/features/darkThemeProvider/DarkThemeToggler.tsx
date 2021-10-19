@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { Button } from "@material-ui/core";
-import { Brightness4, Brightness7 } from "@material-ui/icons";
+import { Button } from "@mui/material";
+import { Brightness4, Brightness7 } from "@mui/icons-material";
 
 import { RootState } from "../../store";
 import { toggleDarkMode } from "./darkThemeProviderSlice";
