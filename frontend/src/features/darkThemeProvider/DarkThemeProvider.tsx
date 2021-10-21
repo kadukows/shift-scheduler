@@ -17,13 +17,6 @@ const DarkThemeProvider = ({ children }: React.PropsWithChildren<Props>) => {
             createTheme({
                 palette: {
                     mode: darkMode ? "dark" : "light",
-                    primary: darkMode
-                        ? {
-                              main: blue[700],
-                          }
-                        : {
-                              main: blue[800],
-                          },
                 },
             }),
         [darkMode]
