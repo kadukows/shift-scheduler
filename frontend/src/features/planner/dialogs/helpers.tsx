@@ -51,7 +51,7 @@ export const getFieldDataArray = <Inputs extends Partial<BaseInputs>>(
             label: "Time from",
             validation: yup.string().required(),
             //
-            views: ["date", "hours", "minutes"],
+            views: ["day", "hours", "minutes"],
             format: timeFormat,
         },
         {
@@ -60,7 +60,7 @@ export const getFieldDataArray = <Inputs extends Partial<BaseInputs>>(
             label: "Time to",
             validation: yup.string().required(),
             //
-            views: ["date", "hours", "minutes"],
+            views: ["day", "hours", "minutes"],
             format: timeFormat,
         },
         {

@@ -1,7 +1,8 @@
 import * as React from "react";
 import * as yup from "yup";
 import { Controller, Control } from "react-hook-form";
-import { DatePicker, DatePickerView } from "@material-ui/pickers";
+import { TextField } from "@mui/material";
+import { DatePicker } from "@mui/lab";
 import { parse, format } from "date-fns";
 
 import { BaseFieldProps } from "./BaseFieldProps";
@@ -19,7 +20,7 @@ export interface DateFieldData<Inputs> {
     // this validates date as string
     validation: DateYupValidationBuilderType;
     //
-    views: DatePickerView[];
+    views: React.ComponentProps<typeof DatePicker>["views"];
     format: string;
 }
 
@@ -50,17 +51,21 @@ const DateField = <Inputs extends unknown>({
                 fieldState: { invalid, error },
             }) => (
                 <DatePicker
-                    label={field.label}
-                    fullWidth
-                    error={invalid}
-                    helperText={error?.message}
                     views={field.views}
                     ref={ref}
-                    name={name}
-                    value={parse(value, field.format, new Date())}
-                    onChange={(date: Date) =>
-                        onChange(format(date, field.format))
-                    }
+                    value={value}
+                    onChange={onChange}
+                    inputFormat={field.format}
+                    renderInput={(props) => (
+                        <TextField
+                            fullWidth
+                            name={name}
+                            label={field.label}
+                            error={invalid}
+                            helperText={error?.message}
+                            {...props}
+                        />
+                    )}
                 />
             )}
         />

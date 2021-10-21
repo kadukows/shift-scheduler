@@ -1,7 +1,8 @@
 import * as React from "react";
 import * as yup from "yup";
 import { Controller, Control } from "react-hook-form";
-import { DateTimePicker, DateTimePickerView } from "@material-ui/pickers";
+import { TextField } from "@mui/material";
+import { DateTimePicker, DateTimePickerProps } from "@mui/lab";
 import { parse, format } from "date-fns";
 
 import { BaseFieldProps } from "./BaseFieldProps";
@@ -18,7 +19,7 @@ export interface DateTimeFieldData<Inputs> {
     label?: string;
     validation: DateYupValidationBuilderType;
     //
-    views: DateTimePickerView[];
+    views: DateTimePickerProps["views"];
     format: string;
 }
 
@@ -41,18 +42,24 @@ const DateTimeField = <Inputs extends unknown>({
                 fieldState: { invalid, error },
             }) => (
                 <DateTimePicker
-                    label={field.label}
-                    fullWidth
-                    error={invalid}
-                    helperText={error?.message}
                     views={field.views}
                     ref={ref}
-                    name={name}
+                    inputFormat={field.format}
                     value={parse(value, field.format, new Date())}
-                    onChange={(date: Date) =>
-                        onChange(format(date, field.format))
+                    onChange={(val: Date) =>
+                        onChange(format(val, field.format))
                     }
                     ampm={false}
+                    renderInput={(props) => (
+                        <TextField
+                            fullWidth
+                            name={name}
+                            label={field.label}
+                            error={invalid}
+                            helperText={error?.message}
+                            {...props}
+                        />
+                    )}
                 />
             )}
         />

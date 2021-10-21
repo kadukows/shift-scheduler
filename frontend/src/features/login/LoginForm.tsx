@@ -9,8 +9,14 @@ import {
     SubmitHandler,
 } from "react-hook-form";
 import { useHistory } from "react-router-dom";
-import { TextField, Grid, Typography, Paper, Button, FormHelperText } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import {
+    TextField,
+    Grid,
+    Typography,
+    Paper,
+    Button,
+    FormHelperText,
+} from "@mui/material";
 import { Lock } from "@mui/icons-material";
 import { yupResolver } from "@hookform/resolvers/yup";
 
@@ -30,18 +36,11 @@ const schema = yup.object().shape({
     password: yup.string().required(),
 });
 
-const useStyles = makeStyles((theme) => ({
-    paper: {
-        padding: theme.spacing(2),
-    },
-}));
-
 const LoginForm = (props: Props) => {
     const [nonFieldErrors, setNonFieldErrors] = React.useState<Array<string>>(
         []
     );
 
-    const classes = useStyles();
     const dispatch = useDispatch();
     const history = useHistory();
 
@@ -95,7 +94,7 @@ const LoginForm = (props: Props) => {
     return (
         <Grid container justifyContent="center">
             <Grid item>
-                <Paper className={classes.paper}>
+                <Paper sx={{ p: 2 }}>
                     <form onSubmit={handleSubmit(onSubmit)}>
                         <Grid
                             container

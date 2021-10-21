@@ -2,30 +2,19 @@ import * as React from "react";
 import { useDispatch } from "react-redux";
 import { Paper, Typography, Button, Grid } from "@mui/material";
 
-import makeStyles from '@mui/styles/makeStyles';
-
 import { addAlert } from "../alerts/alertsSlice";
-
-interface Props {}
-
-const useStyles = makeStyles((theme) => ({
-    paper: {
-        padding: theme.spacing(1),
-    },
-}));
 
 const MyButton = (props: React.ComponentProps<typeof Button>) => (
     <Button color="primary" variant="contained" {...props} />
 );
 
-const IndexPage = (props: Props) => {
+const IndexPage = () => {
     const dispatch = useDispatch();
-    const classes = useStyles();
 
     return (
         <Grid container justifyContent="center">
             <Grid item>
-                <Paper className={classes.paper}>
+                <Paper sx={{ p: 1 }}>
                     <Grid
                         container
                         spacing={2}

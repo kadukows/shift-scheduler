@@ -2,9 +2,12 @@ import * as React from "react";
 import { Provider } from "react-redux";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import { CssBaseline, Container, Grid } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
-import { MuiPickersUtilsProvider } from "@material-ui/pickers";
-import DateFnsUtils from "@date-io/date-fns";
+import makeStyles from "@mui/styles/makeStyles";
+//import { MuiPickersUtilsProvider } from "@mui/lab";
+//import DateFnsUtils from "@date-io/date-fns";
+
+import AdapterDateFns from "@mui/lab/AdapterDateFns";
+import LocalizationProvider from "@mui/lab/LocalizationProvider";
 
 import { store } from "./store";
 
@@ -25,26 +28,18 @@ import PrivateRoute from "./features/auth/PrivateRote";
 import PlannerBoard from "./features/planner/PlannerBoard";
 import PlannerLoader from "./features/planner/PlannerLoader";
 
-const useStyles = makeStyles((theme) => ({
-    container: {
-        marginTop: theme.spacing(2),
-    },
-}));
-
 const App = () => {
-    const classes = useStyles();
-
     return (
         <Provider store={store}>
             <DndProvider backend={HTML5Backend}>
                 {/* This component tries to authenticate the user upon site loading (with localStorage "token"). */}
                 <TryAuthWithCurrentToken />
                 <DarkThemeProvider>
-                    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+                    <LocalizationProvider dateAdapter={AdapterDateFns}>
                         <CssBaseline />
                         <Router>
                             <Navbar />
-                            <Container className={classes.container}>
+                            <Container sx={{ mt: 2 }}>
                                 <Grid container spacing={2} direction="column">
                                     <Grid item>
                                         <AlertsList />
@@ -92,7 +87,7 @@ const App = () => {
                                 </Grid>
                             </Container>
                         </Router>
-                    </MuiPickersUtilsProvider>
+                    </LocalizationProvider>
                 </DarkThemeProvider>
             </DndProvider>
         </Provider>

@@ -1,15 +1,14 @@
 import * as React from "react";
 import { Link as RouterLink, NavLink } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { AppBar, Toolbar, Button, Grid, IconButton } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import { AppBar, Toolbar, Button } from "@mui/material";
+import makeStyles from "@mui/styles/makeStyles";
+import { styled } from "@mui/material";
 import { Menu as MenuIcon } from "@mui/icons-material";
 
 import DarkThemeToggler from "../darkThemeProvider/DarkThemeToggler";
 import { combineClx } from "../helpers";
 import { RootState } from "../../store";
-
-interface Props {}
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -19,10 +18,11 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
     },
     menuButton: {
-        marginRight: theme.spacing(2),
+        marginRight: 2,
     },
-    appbarSpacer: theme.mixins.toolbar,
 }));
+
+const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 
 type LinksProps = React.PropsWithChildren<{ ButtonStyled: React.ElementType }>;
 
@@ -43,7 +43,7 @@ const AuthLink = ({ ButtonStyled, children }: LinksProps) => (
     </>
 );
 
-const Navbar = (props: Props) => {
+const Navbar = () => {
     const classes = useStyles();
     const auth = useSelector((state: RootState) => state.authReducer);
 
@@ -71,15 +71,6 @@ const Navbar = (props: Props) => {
             <div className={classes.root}>
                 <AppBar position="absolute">
                     <Toolbar>
-                        {/*
-                        <IconButton
-                            edge="start"
-                            color="inherit"
-                            className={classes.menuButton}
-                        >
-                            <MenuIcon />
-                        </IconButton>
-                        */}
                         <MyButton to="/draggables">
                             <MenuIcon />
                         </MyButton>
@@ -92,7 +83,7 @@ const Navbar = (props: Props) => {
                     </Toolbar>
                 </AppBar>
             </div>
-            <div className={classes.appbarSpacer} />
+            <Offset />
         </>
     );
 };

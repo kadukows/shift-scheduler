@@ -10,7 +10,7 @@ import {
     DialogActions,
     DialogContent,
 } from "@mui/material";
-import makeStyles from '@mui/styles/makeStyles';
+import makeStyles from "@mui/styles/makeStyles";
 import { useSelector, useDispatch } from "react-redux";
 
 import EmployeeAgGrid from "./EmployeeAgGrid";
@@ -28,12 +28,6 @@ import { getTokenRequestConfig } from "../helpers";
 import { RootState } from "../../store";
 
 const useStyles = makeStyles((theme) => ({
-    paper: {
-        padding: theme.spacing(2),
-    },
-    paperSmall: {
-        padding: theme.spacing(1),
-    },
     dialog: {
         width: 450,
     },
@@ -200,7 +194,7 @@ const EmployeePage = () => {
                 </DialogActions>
             </Dialog>
 
-            <Paper className={classes.paper} elevation={3}>
+            <Paper sx={{ p: 2 }} elevation={3}>
                 <Grid container direction="column" spacing={2}>
                     <Grid item>
                         <Typography variant="h5" component="h5">
