@@ -22,19 +22,38 @@ export interface Props<Tx, Ty>
     extends GridDefinition<Tx, Ty>,
         React.ComponentProps<"div"> {
     items: ItemOnGrid<Tx, Ty>[];
+    additionalRows?: string[];
+    additionalCols?: string[];
+    additionalItems?: ItemOnGrid<string, string>[];
 }
 
-const GenericCssGrid = <Tx, Ty>({ x, y, items, ...rest }: Props<Tx, Ty>) => {
+const GenericCssGrid = <Tx, Ty>({
+    x,
+    y,
+    items,
+    additionalRows,
+    additionalCols,
+    additionalItems,
+    ...rest
+}: Props<Tx, Ty>) => {
     const { style, ...restWoStyle } = rest;
 
     const newStyle = React.useMemo(
-        () => ({ ...generateCssForGrid({ x, y }), ...style }),
-        [x, y, style]
+        () => ({
+            ...generateCssForGrid({ x, y }, additionalRows, additionalCols),
+            ...style,
+        }),
+        [x, y, style, additionalRows, additionalCols]
     );
 
     return (
         <div style={newStyle} {...restWoStyle}>
             {generateGridItems(items, x.getId, y.getId)}
+            {generateGridItems(
+                additionalItems,
+                (a) => a,
+                (a) => a
+            )}
         </div>
     );
 };
@@ -54,11 +73,23 @@ function generateDimensionArray<T>(
     return result;
 }
 
+function generateDimensionArrayForStrings(unique_key: string, keys: string[]) {
+    return keys ? keys.map((key) => `[${unique_key}-${key}] 1fr`) : [];
+}
+
 function generateCssForGrid<Tx, Ty>(
-    definition: GridDefinition<Tx, Ty>
+    definition: GridDefinition<Tx, Ty>,
+    additionalRows: string[],
+    additionalCols: string[]
 ): React.ComponentProps<"div">["style"] {
-    const rowCssArray = generateDimensionArray("row", definition.y);
-    const colCssArray = generateDimensionArray("col", definition.x);
+    const rowCssArray = [
+        ...generateDimensionArrayForStrings("row", additionalRows),
+        ...generateDimensionArray("row", definition.y),
+    ];
+    const colCssArray = [
+        ...generateDimensionArrayForStrings("col", additionalCols),
+        ...generateDimensionArray("col", definition.x),
+    ];
 
     return {
         gridTemplateRows: rowCssArray.join(" "),
@@ -72,6 +103,10 @@ function generateGridItems<Tx, Ty>(
     getIdX: (a: Tx) => string | number,
     getIdY: (a: Ty) => string | number
 ) {
+    if (!items) {
+        return [];
+    }
+
     let key = 1;
 
     const transformItem = ({

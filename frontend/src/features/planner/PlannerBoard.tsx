@@ -19,6 +19,10 @@ import EventTypes from "./EventTypes";
 import EmptyItemDialog from "./dialogs/EmptyItemDialog";
 import PlannerGrid, { YIndexProvider, ItemsGenerator } from "./PlannerGrid";
 
+import PlannerGridByHours, {
+    SecondIndexHandler,
+} from "./plannerGridByHours/PlannerGridByHours";
+
 interface Props {
     schedule: Schedule;
 }
@@ -58,6 +62,50 @@ const PlannerBoard = ({ schedule }: Props) => {
     const dates = getWeek(schedule, 1);
     const itemGenerator = getItemsGenerator(secondIdx, shifts);
 
+    //
+    // planner grid by hours
+    //
+
+    const timeRange: DateFns.Interval = {
+        start: DateFns.startOfDay(
+            shifts
+                .map((shift) => Date.parse(shift.time_from))
+                .reduce((a, b) => Math.min(a, b))
+        ),
+        end: DateFns.endOfDay(
+            shifts
+                .map((shift) => Date.parse(shift.time_to))
+                .reduce((a, b) => Math.max(a, b))
+        ),
+    };
+
+    const employees = useSelector(employeeSelectors.selectAll).filter(
+        (employee) => employee.workplace === schedule.workplace
+    );
+
+    const employeesById = useSelector(employeeSelectors.selectEntities);
+
+    const roles = useSelector(roleSelectors.selectAll).filter(
+        (role) => role.workplace === schedule.workplace
+    );
+
+    const rolesById = useSelector(roleSelectors.selectEntities);
+
+    const secondIndexHandler:
+        | SecondIndexHandler<Employee>
+        | SecondIndexHandler<Role> =
+        secondIdx === "Employee"
+            ? ({
+                  items: employees,
+                  getId: (a) => a.id,
+                  getItemFromShift: (shift) => employeesById[shift.employee],
+              } as SecondIndexHandler<Employee>)
+            : ({
+                  items: roles,
+                  getId: (a) => a.id,
+                  getItemFromShift: (shift) => rolesById[shift.role],
+              } as SecondIndexHandler<Role>);
+
     return (
         <EventProvider
             events={[
@@ -66,33 +114,49 @@ const PlannerBoard = ({ schedule }: Props) => {
             ]}
         >
             <EmptyItemDialog schedule={schedule} />
-            <Paper className="planner-board-paper" elevation={3}>
-                <Typography
-                    variant="h5"
-                    component="h5"
-                    style={{ marginBottom: 16 }}
-                >
-                    Planner for schedule: {workplace.name} --{" "}
-                    {schedule.month_year}
-                </Typography>
-                <TextField
-                    select
-                    variant="outlined"
-                    label="By"
-                    value={secondIdx}
-                    onChange={(event) =>
-                        setSecondIdx(event.target.value as "Employee" | "Role")
-                    }
-                >
-                    <MenuItem value={"Employee"}>Employee</MenuItem>
-                    <MenuItem value={"Role"}>Role</MenuItem>
-                </TextField>
-                <PlannerGrid
-                    yIndexProvider={yIndexProvider}
-                    dates={dates}
-                    itemsGenerator={itemGenerator}
-                />
-            </Paper>
+            <div
+                style={{
+                    display: "flex",
+                    flexDirection: "column",
+                }}
+            >
+                <Paper className="planner-board-paper" elevation={3}>
+                    <Typography
+                        variant="h5"
+                        component="h5"
+                        style={{ marginBottom: 16 }}
+                    >
+                        Planner for schedule: {workplace.name} --{" "}
+                        {schedule.month_year}
+                    </Typography>
+                    <TextField
+                        select
+                        variant="outlined"
+                        label="By"
+                        value={secondIdx}
+                        onChange={(event) =>
+                            setSecondIdx(
+                                event.target.value as "Employee" | "Role"
+                            )
+                        }
+                    >
+                        <MenuItem value={"Employee"}>Employee</MenuItem>
+                        <MenuItem value={"Role"}>Role</MenuItem>
+                    </TextField>
+                    <PlannerGrid
+                        yIndexProvider={yIndexProvider}
+                        dates={dates}
+                        itemsGenerator={itemGenerator}
+                    />
+                </Paper>
+                <Paper sx={{ mt: 2 }}>
+                    <PlannerGridByHours<Role | Employee>
+                        timeRange={timeRange}
+                        secondIndexHandler={secondIndexHandler}
+                        shifts={shifts}
+                    />
+                </Paper>
+            </div>
         </EventProvider>
     );
 };
