@@ -162,7 +162,7 @@ const PlannerBoard = ({ schedule }: Props) => {
                         itemsGenerator={itemGenerator}
                     />
                 </Paper>
-                <Paper sx={{ mt: 2 }}>
+                <Paper sx={{ mt: 2, p: 3 }}>
                     <PlannerGridByHours<Role | Employee>
                         timeRange={timeRange}
                         secondIndexHandler={secondIndexHandler}

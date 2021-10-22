@@ -1,0 +1,8 @@
+.planner-plannerGridByHours-itemOnGrid {
+    z-index: 1;
+}
+
+
+.planner-plannerGridByHours-itemOnGrid:hover {
+    z-index: 2;
+}

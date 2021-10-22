@@ -7,9 +7,10 @@ import GenericCssGrid, {
 import { Employee } from "../../employees/employeeSlice";
 import { Role, roleSelectors } from "../../roles/rolesSlice";
 import { Shift } from "../../shifts/shiftSlice";
-import { useSelector } from "react-redux";
 import { Box, Typography, styled } from "@mui/material";
 import { SECOND_INDEX } from "./SecondIndexType";
+
+import "./style.css";
 
 export interface SecondIndexHandler<Item> {
     items: Item[];
@@ -25,18 +26,6 @@ export interface Props<Item> {
     shifts: Shift[];
 }
 
-const TIME_FORMAT = "yyyy-MM-dd'T'HH";
-
-const ItemDiv = styled("div")({
-    margin: "4px",
-    backgroundColor: "rgb(128, 128, 128)",
-});
-
-enum ADDITIONAL_FIELDS {
-    HourAnnotation = "HourAnnotation",
-    DateAnnotation = "DateAnnotation",
-}
-
 const PlannerGridByHours = <Item extends Role | Employee>({
     timeRange,
     secondIndexHandler: {
@@ -48,48 +37,100 @@ const PlannerGridByHours = <Item extends Role | Employee>({
     },
     shifts,
 }: Props<Item>) => {
+    const hoursDepsArray = [
+        DateFns.getUnixTime(timeRange.start),
+        DateFns.getUnixTime(timeRange.end),
+    ];
     const [hours, additionalHourAnnotations, additionalDayAnnotations] =
         React.useMemo(() => {
             const hours = DateFns.eachHourOfInterval(timeRange);
 
             const additionalHourAnnotations: ItemOnGrid<string, string>[] =
                 hours.map((date) => ({
-                    children: <ItemDiv>{date.getHours()}</ItemDiv>,
+                    children: (
+                        <Box sx={{ p: 0.7 }}>
+                            <Typography align="center">
+                                {DateFns.format(date, "HH")}
+                            </Typography>
+                        </Box>
+                    ),
                     xStart: DateFns.format(date, TIME_FORMAT),
                     yStart: ADDITIONAL_FIELDS.HourAnnotation,
                 }));
 
+            for (const hour of hours) {
+                additionalHourAnnotations.push({
+                    children: <BorderDiv />,
+                    xStart: DateFns.format(hour, TIME_FORMAT),
+                    yStart: ADDITIONAL_FIELDS.HourAnnotation,
+                });
+            }
+
+            const days = DateFns.eachDayOfInterval(timeRange);
             const additionalDayAnnotations: ItemOnGrid<string, string>[] =
-                DateFns.eachDayOfInterval(timeRange).map((date) => ({
+                days.map((date) => ({
                     children: (
-                        <ItemDiv>{DateFns.format(date, "yyyy-MM-dd")}</ItemDiv>
+                        <Typography align="center">
+                            {DateFns.format(date, "yyyy-MM-dd")}
+                        </Typography>
                     ),
                     xStart: DateFns.format(date, TIME_FORMAT),
                     yStart: ADDITIONAL_FIELDS.DateAnnotation,
                     xEnd: DateFns.format(DateFns.addDays(date, 1), TIME_FORMAT),
                 }));
 
+            for (const day of days) {
+                additionalDayAnnotations.push({
+                    children: <BorderDiv />,
+                    xStart: DateFns.format(day, TIME_FORMAT),
+                    yStart: ADDITIONAL_FIELDS.DateAnnotation,
+                    xEnd: DateFns.format(DateFns.addDays(day, 1), TIME_FORMAT),
+                });
+            }
+
             return [hours, additionalHourAnnotations, additionalDayAnnotations];
-        }, [
-            DateFns.getUnixTime(timeRange.start),
-            DateFns.getUnixTime(timeRange.end),
-        ]);
+        }, hoursDepsArray);
+
+    const itemsOnGridDeps: Array<string | number> = [
+        ...hoursDepsArray,
+        secondIndexType,
+    ];
+    for (const shift of shifts) {
+        itemsOnGridDeps.push(...unpackShift(shift));
+    }
 
     const itemsOnGrid = React.useMemo<Array<ItemOnGrid<Date, Item>>>(() => {
-        const shiftsWithMargins = getShiftsWithMargins(shifts, hours);
+        const itemToShifts = getItemToShifts(shifts, getItemFromShift);
 
-        let result = shiftsWithMargins.map(({ shift, order }) => ({
-            children: (
-                <Box sx={{ mt: order, ml: order }}>{renderShift(shift)}</Box>
-            ),
-            xStart: new Date(shift.time_from),
-            xEnd: new Date(shift.time_to),
-            yStart: getItemFromShift(shift),
-            zIndexed: true,
-        }));
+        const shiftsWithOrder: Array<ShiftWithOrder> = [];
+        for (const shifts of itemToShifts.values()) {
+            shiftsWithOrder.push(...getShiftsWithMargins(shifts, hours));
+        }
+
+        const result = shiftsWithOrder.map<ItemOnGrid<Date, Item>>(
+            ({ shift, order }) => ({
+                children: (
+                    <Box sx={{ mt: order, p: 0.5 }}>{renderShift(shift)}</Box>
+                ),
+                xStart: new Date(shift.time_from),
+                xEnd: new Date(shift.time_to),
+                yStart: getItemFromShift(shift),
+                className: "planner-plannerGridByHours-itemOnGrid",
+            })
+        );
+
+        for (const hour of hours) {
+            for (const item of items) {
+                result.push({
+                    children: <BorderDiv />,
+                    xStart: hour,
+                    yStart: item,
+                });
+            }
+        }
 
         return result;
-    }, [...shifts.map((shift) => shift.id), secondIndexType]);
+    }, itemsOnGridDeps);
 
     return (
         <OverflowHelper>
@@ -104,7 +145,9 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                 }}
                 items={itemsOnGrid}
                 style={{
-                    gap: "8px",
+                    gap: "1px",
+                    margin: 8,
+                    padding: 8,
                 }}
                 additionalRows={[
                     ADDITIONAL_FIELDS.DateAnnotation,
@@ -131,10 +174,11 @@ const PaddedDiv = styled("div")({
 });
 
 const OverflowHelper = ({ children }: React.PropsWithChildren<{}>) => (
-    <PaddedDiv
+    <div
         style={{
             display: "flex",
             flexDirection: "row",
+            height: "100%",
         }}
     >
         <div
@@ -153,7 +197,7 @@ const OverflowHelper = ({ children }: React.PropsWithChildren<{}>) => (
                 {children}
             </div>
         </div>
-    </PaddedDiv>
+    </div>
 );
 
 interface ShiftWithOrder {
@@ -165,8 +209,6 @@ const getShiftsWithMargins = (
     shifts: Shift[],
     hours: Date[]
 ): ShiftWithOrder[] => {
-    //const dateIdxToShifts = new Array<Shift[]>(hours.length).fill(null);
-    const TIME_FORMAT = "yyyy-MM-dd'T'HH";
     const dateToShifts = new Map<string, Shift[]>();
 
     for (const shift of shifts) {
@@ -263,3 +305,44 @@ const maximumHour = (shifts: Shift[]) =>
             .map((shift) => Date.parse(shift.time_to))
             .reduce((a, b) => Math.max(a, b))
     );
+
+const unpackShift = ({
+    id,
+    schedule,
+    employee,
+    time_from,
+    time_to,
+    role,
+}: Shift) => [id, schedule, employee, time_from, time_to, role];
+
+const getItemToShifts = <Item extends unknown>(
+    shifts: Shift[],
+    getItemFromShift: (shift: Shift) => Item
+) => {
+    const result = new Map<Item, Shift[]>();
+
+    for (const shift of shifts) {
+        const item = getItemFromShift(shift);
+        if (result.has(item)) {
+            result.get(item).push(shift);
+        } else {
+            result.set(item, [shift]);
+        }
+    }
+
+    return result;
+};
+
+const BorderDiv = styled("div")({
+    zIndex: 0,
+    width: "100%",
+    height: "100%",
+    outline: "1px solid rgba(128, 128, 128, 0.4)",
+});
+
+const TIME_FORMAT = "yyyy-MM-dd'T'HH";
+
+enum ADDITIONAL_FIELDS {
+    HourAnnotation = "HourAnnotation",
+    DateAnnotation = "DateAnnotation",
+}

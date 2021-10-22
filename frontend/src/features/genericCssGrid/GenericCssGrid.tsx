@@ -8,7 +8,7 @@ export interface ItemOnGrid<Tx, Ty> {
     xEnd?: Tx;
     yEnd?: Ty;
 
-    zIndexed?: boolean;
+    className?: string;
 }
 
 export interface GridDimensionDefinition<Cell> {
@@ -71,13 +71,13 @@ function generateDimensionArray<T>(
 ) {
     const result = [];
     for (const cell of def.cells) {
-        result.push(`[${unique_key}-${def.getId(cell)}] 1fr`);
+        result.push(`[${unique_key}-${def.getId(cell)}] auto`);
     }
     return result;
 }
 
 function generateDimensionArrayForStrings(unique_key: string, keys: string[]) {
-    return keys ? keys.map((key) => `[${unique_key}-${key}] 1fr`) : [];
+    return keys ? keys.map((key) => `[${unique_key}-${key}] auto`) : [];
 }
 
 function generateCssForGrid<Tx, Ty>(
@@ -106,13 +106,6 @@ const GridItemDiv = styled("div")({
     height: "100%",
 });
 
-const GridItemHoverableDiv = styled(GridItemDiv)({
-    zIndex: 1,
-    ":hover": {
-        zIndex: 2,
-    },
-});
-
 function generateGridItems<Tx, Ty>(
     items: Props<Tx, Ty>["items"],
     getIdX: (a: Tx) => string | number,
@@ -130,23 +123,22 @@ function generateGridItems<Tx, Ty>(
         yStart,
         yEnd,
         children,
-        zIndexed,
+        className,
     }: ItemOnGrid<Tx, Ty>) => {
         const gridArea = `row-${getIdY(yStart)} / col-${getIdX(xStart)} / ${
             yEnd ? `row-${getIdY(yEnd)}` : "span 1"
         } / ${xEnd ? `col-${getIdX(xEnd)}` : "span 1"}`;
 
-        const Component = zIndexed ? GridItemHoverableDiv : GridItemDiv;
-
         return (
-            <Component
+            <GridItemDiv
                 style={{
                     gridArea: gridArea,
                 }}
                 key={key++}
+                className={className}
             >
                 {children}
-            </Component>
+            </GridItemDiv>
         );
     };
 
