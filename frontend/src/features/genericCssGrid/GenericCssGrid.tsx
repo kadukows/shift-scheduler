@@ -1,3 +1,4 @@
+import { styled } from "@mui/system";
 import * as React from "react";
 
 export interface ItemOnGrid<Tx, Ty> {
@@ -6,6 +7,8 @@ export interface ItemOnGrid<Tx, Ty> {
     yStart: Ty;
     xEnd?: Tx;
     yEnd?: Ty;
+
+    zIndexed?: boolean;
 }
 
 export interface GridDimensionDefinition<Cell> {
@@ -98,6 +101,18 @@ function generateCssForGrid<Tx, Ty>(
     };
 }
 
+const GridItemDiv = styled("div")({
+    width: "100%",
+    height: "100%",
+});
+
+const GridItemHoverableDiv = styled(GridItemDiv)({
+    zIndex: 1,
+    ":hover": {
+        zIndex: 2,
+    },
+});
+
 function generateGridItems<Tx, Ty>(
     items: Props<Tx, Ty>["items"],
     getIdX: (a: Tx) => string | number,
@@ -115,22 +130,23 @@ function generateGridItems<Tx, Ty>(
         yStart,
         yEnd,
         children,
+        zIndexed,
     }: ItemOnGrid<Tx, Ty>) => {
         const gridArea = `row-${getIdY(yStart)} / col-${getIdX(xStart)} / ${
             yEnd ? `row-${getIdY(yEnd)}` : "span 1"
         } / ${xEnd ? `col-${getIdX(xEnd)}` : "span 1"}`;
 
+        const Component = zIndexed ? GridItemHoverableDiv : GridItemDiv;
+
         return (
-            <div
+            <Component
                 style={{
                     gridArea: gridArea,
-                    width: "100%",
-                    height: "100%",
                 }}
                 key={key++}
             >
                 {children}
-            </div>
+            </Component>
         );
     };
 

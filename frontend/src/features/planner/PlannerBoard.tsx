@@ -22,6 +22,9 @@ import PlannerGrid, { YIndexProvider, ItemsGenerator } from "./PlannerGrid";
 import PlannerGridByHours, {
     SecondIndexHandler,
 } from "./plannerGridByHours/PlannerGridByHours";
+import { SECOND_INDEX } from "./plannerGridByHours/SecondIndexType";
+import EmployeeItem from "./plannerGridByHours/items/EmployeeItem";
+import RoleItem from "./plannerGridByHours/items/RoleItem";
 
 interface Props {
     schedule: Schedule;
@@ -91,6 +94,12 @@ const PlannerBoard = ({ schedule }: Props) => {
 
     const rolesById = useSelector(roleSelectors.selectEntities);
 
+    const renderShiftEmployee = (shift: Shift) => (
+        <EmployeeItem shift={shift} />
+    );
+
+    const renderShiftRole = (shift: Shift) => <RoleItem shift={shift} />;
+
     const secondIndexHandler:
         | SecondIndexHandler<Employee>
         | SecondIndexHandler<Role> =
@@ -99,11 +108,15 @@ const PlannerBoard = ({ schedule }: Props) => {
                   items: employees,
                   getId: (a) => a.id,
                   getItemFromShift: (shift) => employeesById[shift.employee],
+                  renderShift: renderShiftEmployee,
+                  secondIndexType: SECOND_INDEX.Employee,
               } as SecondIndexHandler<Employee>)
             : ({
                   items: roles,
                   getId: (a) => a.id,
                   getItemFromShift: (shift) => rolesById[shift.role],
+                  renderShift: renderShiftRole,
+                  secondIndexType: SECOND_INDEX.Role,
               } as SecondIndexHandler<Role>);
 
     return (
