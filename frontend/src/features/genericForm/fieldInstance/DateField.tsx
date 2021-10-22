@@ -32,38 +32,34 @@ interface DateFieldDataProps<Inputs> extends BaseFieldProps<Inputs> {
 /**
  *  Component definition
  */
-//const defaultVal = new Date("01/01/1999");
 
 const DateField = <Inputs extends unknown>({
     field,
     control,
 }: DateFieldDataProps<Inputs>) => {
-    //return <DatePicker views={} />;
     return (
         <Controller<Inputs>
             control={control}
-            // @ts-ignore
+            // @ts-expect-error
             name={field.name}
-            // @ts-ignore
-            //defaultValue={defaultVal}
             render={({
                 field: { onChange, value, name, ref },
                 fieldState: { invalid, error },
             }) => (
                 <DatePicker
                     views={field.views}
-                    ref={ref}
-                    value={value}
-                    onChange={onChange}
-                    inputFormat={field.format}
+                    //ref={ref}
+                    value={parse(value, field.format, new Date())}
+                    onChange={(val: Date) =>
+                        onChange(format(val, field.format))
+                    }
                     renderInput={(props) => (
                         <TextField
+                            {...props}
                             fullWidth
-                            name={name}
                             label={field.label}
                             error={invalid}
                             helperText={error?.message}
-                            {...props}
                         />
                     )}
                 />

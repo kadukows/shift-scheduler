@@ -19,9 +19,8 @@ import EventTypes from "./EventTypes";
 import EmptyItemDialog from "./dialogs/EmptyItemDialog";
 import PlannerGrid, { YIndexProvider, ItemsGenerator } from "./PlannerGrid";
 
-import PlannerGridByHours, {
-    SecondIndexHandler,
-} from "./plannerGridByHours/PlannerGridByHours";
+import { SecondIndexHandler } from "./plannerGridByHours/PlannerGridByHours";
+import PlannerByHours from "./plannerGridByHours/PlannerByHours";
 import { SECOND_INDEX } from "./plannerGridByHours/SecondIndexType";
 import EmployeeItem from "./plannerGridByHours/items/EmployeeItem";
 import RoleItem from "./plannerGridByHours/items/RoleItem";
@@ -104,20 +103,22 @@ const PlannerBoard = ({ schedule }: Props) => {
         | SecondIndexHandler<Employee>
         | SecondIndexHandler<Role> =
         secondIdx === "Employee"
-            ? ({
+            ? {
                   items: employees,
-                  getId: (a) => a.id,
+                  getId: (a: Employee) => a.id,
                   getItemFromShift: (shift) => employeesById[shift.employee],
                   renderShift: renderShiftEmployee,
                   secondIndexType: SECOND_INDEX.Employee,
-              } as SecondIndexHandler<Employee>)
-            : ({
+                  itemToString: employeeToString,
+              }
+            : {
                   items: roles,
-                  getId: (a) => a.id,
+                  getId: (a: Role) => a.id,
                   getItemFromShift: (shift) => rolesById[shift.role],
                   renderShift: renderShiftRole,
                   secondIndexType: SECOND_INDEX.Role,
-              } as SecondIndexHandler<Role>);
+                  itemToString: (role: Role) => role.name,
+              };
 
     return (
         <EventProvider
@@ -163,10 +164,11 @@ const PlannerBoard = ({ schedule }: Props) => {
                     />
                 </Paper>
                 <Paper sx={{ mt: 2, p: 3 }}>
-                    <PlannerGridByHours<Role | Employee>
+                    <PlannerByHours<Role | Employee>
                         timeRange={timeRange}
                         secondIndexHandler={secondIndexHandler}
                         shifts={shifts}
+                        schedule={schedule}
                     />
                 </Paper>
             </div>

@@ -67,7 +67,7 @@ export const getFieldDataArray = <Inputs extends Partial<BaseInputs>>(
             type: "choose_object",
             name: secondIdx === "Employee" ? "role" : "employee",
             label: secondIdx === "Employee" ? "Role" : "Employee",
-            validation: yup.string().required(),
+            validation: yup.number().required(),
             //
             entitySelector: selector,
             entityToString: toString,

@@ -42,7 +42,7 @@ const fields: FieldData<Inputs, Workplace>[] = [
         type: "choose_object",
         name: "workplace",
         label: "Workplace",
-        validation: yup.string().required(),
+        validation: yup.number().required(),
         //
         entitySelector: workplaceSelectors.selectAll,
         entityToString: (workplace) => workplace.name,

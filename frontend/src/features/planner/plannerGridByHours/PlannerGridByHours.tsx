@@ -18,6 +18,7 @@ export interface SecondIndexHandler<Item> {
     getItemFromShift: (shift: Shift) => Item;
     renderShift: (shift: Shift) => React.ReactNode;
     secondIndexType: SECOND_INDEX;
+    itemToString: (item: Item) => string;
 }
 
 export interface Props<Item> {
@@ -25,6 +26,18 @@ export interface Props<Item> {
     secondIndexHandler: SecondIndexHandler<Item>;
     shifts: Shift[];
 }
+
+const TIME_FORMAT = "yyyy-MM-dd'T'HH";
+
+enum ADDITIONAL_FIELDS {
+    HourAnnotation = "HourAnnotation",
+    DateAnnotation = "DateAnnotation",
+    ItemAnnotation = "ItemAnnotation",
+}
+
+//
+//
+//
 
 const PlannerGridByHours = <Item extends Role | Employee>({
     timeRange,
@@ -34,6 +47,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         getItemFromShift,
         renderShift,
         secondIndexType,
+        itemToString,
     },
     shifts,
 }: Props<Item>) => {
@@ -99,7 +113,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         itemsOnGridDeps.push(...unpackShift(shift));
     }
 
-    const itemsOnGrid = React.useMemo<Array<ItemOnGrid<Date, Item>>>(() => {
+    const [itemsOnGrid, additionalItemAnnotations] = React.useMemo(() => {
         const itemToShifts = getItemToShifts(shifts, getItemFromShift);
 
         const shiftsWithOrder: Array<ShiftWithOrder> = [];
@@ -129,7 +143,27 @@ const PlannerGridByHours = <Item extends Role | Employee>({
             }
         }
 
-        return result;
+        const itemAnnotations: Array<ItemOnGrid<string, Item>> = items.map(
+            (item) => ({
+                children: (
+                    <Typography sx={{ p: 0.7 }} align="center">
+                        {itemToString(item)}
+                    </Typography>
+                ),
+                xStart: ADDITIONAL_FIELDS.ItemAnnotation,
+                yStart: item,
+            })
+        );
+
+        for (const item of items) {
+            itemAnnotations.push({
+                children: <BorderDiv />,
+                xStart: ADDITIONAL_FIELDS.ItemAnnotation,
+                yStart: item,
+            });
+        }
+
+        return [result, itemAnnotations];
     }, itemsOnGridDeps);
 
     return (
@@ -153,10 +187,12 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                     ADDITIONAL_FIELDS.DateAnnotation,
                     ADDITIONAL_FIELDS.HourAnnotation,
                 ]}
+                additionalCols={[ADDITIONAL_FIELDS.ItemAnnotation]}
                 additionalItems={[
                     ...additionalHourAnnotations,
                     ...additionalDayAnnotations,
                 ]}
+                additionalColItems={additionalItemAnnotations}
             />
         </OverflowHelper>
     );
@@ -168,17 +204,11 @@ export default PlannerGridByHours;
 //
 //
 
-const PaddedDiv = styled("div")({
-    p: 4,
-    m: 4,
-});
-
 const OverflowHelper = ({ children }: React.PropsWithChildren<{}>) => (
     <div
         style={{
             display: "flex",
             flexDirection: "row",
-            height: "100%",
         }}
     >
         <div
@@ -339,10 +369,3 @@ const BorderDiv = styled("div")({
     height: "100%",
     outline: "1px solid rgba(128, 128, 128, 0.4)",
 });
-
-const TIME_FORMAT = "yyyy-MM-dd'T'HH";
-
-enum ADDITIONAL_FIELDS {
-    HourAnnotation = "HourAnnotation",
-    DateAnnotation = "DateAnnotation",
-}

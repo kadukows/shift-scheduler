@@ -43,8 +43,6 @@ const DateTimeField = <Inputs extends unknown>({
             }) => (
                 <DateTimePicker
                     views={field.views}
-                    ref={ref}
-                    inputFormat={field.format}
                     value={parse(value, field.format, new Date())}
                     onChange={(val: Date) =>
                         onChange(format(val, field.format))
@@ -52,12 +50,11 @@ const DateTimeField = <Inputs extends unknown>({
                     ampm={false}
                     renderInput={(props) => (
                         <TextField
+                            {...props}
                             fullWidth
-                            name={name}
                             label={field.label}
                             error={invalid}
                             helperText={error?.message}
-                            {...props}
                         />
                     )}
                 />

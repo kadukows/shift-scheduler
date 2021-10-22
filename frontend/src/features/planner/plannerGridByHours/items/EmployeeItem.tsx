@@ -7,6 +7,8 @@ import { RootState } from "../../../../store";
 import { roleSelectors } from "../../../roles/rolesSlice";
 import { Shift } from "../../../shifts/shiftSlice";
 import { StyledDiv } from "./StyledDiv";
+import { useSignal } from "../../../eventProvider/EventProvider";
+import { EventTypes, CallbackTypes } from "../EventTypes";
 
 interface Props {
     shift: Shift;
@@ -17,8 +19,12 @@ const EmployeeItem = ({ shift }: Props) => {
         roleSelectors.selectById(state, shift.role)
     );
 
+    const signal: CallbackTypes.EMPLOYEE_ITEM_CLICK = useSignal(
+        EventTypes.EMPLOYEE_ITEM_CLICK
+    );
+
     return (
-        <StyledDiv>
+        <StyledDiv onClick={() => signal(shift)}>
             <Typography>
                 {role.name}
                 <br />

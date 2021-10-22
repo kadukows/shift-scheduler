@@ -28,6 +28,8 @@ export interface Props<Tx, Ty>
     additionalRows?: string[];
     additionalCols?: string[];
     additionalItems?: ItemOnGrid<string, string>[];
+    additionalColItems?: ItemOnGrid<string, Ty>[];
+    additionalRowItems?: ItemOnGrid<Tx, string>[];
 }
 
 const GenericCssGrid = <Tx, Ty>({
@@ -37,6 +39,8 @@ const GenericCssGrid = <Tx, Ty>({
     additionalRows,
     additionalCols,
     additionalItems,
+    additionalColItems,
+    additionalRowItems,
     ...rest
 }: Props<Tx, Ty>) => {
     const { style, ...restWoStyle } = rest;
@@ -57,6 +61,8 @@ const GenericCssGrid = <Tx, Ty>({
                 (a) => a,
                 (a) => a
             )}
+            {generateGridItems(additionalColItems, (a) => a, y.getId)}
+            {generateGridItems(additionalRowItems, x.getId, (a) => a)}
         </div>
     );
 };

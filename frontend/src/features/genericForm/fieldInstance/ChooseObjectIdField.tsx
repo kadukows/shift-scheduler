@@ -6,7 +6,7 @@ import { Controller, Control, useFormContext } from "react-hook-form";
 import { RootState } from "../../../store";
 import { MyTextField, capitalize, WithId } from "../../helpers";
 import {
-    StringYupValidationBuilderObject,
+    NumberYupValidationBuilderObject,
     BaseFieldProps,
 } from "./BaseFieldProps";
 
@@ -18,7 +18,7 @@ export interface ChooseObjectIdFieldData<Inputs, Entity extends WithId> {
     type: "choose_object";
     name: keyof Inputs;
     label?: string;
-    validation: StringYupValidationBuilderObject;
+    validation: NumberYupValidationBuilderObject;
 
     entitySelector: (state: RootState, getValues: any) => Entity[];
     entityToString: (a: Entity) => string;
