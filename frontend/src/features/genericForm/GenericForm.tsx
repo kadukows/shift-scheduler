@@ -2,7 +2,13 @@ import * as React from "react";
 import * as yup from "yup";
 import axios, { AxiosError } from "axios";
 import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
-import { FormHelperText, Grid, LinearProgress } from "@mui/material";
+import {
+    FormHelperText,
+    LinearProgress,
+    Stack,
+    styled,
+    Paper,
+} from "@mui/material";
 
 import { DjangoErrors, handleErrors, WithId } from "../helpers";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -15,6 +21,12 @@ interface Props<Inputs, Entity extends WithId> {
     formId?: string;
     defaultValues?: Partial<Inputs>;
 }
+
+const Item = styled("div")(({ theme }) => ({
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: "center",
+}));
 
 function GenericForm<Inputs, Entity extends WithId>({
     fields,
@@ -74,28 +86,28 @@ function GenericForm<Inputs, Entity extends WithId>({
     return (
         <FormProvider {...methods}>
             <form onSubmit={handleSubmit(onSubmit)} id={formId}>
-                <Grid container direction="column" spacing={2}>
+                <Stack spacing={2}>
                     {fields.map((field) => (
-                        <Grid item key={i++}>
+                        <Item key={i++}>
                             <Field
                                 control={control}
                                 field={field}
                                 {...baseProps}
                             />
-                        </Grid>
+                        </Item>
                     ))}
                     {isSubmitting && (
-                        <Grid item>
+                        <Item>
                             <LinearProgress />
-                        </Grid>
+                        </Item>
                     )}
                     {nonFieldErrors &&
                         nonFieldErrors.map((error) => (
-                            <Grid item key={i++}>
+                            <Item key={i++}>
                                 <FormHelperText error>{error}</FormHelperText>
-                            </Grid>
+                            </Item>
                         ))}
-                </Grid>
+                </Stack>
             </form>
         </FormProvider>
     );

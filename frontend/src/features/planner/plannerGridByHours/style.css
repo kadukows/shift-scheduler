@@ -6,3 +6,11 @@
 .planner-plannerGridByHours-itemOnGrid:hover {
     z-index: 2;
 }
+
+.planner-plannerGridByHours-z-minus-1 {
+    z-index: -1;
+}
+
+.planner-plannerGridByHours-z-0 {
+    z-index: 0;
+}

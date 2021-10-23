@@ -116,11 +116,13 @@ const EmployeeSetDialog = ({
                 role,
                 id: shift.id,
                 employee: shift.employee,
+                schedule: shift.schedule,
             },
             getTokenRequestConfig(token)
         );
 
         dispatch(updateShift(response.data as any));
+        setOpen(false);
     };
 
     const defaultValues: any = shift

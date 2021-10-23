@@ -12,6 +12,12 @@ import { SECOND_INDEX } from "./SecondIndexType";
 
 import "./style.css";
 
+import EmptyItemDrag from "./items/EmptyItemDrag";
+import EmptyItemDrop from "./items/EmptyItemDrop";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../store";
+import PotentialNewItem from "./items/PotentialNewItem";
+
 export interface SecondIndexHandler<Item> {
     items: Item[];
     getId: (item: Item) => number;
@@ -51,6 +57,10 @@ const PlannerGridByHours = <Item extends Role | Employee>({
     },
     shifts,
 }: Props<Item>) => {
+    const plannerByHourReducer = useSelector(
+        (state: RootState) => state.plannerByHourReducer
+    );
+
     const hoursDepsArray = [
         DateFns.getUnixTime(timeRange.start),
         DateFns.getUnixTime(timeRange.end),
@@ -105,7 +115,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
             return [hours, additionalHourAnnotations, additionalDayAnnotations];
         }, hoursDepsArray);
 
-    const itemsOnGridDeps: Array<string | number> = [
+    const itemsOnGridDeps: Array<string | number | boolean> = [
         ...hoursDepsArray,
         secondIndexType,
     ];
@@ -113,58 +123,111 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         itemsOnGridDeps.push(...unpackShift(shift));
     }
 
-    const [itemsOnGrid, additionalItemAnnotations] = React.useMemo(() => {
-        const itemToShifts = getItemToShifts(shifts, getItemFromShift);
+    itemsOnGridDeps.push(plannerByHourReducer.isDragging);
 
-        const shiftsWithOrder: Array<ShiftWithOrder> = [];
-        for (const shifts of itemToShifts.values()) {
-            shiftsWithOrder.push(...getShiftsWithMargins(shifts, hours));
-        }
+    const [itemsOnGrid, additionalItemAnnotations, potentialNewItems] =
+        React.useMemo(() => {
+            const itemToShifts = getItemToShifts(shifts, getItemFromShift);
 
-        const result = shiftsWithOrder.map<ItemOnGrid<Date, Item>>(
-            ({ shift, order }) => ({
-                children: (
-                    <Box sx={{ mt: order, p: 0.5 }}>{renderShift(shift)}</Box>
-                ),
-                xStart: new Date(shift.time_from),
-                xEnd: new Date(shift.time_to),
-                yStart: getItemFromShift(shift),
-                className: "planner-plannerGridByHours-itemOnGrid",
-            })
-        );
+            const shiftsWithOrder: Array<ShiftWithOrder> = [];
+            for (const shifts of itemToShifts.values()) {
+                shiftsWithOrder.push(...getShiftsWithMargins(shifts, hours));
+            }
 
-        for (const hour of hours) {
+            const result = shiftsWithOrder.map<ItemOnGrid<Date, Item>>(
+                ({ shift, order }) => ({
+                    children: (
+                        <Box sx={{ mt: order, p: 0.5 }}>
+                            {renderShift(shift)}
+                        </Box>
+                    ),
+                    xStart: new Date(shift.time_from),
+                    xEnd: new Date(shift.time_to),
+                    yStart: getItemFromShift(shift),
+                    className: "planner-plannerGridByHours-itemOnGrid",
+                })
+            );
+
+            for (const hour of hours) {
+                for (const item of items) {
+                    result.push({
+                        children: (
+                            <BorderDiv>
+                                <EmptyItemDrag
+                                    hour={hour}
+                                    itemId={getId(item)}
+                                />
+                            </BorderDiv>
+                        ),
+                        xStart: hour,
+                        yStart: item,
+                        className: plannerByHourReducer.isDragging
+                            ? "planner-plannerGridByHours-z-minus-1"
+                            : "planner-plannerGridByHours-z-0",
+                    });
+                    result.push({
+                        children: (
+                            <BorderDiv>
+                                <EmptyItemDrop
+                                    hour={hour}
+                                    itemId={getId(item)}
+                                />
+                            </BorderDiv>
+                        ),
+                        xStart: hour,
+                        yStart: item,
+                        className: !plannerByHourReducer.isDragging
+                            ? "planner-plannerGridByHours-z-minus-1"
+                            : "planner-plannerGridByHours-z-0",
+                    });
+                }
+            }
+
+            const potentialNewItems: Array<ItemOnGrid<Date, string>> = [];
+
+            {
+                const interval = plannerByHourReducer.potentialNewShift;
+                if (
+                    interval.start !== null &&
+                    interval.end !== null &&
+                    interval.itemId !== null
+                ) {
+                    potentialNewItems.push({
+                        children: <PotentialNewItem />,
+                        xStart: new Date(interval.start),
+                        yStart: `${interval.itemId}`,
+                        xEnd: new Date(interval.end),
+                    });
+                }
+            }
+
+            const itemAnnotations: Array<ItemOnGrid<string, Item>> = items.map(
+                (item) => ({
+                    children: (
+                        <Typography sx={{ p: 0.7 }} align="center">
+                            {itemToString(item)}
+                        </Typography>
+                    ),
+                    xStart: ADDITIONAL_FIELDS.ItemAnnotation,
+                    yStart: item,
+                })
+            );
+
             for (const item of items) {
-                result.push({
+                itemAnnotations.push({
                     children: <BorderDiv />,
-                    xStart: hour,
+                    xStart: ADDITIONAL_FIELDS.ItemAnnotation,
                     yStart: item,
                 });
             }
-        }
 
-        const itemAnnotations: Array<ItemOnGrid<string, Item>> = items.map(
-            (item) => ({
-                children: (
-                    <Typography sx={{ p: 0.7 }} align="center">
-                        {itemToString(item)}
-                    </Typography>
-                ),
-                xStart: ADDITIONAL_FIELDS.ItemAnnotation,
-                yStart: item,
-            })
-        );
-
-        for (const item of items) {
-            itemAnnotations.push({
-                children: <BorderDiv />,
-                xStart: ADDITIONAL_FIELDS.ItemAnnotation,
-                yStart: item,
-            });
-        }
-
-        return [result, itemAnnotations];
-    }, itemsOnGridDeps);
+            return [
+                result,
+                itemAnnotations,
+                potentialNewItems,
+                plannerByHourReducer.isDragging,
+            ];
+        }, itemsOnGridDeps);
 
     return (
         <OverflowHelper>
@@ -193,6 +256,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                     ...additionalDayAnnotations,
                 ]}
                 additionalColItems={additionalItemAnnotations}
+                additionalRowItems={potentialNewItems}
             />
         </OverflowHelper>
     );
