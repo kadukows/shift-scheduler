@@ -13,7 +13,6 @@ import { SECOND_INDEX } from "./SecondIndexType";
 import "./style.css";
 
 import EmptyItemDrag from "./items/EmptyItemDrag";
-import EmptyItemDrop from "./items/EmptyItemDrop";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import PotentialNewItem from "./items/PotentialNewItem";
@@ -123,8 +122,6 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         itemsOnGridDeps.push(...unpackShift(shift));
     }
 
-    itemsOnGridDeps.push(plannerByHourReducer.isDragging);
-
     const [itemsOnGrid, additionalItemAnnotations, potentialNewItems] =
         React.useMemo(() => {
             const itemToShifts = getItemToShifts(shifts, getItemFromShift);
@@ -161,24 +158,6 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                         ),
                         xStart: hour,
                         yStart: item,
-                        className: plannerByHourReducer.isDragging
-                            ? "planner-plannerGridByHours-z-minus-1"
-                            : "planner-plannerGridByHours-z-0",
-                    });
-                    result.push({
-                        children: (
-                            <BorderDiv>
-                                <EmptyItemDrop
-                                    hour={hour}
-                                    itemId={getId(item)}
-                                />
-                            </BorderDiv>
-                        ),
-                        xStart: hour,
-                        yStart: item,
-                        className: !plannerByHourReducer.isDragging
-                            ? "planner-plannerGridByHours-z-minus-1"
-                            : "planner-plannerGridByHours-z-0",
                     });
                 }
             }
@@ -221,12 +200,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                 });
             }
 
-            return [
-                result,
-                itemAnnotations,
-                potentialNewItems,
-                plannerByHourReducer.isDragging,
-            ];
+            return [result, itemAnnotations, potentialNewItems];
         }, itemsOnGridDeps);
 
     return (

@@ -12,7 +12,6 @@ interface PlannerByHoursState {
         end: number;
         itemId: number; // either role or employee id
     };
-    isDragging: boolean;
 }
 
 const initialState: PlannerByHoursState = {
@@ -21,7 +20,6 @@ const initialState: PlannerByHoursState = {
         end: null,
         itemId: null,
     },
-    isDragging: false,
 };
 
 const plannerByHourSlice = createSlice({
@@ -30,7 +28,6 @@ const plannerByHourSlice = createSlice({
     reducers: {
         potentialNewShiftSetStart(state, { payload }: PayloadAction<number>) {
             state.potentialNewShift.start = payload;
-            state.isDragging = true;
         },
         potentationNewShiftSetSendParam(
             state,
@@ -50,16 +47,12 @@ const plannerByHourSlice = createSlice({
         },
         potentationNewShiftReset(state) {
             state.potentialNewShift = { start: null, end: null, itemId: null };
-            state.isDragging = false;
         },
         potentationNewShiftSetItemId(
             state,
             { payload }: PayloadAction<number>
         ) {
             state.potentialNewShift.itemId = payload;
-        },
-        setIsDragging(state, { payload }: PayloadAction<boolean>) {
-            state.isDragging = payload;
         },
     },
 });
@@ -69,7 +62,6 @@ export const {
     potentationNewShiftSetSendParam,
     potentationNewShiftReset,
     potentationNewShiftSetItemId,
-    setIsDragging,
 } = plannerByHourSlice.actions;
 
 export const plannerByHourReducer = plannerByHourSlice.reducer;

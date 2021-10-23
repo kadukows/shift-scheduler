@@ -9,7 +9,6 @@ import {
     potentationNewShiftReset,
     potentationNewShiftSetSendParam,
     potentationNewShiftSetItemId,
-    setIsDragging,
 } from "../plannerByHoursSlice";
 
 interface Props {
@@ -28,6 +27,7 @@ export const MyDiv = styled("div")({
 
 const EmptyItemDrag = ({ hour, itemId }: Props) => {
     const dispatch = useDispatch();
+    const myRef = React.useRef();
 
     const [{}, drag] = useDrag(
         () => ({
@@ -42,7 +42,20 @@ const EmptyItemDrag = ({ hour, itemId }: Props) => {
         [hour, itemId]
     );
 
-    return <MyDiv ref={drag} />;
+    const [{}, drop] = useDrop(() => ({
+        accept: getDndTypeForItemId(DndTypes.EMPTY_ITEM_DRAG, itemId),
+        drop: ({ hour }: ItemPassed.EMPTY_ITEM_DRAG) =>
+            alert(`Dropped from hour ${hour}`),
+        hover: ({}: ItemPassed.EMPTY_ITEM_DRAG) =>
+            dispatch(potentationNewShiftSetSendParam(hour.getTime())),
+    }));
+
+    React.useEffect(() => {
+        drag(myRef.current);
+        drop(myRef.current);
+    }, [myRef.current]);
+
+    return <MyDiv ref={myRef} />;
 };
 
 export default EmptyItemDrag;
