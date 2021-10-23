@@ -25,6 +25,7 @@ const gridDefinition: GridDefinition<number, number> = {
 };
 
 const DraggablePage = () => {
+    /*
     const itemsOnGrid: ItemOnGrid<number, number>[] = [];
     for (const x of xList) {
         for (const y of yList) {
@@ -70,6 +71,8 @@ const DraggablePage = () => {
             </Grid>
         </>
     );
+    */
+    return <div />;
 };
 
 export default DraggablePage;

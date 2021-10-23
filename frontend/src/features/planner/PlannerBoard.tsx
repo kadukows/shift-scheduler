@@ -121,58 +121,14 @@ const PlannerBoard = ({ schedule }: Props) => {
               };
 
     return (
-        <EventProvider
-            events={[
-                EventTypes.EMPTY_FIELD_CLICKED,
-                EventTypes.NON_EMPTY_FIELD_CLICKED,
-            ]}
-        >
-            <EmptyItemDialog schedule={schedule} />
-            <div
-                style={{
-                    display: "flex",
-                    flexDirection: "column",
-                }}
-            >
-                <Paper className="planner-board-paper" elevation={3}>
-                    <Typography
-                        variant="h5"
-                        component="h5"
-                        style={{ marginBottom: 16 }}
-                    >
-                        Planner for schedule: {workplace.name} --{" "}
-                        {schedule.month_year}
-                    </Typography>
-                    <TextField
-                        select
-                        variant="outlined"
-                        label="By"
-                        value={secondIdx}
-                        onChange={(event) =>
-                            setSecondIdx(
-                                event.target.value as "Employee" | "Role"
-                            )
-                        }
-                    >
-                        <MenuItem value={"Employee"}>Employee</MenuItem>
-                        <MenuItem value={"Role"}>Role</MenuItem>
-                    </TextField>
-                    <PlannerGrid
-                        yIndexProvider={yIndexProvider}
-                        dates={dates}
-                        itemsGenerator={itemGenerator}
-                    />
-                </Paper>
-                <Paper sx={{ mt: 2, p: 3 }}>
-                    <PlannerByHours<Role | Employee>
-                        timeRange={timeRange}
-                        secondIndexHandler={secondIndexHandler}
-                        shifts={shifts}
-                        schedule={schedule}
-                    />
-                </Paper>
-            </div>
-        </EventProvider>
+        <Paper sx={{ p: 3 }}>
+            <PlannerByHours<Role | Employee>
+                timeRange={timeRange}
+                secondIndexHandler={secondIndexHandler}
+                shifts={shifts}
+                schedule={schedule}
+            />
+        </Paper>
     );
 };
 

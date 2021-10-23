@@ -2,7 +2,7 @@ import * as React from "react";
 import * as DateFns from "date-fns";
 
 import GenericCssGrid, {
-    ItemOnGrid,
+    DefaultItemOnGrid,
 } from "../../genericCssGrid/GenericCssGrid";
 import { Employee } from "../../employees/employeeSlice";
 import { Role, roleSelectors } from "../../roles/rolesSlice";
@@ -214,7 +214,6 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                     cells: items,
                     getId: (item) => getId(item),
                 }}
-                items={itemsOnGrid}
                 style={{
                     gap: "1px",
                     margin: 8,
@@ -225,13 +224,15 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                     ADDITIONAL_FIELDS.HourAnnotation,
                 ]}
                 additionalCols={[ADDITIONAL_FIELDS.ItemAnnotation]}
+                /*
                 additionalItems={[
                     ...additionalHourAnnotations,
                     ...additionalDayAnnotations,
                 ]}
                 additionalColItems={additionalItemAnnotations}
                 additionalRowItems={potentialNewItems}
-            />
+                */
+            ></GenericCssGrid>
         </OverflowHelper>
     );
 };

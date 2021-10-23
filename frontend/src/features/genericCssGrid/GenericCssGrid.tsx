@@ -1,20 +1,16 @@
 import { styled } from "@mui/system";
 import * as React from "react";
 
-export interface ItemOnGrid<Tx, Ty> {
-    children: React.ReactNode;
-    xStart: Tx;
-    yStart: Ty;
-    xEnd?: Tx;
-    yEnd?: Ty;
-
-    className?: string;
-}
-
 export interface GridDimensionDefinition<Cell> {
     cells: Cell[];
     getId: (a: Cell) => string | number;
 }
+
+const unpackGridDimensionDefinition = <Cell extends unknown>(
+    def: GridDimensionDefinition<Cell>
+) => {
+    return def.cells.map(def.getId);
+};
 
 export interface GridDefinition<Tx, Ty> {
     x: GridDimensionDefinition<Tx>;
@@ -24,52 +20,59 @@ export interface GridDefinition<Tx, Ty> {
 export interface Props<Tx, Ty>
     extends GridDefinition<Tx, Ty>,
         React.ComponentProps<"div"> {
-    items: ItemOnGrid<Tx, Ty>[];
     additionalRows?: string[];
     additionalCols?: string[];
-    additionalItems?: ItemOnGrid<string, string>[];
-    additionalColItems?: ItemOnGrid<string, Ty>[];
-    additionalRowItems?: ItemOnGrid<Tx, string>[];
 }
+
+interface GenericCssGridContextValueType<Tx, Ty> {
+    getIdX: (a: Tx) => string | number;
+    getIdY: (a: Ty) => string | number;
+}
+
+const initalValue = {
+    getIdX: () => {
+        throw "GenericCssGridContext(): inital vlaue getIdX used!";
+    },
+    getIdY: () => {
+        throw "GenericCssGridContext(): inital vlaue getIdY used!";
+    },
+};
+
+const GenericCssGridContext =
+    React.createContext<GenericCssGridContextValueType<any, any>>(initalValue);
 
 const GenericCssGrid = <Tx, Ty>({
     x,
     y,
-    items,
     additionalRows,
     additionalCols,
-    additionalItems,
-    additionalColItems,
-    additionalRowItems,
+    children,
     ...rest
-}: Props<Tx, Ty>) => {
+}: React.PropsWithChildren<Props<Tx, Ty>>) => {
     const { style, ...restWoStyle } = rest;
 
-    const newStyle = React.useMemo(
-        () => ({
-            ...generateCssForGrid({ x, y }, additionalRows, additionalCols),
-            ...style,
-        }),
-        [x, y, style, additionalRows, additionalCols]
+    const gridArea = React.useMemo(
+        () => generateCssForGrid({ x, y }, additionalRows, additionalCols),
+        [
+            ...unpackGridDimensionDefinition(x),
+            ...unpackGridDimensionDefinition(y),
+            additionalRows,
+            additionalCols,
+        ]
     );
 
     return (
-        <div style={newStyle} {...restWoStyle}>
-            {generateGridItems(items, x.getId, y.getId)}
-            {generateGridItems(
-                additionalItems,
-                (a) => a,
-                (a) => a
-            )}
-            {generateGridItems(additionalColItems, (a) => a, y.getId)}
-            {generateGridItems(additionalRowItems, x.getId, (a) => a)}
-        </div>
+        <GenericCssGridContext.Provider
+            value={{ getIdX: x.getId, getIdY: y.getId }}
+        >
+            <div style={{ ...gridArea, ...style }} {...restWoStyle}>
+                {children}
+            </div>
+        </GenericCssGridContext.Provider>
     );
 };
 
-/**
- *
- */
+export default GenericCssGrid;
 
 function generateDimensionArray<T>(
     unique_key: string,
@@ -107,48 +110,106 @@ function generateCssForGrid<Tx, Ty>(
     };
 }
 
-const GridItemDiv = styled("div")({
-    width: "100%",
-    height: "100%",
-});
+/**
+ *
+ */
 
-function generateGridItems<Tx, Ty>(
-    items: Props<Tx, Ty>["items"],
-    getIdX: (a: Tx) => string | number,
-    getIdY: (a: Ty) => string | number
-) {
-    if (!items) {
-        return [];
-    }
-
-    let key = 1;
-
-    const transformItem = ({
-        xStart,
-        xEnd,
-        yStart,
-        yEnd,
-        children,
-        className,
-    }: ItemOnGrid<Tx, Ty>) => {
-        const gridArea = `row-${getIdY(yStart)} / col-${getIdX(xStart)} / ${
-            yEnd ? `row-${getIdY(yEnd)}` : "span 1"
-        } / ${xEnd ? `col-${getIdX(xEnd)}` : "span 1"}`;
-
-        return (
-            <GridItemDiv
-                style={{
-                    gridArea: gridArea,
-                }}
-                key={key++}
-                className={className}
-            >
-                {children}
-            </GridItemDiv>
-        );
-    };
-
-    return items.map(transformItem);
+interface GridAreaArg<Tx, Ty> {
+    xStart: Tx;
+    yStart: Ty;
+    xEnd?: Tx;
+    yEnd?: Ty;
 }
 
-export default GenericCssGrid;
+export const useGridArea = <Tx, Ty>({
+    xStart,
+    yStart,
+    xEnd,
+    yEnd,
+}: GridAreaArg<Tx, Ty>) => {
+    const context = React.useContext(GenericCssGridContext);
+
+    const xEndText = xEnd ? `col-${context.getIdX(xEnd)}` : "span 1";
+    const yEndText = yEnd ? `col-${context.getIdY(yEnd)}` : "span 1";
+
+    return `row-${context.getIdY(yStart)} / col-${context.getIdX(
+        xStart
+    )} / ${xEndText} / ${yEndText}`;
+};
+
+interface GridColumnArg<Tx> {
+    xStart: Tx;
+    yStart: string;
+    xEnd?: Tx;
+    yEnd?: string;
+}
+
+export const useGridColumn = <Tx extends unknown>({
+    xStart,
+    yStart,
+    xEnd,
+    yEnd,
+}: GridColumnArg<Tx>) => {
+    const context = React.useContext(GenericCssGridContext);
+
+    const xEndText = xEnd ? `col-${context.getIdX(xEnd)}` : "span 1";
+    const yEndText = yEnd ? `row-${yEnd}` : "span 1";
+
+    return `row-${yStart} / col-${context.getIdX(
+        xStart
+    )} / ${yEndText} / ${xEndText}`;
+};
+
+interface GridRowArg<Ty> {
+    xStart: string;
+    yStart: Ty;
+    xEnd?: string;
+    yEnd?: Ty;
+}
+
+export const useGridRow = <Ty extends unknown>({
+    xStart,
+    yStart,
+    xEnd,
+    yEnd,
+}: GridRowArg<Ty>) => {
+    const context: GenericCssGridContextValueType<any, Ty> = React.useContext(
+        GenericCssGridContext
+    );
+
+    const xEndText = xEnd ? `col-${xEnd}` : "span 1";
+    const yEndText = yEnd ? `row-${context.getIdY(yEnd)}` : "span 1";
+
+    return `row-${context.getIdY(
+        yStart
+    )} / col-${xStart} / ${yEndText} / ${xEndText}`;
+};
+
+/**
+ *
+ */
+
+interface DefaultItemOnGridProps<Tx, Ty> extends React.ComponentProps<"div"> {
+    xStart: Tx;
+    yStart: Ty;
+    xEnd?: Tx;
+    yEnd?: Ty;
+}
+
+export const DefaultItemOnGrid = <Tx, Ty>({
+    xStart,
+    yStart,
+    xEnd,
+    yEnd,
+    style,
+    children,
+    ...rest
+}: React.PropsWithChildren<DefaultItemOnGridProps<Tx, Ty>>) => {
+    const gridArea = useGridArea<Tx, Ty>({ xStart, yStart, xEnd, yEnd });
+
+    return (
+        <div style={{ ...style, gridArea }} {...rest}>
+            {children}
+        </div>
+    );
+};
