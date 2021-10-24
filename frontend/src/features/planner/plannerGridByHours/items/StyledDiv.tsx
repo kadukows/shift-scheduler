@@ -23,3 +23,10 @@ export const BorderTypography = styled(Typography)({
     height: "100%",
     outline: "1px solid rgba(128, 128, 128, 0.4)",
 });
+
+export const HoverableDiv = styled("div")({
+    zIndex: 2,
+    ":hover": {
+        zIndex: 3,
+    },
+});

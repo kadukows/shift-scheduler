@@ -20,58 +20,58 @@ import GenericForm from "../../../genericForm/GenericForm";
 import { getTokenRequestConfig } from "../../../helpers";
 import { RootState } from "../../../../store";
 import { scheduleSelectors } from "../../../schedules/scheduleSlice";
+import { Employee, employeeSelectors } from "../../../employees/employeeSlice";
+import { employeeToString } from "../../../employees/helpers";
 
 interface Inputs {
     time_from: string;
     time_to: string;
-    role: number;
+    employee: number;
 }
 
 const TIME_FORMAT = "yyyy-MM-dd'T'HH:mmX";
 const FORM_ID = "PLANNER_GRID_BY_HOURS__EMPLOYEE_DIALOG_FORM";
 
-const EmployeeDialog = () => {
+const RoleDialog = () => {
     const [open, setOpen] = React.useState(false);
     const [shift, setShift] = React.useState<Shift>(null);
 
-    const eventCallback: CallbackTypes.EMPLOYEE_ITEM_CLICK = (shift: Shift) => {
+    const eventCallback: CallbackTypes.ROLE_ITEM_CLICK = (shift: Shift) => {
         setShift(shift);
         setOpen(true);
     };
 
-    useSlot(EventTypes.EMPLOYEE_ITEM_CLICK, eventCallback);
+    useSlot(EventTypes.ROLE_ITEM_CLICK, eventCallback);
 
     return shift ? (
-        <EmployeeSetDialog shift={shift} open={open} setOpen={setOpen} />
+        <RoleSetDialog shift={shift} open={open} setOpen={setOpen} />
     ) : (
         <React.Fragment />
     );
 };
 
-export default EmployeeDialog;
+export default RoleDialog;
 
-interface EmployeeSetDialogProps {
+interface RoleSetDialogProps {
     shift: Shift;
     open: boolean;
     setOpen: (a: boolean) => void;
 }
 
-const EmployeeSetDialog = ({
-    shift,
-    open,
-    setOpen,
-}: EmployeeSetDialogProps) => {
+const RoleSetDialog = ({ shift, open, setOpen }: RoleSetDialogProps) => {
     const schedule = useSelector((state: RootState) =>
         scheduleSelectors.selectById(state, shift.schedule)
     );
 
     const fields = React.useMemo(() => {
         const entitySelector = (state: RootState) =>
-            roleSelectors
+            employeeSelectors
                 .selectAll(state)
-                .filter((role) => role.workplace === schedule.workplace);
+                .filter(
+                    (employee) => employee.workplace === schedule.workplace
+                );
 
-        const fields: FieldData<Inputs, Role>[] = [
+        const fields: FieldData<Inputs, Employee>[] = [
             {
                 type: "datetime",
                 name: "time_from",
@@ -92,12 +92,12 @@ const EmployeeSetDialog = ({
             },
             {
                 type: "choose_object",
-                name: "role",
-                label: "Role",
+                name: "employee",
+                label: "Employee",
                 validation: yup.number().required(),
                 //
                 entitySelector,
-                entityToString: (role: Role) => role.name,
+                entityToString: employeeToString,
             },
         ];
 
@@ -107,15 +107,15 @@ const EmployeeSetDialog = ({
     const token = useSelector((state: RootState) => state.authReducer.token);
     const dispatch = useDispatch();
 
-    const submit = async ({ time_from, time_to, role }: Inputs) => {
+    const submit = async ({ time_from, time_to, employee }: Inputs) => {
         const response = await axios.put<Shift>(
             `/api/shift/${shift.id}/`,
             {
                 time_from,
                 time_to,
-                role,
+                role: shift.role,
                 id: shift.id,
-                employee: shift.employee,
+                employee: employee,
                 schedule: shift.schedule,
             },
             getTokenRequestConfig(token)
@@ -125,7 +125,7 @@ const EmployeeSetDialog = ({
 
         dispatch(
             updateShift({
-                id: id,
+                id,
                 changes: { ...changes },
             })
         );
@@ -136,8 +136,7 @@ const EmployeeSetDialog = ({
         ? {
               time_from: format(Date.parse(shift.time_from), TIME_FORMAT),
               time_to: format(Date.parse(shift.time_to), TIME_FORMAT),
-              role: shift.role,
-              schedule: shift.schedule,
+              employee: shift.employee,
           }
         : undefined;
 

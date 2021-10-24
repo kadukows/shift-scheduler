@@ -22,11 +22,13 @@ export interface Props<Tx, Ty>
         React.ComponentProps<"div"> {
     additionalRows?: string[];
     additionalCols?: string[];
+    inverse?: boolean;
 }
 
 interface GenericCssGridContextValueType<Tx, Ty> {
     getIdX: (a: Tx) => string | number;
     getIdY: (a: Ty) => string | number;
+    inverse: boolean;
 }
 
 const initalValue = {
@@ -36,6 +38,7 @@ const initalValue = {
     getIdY: () => {
         throw "GenericCssGridContext(): inital vlaue getIdY used!";
     },
+    inverse: false,
 };
 
 const GenericCssGridContext =
@@ -47,23 +50,31 @@ const GenericCssGrid = <Tx, Ty>({
     additionalRows,
     additionalCols,
     children,
+    inverse,
     ...rest
 }: React.PropsWithChildren<Props<Tx, Ty>>) => {
     const { style, ...restWoStyle } = rest;
 
+    inverse = !!inverse;
+
     const gridArea = React.useMemo(
-        () => generateCssForGrid({ x, y }, additionalRows, additionalCols),
-        [
-            ...unpackGridDimensionDefinition(x),
-            ...unpackGridDimensionDefinition(y),
-            additionalRows,
-            additionalCols,
-        ]
+        () =>
+            generateCssForGrid(
+                { x, y },
+                additionalRows,
+                additionalCols,
+                inverse
+            ),
+        [x, y, additionalRows, additionalCols, inverse]
     );
 
     return (
         <GenericCssGridContext.Provider
-            value={{ getIdX: x.getId, getIdY: y.getId }}
+            value={{
+                getIdX: !inverse ? x.getId : y.getId,
+                getIdY: !inverse ? y.getId : x.getId,
+                inverse,
+            }}
         >
             <div style={{ ...gridArea, ...style }} {...restWoStyle}>
                 {children}
@@ -92,15 +103,28 @@ function generateDimensionArrayForStrings(unique_key: string, keys: string[]) {
 function generateCssForGrid<Tx, Ty>(
     definition: GridDefinition<Tx, Ty>,
     additionalRows: string[],
-    additionalCols: string[]
+    additionalCols: string[],
+    inverse: boolean
 ): React.ComponentProps<"div">["style"] {
     const rowCssArray = [
-        ...generateDimensionArrayForStrings("row", additionalRows),
-        ...generateDimensionArray("row", definition.y),
+        ...generateDimensionArrayForStrings(
+            "row",
+            !inverse ? additionalRows : additionalCols
+        ),
+        ...generateDimensionArray(
+            "row",
+            !inverse ? definition.y : (definition.x as any)
+        ),
     ];
     const colCssArray = [
-        ...generateDimensionArrayForStrings("col", additionalCols),
-        ...generateDimensionArray("col", definition.x),
+        ...generateDimensionArrayForStrings(
+            "col",
+            !inverse ? additionalCols : additionalRows
+        ),
+        ...generateDimensionArray(
+            "col",
+            !inverse ? definition.x : (definition.y as any)
+        ),
     ];
 
     return {
@@ -121,20 +145,33 @@ interface GridAreaArg<Tx, Ty> {
     yEnd?: Ty;
 }
 
-export const useGridArea = <Tx, Ty>({
+interface GridAreaImplArg<Tx, Ty> extends GridAreaArg<Tx, Ty> {
+    getIdX: (a: Tx) => number | string;
+    getIdY: (a: Ty) => number | string;
+    inverse: boolean;
+}
+
+const gridAreaImpl = <Tx, Ty>({
     xStart,
     yStart,
     xEnd,
     yEnd,
-}: GridAreaArg<Tx, Ty>) => {
-    const context = React.useContext(GenericCssGridContext);
+    getIdX,
+    getIdY,
+    inverse,
+}: GridAreaImplArg<Tx, Ty>) => {
+    const xEndText = xEnd ? `col-${getIdX(xEnd)}` : "span 1";
+    const yEndText = yEnd ? `row-${getIdY(yEnd)}` : "span 1";
 
-    const xEndText = xEnd ? `col-${context.getIdX(xEnd)}` : "span 1";
-    const yEndText = yEnd ? `col-${context.getIdY(yEnd)}` : "span 1";
-
-    return `row-${context.getIdY(yStart)} / col-${context.getIdX(
+    return `row-${getIdY(yStart)} / col-${getIdX(
         xStart
     )} / ${yEndText} / ${xEndText}`;
+};
+
+export const useGridArea = <Tx, Ty>(args: GridAreaArg<Tx, Ty>) => {
+    const { getIdX, getIdY, inverse } = React.useContext(GenericCssGridContext);
+
+    return gridAreaImpl({ ...args, inverse, getIdX, getIdY });
 };
 
 interface GridColumnArg<Tx> {
@@ -144,20 +181,10 @@ interface GridColumnArg<Tx> {
     yEnd?: string;
 }
 
-export const useGridColumn = <Tx extends unknown>({
-    xStart,
-    yStart,
-    xEnd,
-    yEnd,
-}: GridColumnArg<Tx>) => {
-    const context = React.useContext(GenericCssGridContext);
+export const useGridColumn = <Tx extends unknown>(args: GridColumnArg<Tx>) => {
+    const { getIdX, inverse } = React.useContext(GenericCssGridContext);
 
-    const xEndText = xEnd ? `col-${context.getIdX(xEnd)}` : "span 1";
-    const yEndText = yEnd ? `row-${yEnd}` : "span 1";
-
-    return `row-${yStart} / col-${context.getIdX(
-        xStart
-    )} / ${yEndText} / ${xEndText}`;
+    return gridAreaImpl({ ...args, inverse, getIdX, getIdY: (a) => a });
 };
 
 interface GridRowArg<Ty> {
@@ -167,22 +194,10 @@ interface GridRowArg<Ty> {
     yEnd?: Ty;
 }
 
-export const useGridRow = <Ty extends unknown>({
-    xStart,
-    yStart,
-    xEnd,
-    yEnd,
-}: GridRowArg<Ty>) => {
-    const context: GenericCssGridContextValueType<any, Ty> = React.useContext(
-        GenericCssGridContext
-    );
+export const useGridRow = <Ty extends unknown>(args: GridRowArg<Ty>) => {
+    const { getIdY, inverse } = React.useContext(GenericCssGridContext);
 
-    const xEndText = xEnd ? `col-${xEnd}` : "span 1";
-    const yEndText = yEnd ? `row-${context.getIdY(yEnd)}` : "span 1";
-
-    return `row-${context.getIdY(
-        yStart
-    )} / col-${xStart} / ${yEndText} / ${xEndText}`;
+    return gridAreaImpl({ ...args, inverse, getIdX: (a) => a, getIdY });
 };
 
 /**

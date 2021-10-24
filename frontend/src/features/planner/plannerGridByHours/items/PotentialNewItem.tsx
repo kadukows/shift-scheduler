@@ -1,5 +1,6 @@
 import * as React from "react";
 import { styled } from "@mui/material";
+import { addHours } from "date-fns";
 
 import { EventTypes, CallbackTypes } from "../EventTypes";
 import { useGridArea } from "../../../genericCssGrid/GenericCssGrid";
@@ -42,78 +43,41 @@ const reducer = (state: NumberInterval, action: NumberIntervalAction) => {
 };
 
 const PotentialNewItem = (props: Props) => {
-    /*
-    const [interval, setInterval] = React.useState<NumberInterval>({
-        start: null,
-        end: null,
-    });
-    */
-    const [interval, dispatchInterval] = React.useReducer(reducer, {
-        start: null,
-        end: null,
-    });
+    const [start, setStart] = React.useState<number>(null);
+    const [end, setEnd] = React.useState<number>(null);
     const [itemId, setItemId] = React.useState<number>(null);
 
     const startDragCallback: CallbackTypes.POTENTIAL_NEW_SHIFT_START_DRAG = (
         event
     ) => {
-        dispatchInterval({
-            type: NumberIntervalActionType.SET_START,
-            payload: event.start,
-        });
+        setStart(event.start);
         setItemId(event.itemId);
         console.log("drag start");
     };
     useSlot(EventTypes.POTENTIAL_NEW_SHIFT_START_DRAG, startDragCallback);
 
     const hoverCallback: CallbackTypes.POTENTIAL_NEW_SHIFT_HOVER = (end) => {
-        dispatchInterval({
-            type: NumberIntervalActionType.SET_END,
-            payload: end,
-        });
+        setEnd(end);
     };
     useSlot(EventTypes.POTENTIAL_NEW_SHIFT_HOVER, hoverCallback);
 
     const endDragCallback: CallbackTypes.POTENTIAL_NEW_SHIFT_END_DRAG = () => {
         setItemId(null);
-        dispatchInterval({
-            type: NumberIntervalActionType.RESET,
-            payload: null,
-        });
+        setStart(null);
+        setEnd(null);
         console.log("end drag");
     };
     useSlot(EventTypes.POTENTIAL_NEW_SHIFT_END_DRAG, endDragCallback);
 
-    return interval.start !== null &&
-        interval.end !== null &&
-        itemId !== null ? (
-        <PotentialNewItemImpl {...interval} itemId={itemId} />
-    ) : (
-        <React.Fragment />
-    );
-};
-
-export default PotentialNewItem;
-
-/**
- *
- */
-
-interface PotentialNewItemImplProps {
-    start: number;
-    end: number;
-    itemId: number;
-}
-
-const PotentialNewItemImpl = ({
-    start,
-    end,
-    itemId,
-}: PotentialNewItemImplProps) => {
     const getXDesc = () => {
+        if (start === null || end === null)
+            return {
+                xStart: new Date(0),
+            };
+
         return start < end
-            ? { xStart: new Date(start), xEnd: new Date(end) }
-            : { xStart: new Date(end), xEnd: new Date(start) };
+            ? { xStart: new Date(start), xEnd: addHours(end, 1) }
+            : { xStart: new Date(end), xEnd: addHours(start, 1) };
     };
 
     const gridArea = useGridArea({
@@ -123,6 +87,12 @@ const PotentialNewItemImpl = ({
 
     return <PotentialNewShiftDiv style={{ gridArea }} />;
 };
+
+export default PotentialNewItem;
+
+/**
+ *
+ */
 
 const PotentialNewShiftDiv = styled("div")({
     backgroundColor: "rgba(128, 128, 128, 0.6)",

@@ -11,7 +11,7 @@ import { BorderedDiv } from "./StyledDiv";
 import { EventTypes, CallbackTypes } from "../EventTypes";
 import { useSignal } from "../../../eventProvider/EventProvider";
 
-interface Props<Item> extends React.ComponentProps<"div"> {
+interface Props<Item> {
     hour: Date;
     item: Item;
 }
@@ -26,10 +26,8 @@ export const MyDiv = styled(BorderedDiv)({
 const EmptyItem = <Item extends Role | Employee>({
     hour,
     item,
-    style,
     ...rest
 }: Props<Item>) => {
-    const [shouldFire, setShouldFire] = React.useState(false);
     const myRef = React.useRef();
     const gridArea = useGridArea<Date, Item>({ xStart: hour, yStart: item });
 
@@ -51,7 +49,7 @@ const EmptyItem = <Item extends Role | Employee>({
             }) as () => ItemPassed.EMPTY_ITEM_DRAG,
             end: () => endDragSignal(),
         }),
-        [hour, item]
+        [hour.getTime(), item.id]
     );
 
     const [{}, drop] = useDrop(
@@ -60,16 +58,8 @@ const EmptyItem = <Item extends Role | Employee>({
             drop: ({ hour }: ItemPassed.EMPTY_ITEM_DRAG) => {
                 console.log(`Dropped from hour ${hour}`);
             },
-            /*
-            hover: ({}: ItemPassed.EMPTY_ITEM_DRAG) => {
-                if (shouldFire) {
-                    setShouldFire(false);
-                    hoverSignal(hour.getTime());
-                }
-            },
-            */
         }),
-        [hour, item]
+        [hour.getTime(), item.id]
     );
 
     React.useEffect(() => {
@@ -79,9 +69,8 @@ const EmptyItem = <Item extends Role | Employee>({
 
     return (
         <MyDiv
-            /*onMouseEnter={}*/
             onDragEnter={() => hoverSignal(hour.getTime())}
-            style={{ ...style, gridArea }}
+            style={{ gridArea, zIndex: 1 }}
             {...rest}
             ref={myRef}
         />
