@@ -12,8 +12,43 @@ interface NumberInterval {
     end: number;
 }
 
+enum NumberIntervalActionType {
+    SET_START = "SET_START",
+    SET_END = "SET_END",
+    RESET = "RESET",
+}
+
+interface NumberIntervalAction {
+    type: NumberIntervalActionType;
+    payload: number;
+}
+
+const reducer = (state: NumberInterval, action: NumberIntervalAction) => {
+    switch (action.type) {
+        case NumberIntervalActionType.SET_START:
+            return { start: action.payload, end: null };
+        case NumberIntervalActionType.SET_END:
+            if (state.end !== action.payload) {
+                console.log("hover on: ", action.payload);
+                return { ...state, end: action.payload };
+            } else {
+                return state;
+            }
+        case NumberIntervalActionType.RESET:
+            return { start: null, end: null };
+        default:
+            return state;
+    }
+};
+
 const PotentialNewItem = (props: Props) => {
+    /*
     const [interval, setInterval] = React.useState<NumberInterval>({
+        start: null,
+        end: null,
+    });
+    */
+    const [interval, dispatchInterval] = React.useReducer(reducer, {
         start: null,
         end: null,
     });
@@ -22,21 +57,30 @@ const PotentialNewItem = (props: Props) => {
     const startDragCallback: CallbackTypes.POTENTIAL_NEW_SHIFT_START_DRAG = (
         event
     ) => {
-        setInterval({ start: event.start, end: null });
+        dispatchInterval({
+            type: NumberIntervalActionType.SET_START,
+            payload: event.start,
+        });
         setItemId(event.itemId);
+        console.log("drag start");
     };
     useSlot(EventTypes.POTENTIAL_NEW_SHIFT_START_DRAG, startDragCallback);
 
     const hoverCallback: CallbackTypes.POTENTIAL_NEW_SHIFT_HOVER = (end) => {
-        if (end !== interval.end) {
-            setInterval({ start: interval.start, end: end });
-        }
+        dispatchInterval({
+            type: NumberIntervalActionType.SET_END,
+            payload: end,
+        });
     };
     useSlot(EventTypes.POTENTIAL_NEW_SHIFT_HOVER, hoverCallback);
 
     const endDragCallback: CallbackTypes.POTENTIAL_NEW_SHIFT_END_DRAG = () => {
         setItemId(null);
-        setInterval({ start: null, end: null });
+        dispatchInterval({
+            type: NumberIntervalActionType.RESET,
+            payload: null,
+        });
+        console.log("end drag");
     };
     useSlot(EventTypes.POTENTIAL_NEW_SHIFT_END_DRAG, endDragCallback);
 

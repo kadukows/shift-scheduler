@@ -29,7 +29,7 @@ const EmptyItem = <Item extends Role | Employee>({
     style,
     ...rest
 }: Props<Item>) => {
-    const dispatch = useDispatch();
+    const [shouldFire, setShouldFire] = React.useState(false);
     const myRef = React.useRef();
     const gridArea = useGridArea<Date, Item>({ xStart: hour, yStart: item });
 
@@ -60,9 +60,14 @@ const EmptyItem = <Item extends Role | Employee>({
             drop: ({ hour }: ItemPassed.EMPTY_ITEM_DRAG) => {
                 console.log(`Dropped from hour ${hour}`);
             },
+            /*
             hover: ({}: ItemPassed.EMPTY_ITEM_DRAG) => {
-                hoverSignal(hour.getTime());
+                if (shouldFire) {
+                    setShouldFire(false);
+                    hoverSignal(hour.getTime());
+                }
             },
+            */
         }),
         [hour, item]
     );
@@ -72,7 +77,15 @@ const EmptyItem = <Item extends Role | Employee>({
         drop(myRef.current);
     }, [myRef.current]);
 
-    return <MyDiv style={{ ...style, gridArea }} {...rest} ref={myRef} />;
+    return (
+        <MyDiv
+            /*onMouseEnter={}*/
+            onDragEnter={() => hoverSignal(hour.getTime())}
+            style={{ ...style, gridArea }}
+            {...rest}
+            ref={myRef}
+        />
+    );
 };
 
 export default EmptyItem;

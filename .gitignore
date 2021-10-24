@@ -3,6 +3,7 @@ db.sqlite3
 __pycache__
 node_modules
 base.js
+base.js.LICENSE.txt
 package-lock.json
 .coverage
 htmlcov/
