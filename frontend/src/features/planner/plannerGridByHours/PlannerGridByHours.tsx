@@ -2,7 +2,9 @@ import * as React from "react";
 import * as DateFns from "date-fns";
 
 import GenericCssGrid, {
+    DefaultColumnItemOnGrid,
     DefaultItemOnGrid,
+    DefaultRowItemOnGrid,
 } from "../../genericCssGrid/GenericCssGrid";
 import { Employee } from "../../employees/employeeSlice";
 import { Role, roleSelectors } from "../../roles/rolesSlice";
@@ -12,10 +14,12 @@ import { SECOND_INDEX } from "./SecondIndexType";
 
 import "./style.css";
 
-import EmptyItemDrag from "./items/EmptyItemDrag";
+import EmptyItem from "./items/EmptyItem";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import PotentialNewItem from "./items/PotentialNewItem";
+import HourItem from "./items/HourItem";
+import DayItem from "./items/DayItem";
 
 export interface SecondIndexHandler<Item> {
     items: Item[];
@@ -56,152 +60,34 @@ const PlannerGridByHours = <Item extends Role | Employee>({
     },
     shifts,
 }: Props<Item>) => {
-    const plannerByHourReducer = useSelector(
-        (state: RootState) => state.plannerByHourReducer
+    const hours = React.useMemo(
+        () => DateFns.eachHourOfInterval(timeRange),
+        [
+            DateFns.getUnixTime(timeRange.start),
+            DateFns.getUnixTime(timeRange.end),
+        ]
     );
 
-    const hoursDepsArray = [
-        DateFns.getUnixTime(timeRange.start),
-        DateFns.getUnixTime(timeRange.end),
-    ];
-    const [hours, additionalHourAnnotations, additionalDayAnnotations] =
-        React.useMemo(() => {
-            const hours = DateFns.eachHourOfInterval(timeRange);
+    const emptyItems = React.useMemo(() => {
+        const result: JSX.Element[] = [];
 
-            const additionalHourAnnotations: ItemOnGrid<string, string>[] =
-                hours.map((date) => ({
-                    children: (
-                        <Box sx={{ p: 0.7 }}>
-                            <Typography align="center">
-                                {DateFns.format(date, "HH")}
-                            </Typography>
-                        </Box>
-                    ),
-                    xStart: DateFns.format(date, TIME_FORMAT),
-                    yStart: ADDITIONAL_FIELDS.HourAnnotation,
-                }));
-
-            for (const hour of hours) {
-                additionalHourAnnotations.push({
-                    children: <BorderDiv />,
-                    xStart: DateFns.format(hour, TIME_FORMAT),
-                    yStart: ADDITIONAL_FIELDS.HourAnnotation,
-                });
-            }
-
-            const days = DateFns.eachDayOfInterval(timeRange);
-            const additionalDayAnnotations: ItemOnGrid<string, string>[] =
-                days.map((date) => ({
-                    children: (
-                        <Typography align="center">
-                            {DateFns.format(date, "yyyy-MM-dd")}
-                        </Typography>
-                    ),
-                    xStart: DateFns.format(date, TIME_FORMAT),
-                    yStart: ADDITIONAL_FIELDS.DateAnnotation,
-                    xEnd: DateFns.format(DateFns.addDays(date, 1), TIME_FORMAT),
-                }));
-
-            for (const day of days) {
-                additionalDayAnnotations.push({
-                    children: <BorderDiv />,
-                    xStart: DateFns.format(day, TIME_FORMAT),
-                    yStart: ADDITIONAL_FIELDS.DateAnnotation,
-                    xEnd: DateFns.format(DateFns.addDays(day, 1), TIME_FORMAT),
-                });
-            }
-
-            return [hours, additionalHourAnnotations, additionalDayAnnotations];
-        }, hoursDepsArray);
-
-    const itemsOnGridDeps: Array<string | number | boolean> = [
-        ...hoursDepsArray,
-        secondIndexType,
-    ];
-    for (const shift of shifts) {
-        itemsOnGridDeps.push(...unpackShift(shift));
-    }
-
-    const [itemsOnGrid, additionalItemAnnotations, potentialNewItems] =
-        React.useMemo(() => {
-            const itemToShifts = getItemToShifts(shifts, getItemFromShift);
-
-            const shiftsWithOrder: Array<ShiftWithOrder> = [];
-            for (const shifts of itemToShifts.values()) {
-                shiftsWithOrder.push(...getShiftsWithMargins(shifts, hours));
-            }
-
-            const result = shiftsWithOrder.map<ItemOnGrid<Date, Item>>(
-                ({ shift, order }) => ({
-                    children: (
-                        <Box sx={{ mt: order, p: 0.5 }}>
-                            {renderShift(shift)}
-                        </Box>
-                    ),
-                    xStart: new Date(shift.time_from),
-                    xEnd: new Date(shift.time_to),
-                    yStart: getItemFromShift(shift),
-                    className: "planner-plannerGridByHours-itemOnGrid",
-                })
-            );
-
-            for (const hour of hours) {
-                for (const item of items) {
-                    result.push({
-                        children: (
-                            <BorderDiv>
-                                <EmptyItemDrag
-                                    hour={hour}
-                                    itemId={getId(item)}
-                                />
-                            </BorderDiv>
-                        ),
-                        xStart: hour,
-                        yStart: item,
-                    });
-                }
-            }
-
-            const potentialNewItems: Array<ItemOnGrid<Date, string>> = [];
-
-            {
-                const interval = plannerByHourReducer.potentialNewShift;
-                if (
-                    interval.start !== null &&
-                    interval.end !== null &&
-                    interval.itemId !== null
-                ) {
-                    potentialNewItems.push({
-                        children: <PotentialNewItem />,
-                        xStart: new Date(interval.start),
-                        yStart: `${interval.itemId}`,
-                        xEnd: new Date(interval.end),
-                    });
-                }
-            }
-
-            const itemAnnotations: Array<ItemOnGrid<string, Item>> = items.map(
-                (item) => ({
-                    children: (
-                        <Typography sx={{ p: 0.7 }} align="center">
-                            {itemToString(item)}
-                        </Typography>
-                    ),
-                    xStart: ADDITIONAL_FIELDS.ItemAnnotation,
-                    yStart: item,
-                })
-            );
-
+        for (const hour of hours) {
             for (const item of items) {
-                itemAnnotations.push({
-                    children: <BorderDiv />,
-                    xStart: ADDITIONAL_FIELDS.ItemAnnotation,
-                    yStart: item,
-                });
+                result.push(
+                    <EmptyItem
+                        item={item}
+                        hour={hour}
+                        key={`${hour.getTime()}-${secondIndexType}-${item.id}`}
+                        style={{
+                            zIndex: 1,
+                        }}
+                    />
+                );
             }
+        }
 
-            return [result, itemAnnotations, potentialNewItems];
-        }, itemsOnGridDeps);
+        return result;
+    }, [hours, ...items.map(getId)]);
 
     return (
         <OverflowHelper>
@@ -224,20 +110,42 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                     ADDITIONAL_FIELDS.HourAnnotation,
                 ]}
                 additionalCols={[ADDITIONAL_FIELDS.ItemAnnotation]}
-                /*
-                additionalItems={[
-                    ...additionalHourAnnotations,
-                    ...additionalDayAnnotations,
-                ]}
-                additionalColItems={additionalItemAnnotations}
-                additionalRowItems={potentialNewItems}
-                */
-            ></GenericCssGrid>
+            >
+                <PotentialNewItem />
+                {hours.map((hour) => (
+                    <HourItem
+                        hour={hour}
+                        row={ADDITIONAL_FIELDS.HourAnnotation}
+                        key={hour.getTime()}
+                    />
+                ))}
+                {DateFns.eachDayOfInterval(timeRange).map((day) => (
+                    <DayItem
+                        day={day}
+                        row={ADDITIONAL_FIELDS.DateAnnotation}
+                        key={day.getTime()}
+                    />
+                ))}
+                {items.map((item) => (
+                    <DefaultRowItemOnGrid<Item>
+                        xStart={ADDITIONAL_FIELDS.ItemAnnotation}
+                        yStart={item}
+                        key={item.id}
+                    >
+                        {itemToString(item)}
+                    </DefaultRowItemOnGrid>
+                ))}
+                {emptyItems}
+            </GenericCssGrid>
         </OverflowHelper>
     );
 };
 
 export default PlannerGridByHours;
+
+//
+//
+//
 
 //
 //

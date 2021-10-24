@@ -5,11 +5,12 @@ import { useSelector } from "react-redux";
 
 import DragOnField from "./DragOnField";
 import GenericCssGrid, {
-    ItemOnGrid,
     GridDefinition,
 } from "../genericCssGrid/GenericCssGrid";
 
 import "./style.css";
+
+type ItemOnGrid<T, U> = any;
 
 const gridDefinition: GridDefinition<number, number> = {
     x: {
@@ -37,7 +38,7 @@ const DragOnFieldsGrid = () => {
     return (
         <Paper style={{ padding: "1rem", width: "300px", height: "300px" }}>
             <GenericCssGrid
-                items={itemsOnGrid}
+                //items={itemsOnGrid}
                 style={{
                     width: "100%",
                     height: "100%",

@@ -2,7 +2,6 @@ import * as React from "react";
 
 import GenericCssGrid, {
     GridDefinition,
-    ItemOnGrid,
     Props as GenericCssGridProps,
 } from "./GenericCssGrid";
 
@@ -17,10 +16,12 @@ interface AnnotationCell {
     type: "ANNOTATION_TYPE";
 }
 
+type ItemOnGrid<T, U> = any;
+
 const AnnotatedGenericCssGrid = <Tx, Ty>({
     x,
     y,
-    items,
+    //items,
     annotateX,
     annotateY,
     ...rest
@@ -53,9 +54,10 @@ const AnnotatedGenericCssGrid = <Tx, Ty>({
         }
     };
 
-    const itemsOnGrid: ItemOnGrid<Tx | AnnotationCell, Ty | AnnotationCell>[] =
-        [...items];
+    //const itemsOnGrid: ItemOnGrid<Tx | AnnotationCell, Ty | AnnotationCell>[] =
+    //    [...items];
 
+    /*
     for (const xCell of x.cells) {
         itemsOnGrid.push({
             children: annotateX(xCell),
@@ -88,11 +90,13 @@ const AnnotatedGenericCssGrid = <Tx, Ty>({
 
     return (
         <GenericCssGrid<Tx | AnnotationCell, Ty | AnnotationCell>
-            items={itemsOnGrid}
+            //items={itemsOnGrid}
             {...gridDefinition}
             {...rest}
         />
     );
+    */
+    return <></>;
 };
 
 export default AnnotatedGenericCssGrid;

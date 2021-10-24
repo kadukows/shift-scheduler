@@ -39,7 +39,7 @@ function getWeek(schedule: Schedule, idx: number): Date[] {
 
     let result: Date[] = [];
     const currentMonth = date.getMonth();
-    for (let i = 0; i < 30 && currentMonth === date.getMonth(); ++i) {
+    for (let i = 0; i < 6 && currentMonth === date.getMonth(); ++i) {
         result.push(new Date(date));
         date.setDate(date.getDate() + 1);
     }
@@ -48,10 +48,6 @@ function getWeek(schedule: Schedule, idx: number): Date[] {
 }
 
 const PlannerBoard = ({ schedule }: Props) => {
-    const workplace = useSelector((state: RootState) =>
-        workplaceSelectors.selectById(state, schedule.workplace)
-    );
-
     const [secondIdx, setSecondIdx] = React.useState<"Employee" | "Role">(
         "Employee"
     );
@@ -59,10 +55,6 @@ const PlannerBoard = ({ schedule }: Props) => {
     const shifts = useSelector(shiftSelectors.selectAll).filter(
         (shift) => shift.schedule === schedule.id
     );
-
-    const yIndexProvider = getYIdxProvider(secondIdx, schedule);
-    const dates = getWeek(schedule, 1);
-    const itemGenerator = getItemsGenerator(secondIdx, shifts);
 
     //
     // planner grid by hours
@@ -122,6 +114,18 @@ const PlannerBoard = ({ schedule }: Props) => {
 
     return (
         <Paper sx={{ p: 3 }}>
+            <TextField
+                select
+                label="Second index"
+                onChange={(e) =>
+                    setSecondIdx(e.target.value as "Role" | "Employee")
+                }
+                value={secondIdx}
+                style={{ minWidth: 120 }}
+            >
+                <MenuItem value="Employee">Employee</MenuItem>
+                <MenuItem value="Role">Role</MenuItem>
+            </TextField>
             <PlannerByHours<Role | Employee>
                 timeRange={timeRange}
                 secondIndexHandler={secondIndexHandler}
@@ -133,145 +137,3 @@ const PlannerBoard = ({ schedule }: Props) => {
 };
 
 export default PlannerBoard;
-
-//
-//
-//
-
-const getYIdxProvider = (
-    secondIdx: "Employee" | "Role",
-    schedule: Schedule
-): YIndexProvider<Role> | YIndexProvider<Employee> => {
-    if (secondIdx === "Employee") {
-        return {
-            selector: (state: RootState) =>
-                employeeSelectors
-                    .selectAll(state)
-                    .filter(
-                        (employee) => employee.workplace === schedule.workplace
-                    ),
-            annotate: (employee) => (
-                <Typography align="center">
-                    {employeeToString(employee)}
-                </Typography>
-            ),
-        } as YIndexProvider<Employee>;
-    } else {
-        return {
-            selector: (state: RootState) =>
-                roleSelectors
-                    .selectAll(state)
-                    .filter((role) => role.workplace === schedule.workplace),
-            annotate: (role) => (
-                <Typography align="center">{role.name}</Typography>
-            ),
-        } as YIndexProvider<Role>;
-    }
-};
-
-const getItemsGenerator = (
-    secondIdx: "Employee" | "Role",
-    shifts: Shift[]
-): ItemsGenerator => {
-    interface ShiftAndInterval {
-        shift: Shift;
-        interval: DateFns.Interval;
-    }
-
-    const shiftAndIntervals: ShiftAndInterval[] = shifts.map((shift) => {
-        const start = DateFns.set(Date.parse(shift.time_from), {
-            hours: 0,
-            minutes: 0,
-            seconds: 0,
-        });
-        const end = DateFns.set(Date.parse(shift.time_to), {
-            hours: 23,
-            minutes: 59,
-            seconds: 59,
-        });
-
-        const interval: Interval = { start, end };
-
-        return { shift, interval };
-    });
-
-    type TemplatedGetItemsGenerator = (
-        shiftPayloadEq: (shift: Shift, payload: Employee | Role) => boolean,
-        secondIdx: "Employee" | "Role"
-    ) => ItemsGenerator;
-
-    const templatedGetItemsGenerator: TemplatedGetItemsGenerator =
-        (shiftPayloadEq, secondIdx) => (dates, payloads) => {
-            const addedShiftsId = new Set<number>();
-            const result: GenericCssGridProps<Date, Employee | Role>["items"] =
-                [];
-
-            for (const date of dates) {
-                for (const payload of payloads) {
-                    const shiftAndInterval = shiftAndIntervals.find(
-                        ({ shift, interval }) =>
-                            DateFns.isWithinInterval(date, interval) &&
-                            shiftPayloadEq(shift, payload)
-                    );
-
-                    if (shiftAndInterval) {
-                        const { shift, interval } = shiftAndInterval;
-
-                        if (!addedShiftsId.has(shift.id)) {
-                            const children = (
-                                <ItemFactory
-                                    shift={shift}
-                                    // @ts-expect-error
-                                    indices={{
-                                        secondIdx,
-                                        payload,
-                                        date,
-                                    }}
-                                />
-                            );
-
-                            result.push({
-                                children,
-                                xStart: interval.start as Date,
-                                xEnd: DateFns.add(interval.end, { days: 1 }),
-                                yStart: payload,
-                            });
-
-                            addedShiftsId.add(shift.id);
-                        }
-                    } else {
-                        const children = (
-                            <ItemFactory
-                                // @ts-expect-error
-                                indices={{
-                                    secondIdx,
-                                    payload,
-                                    date,
-                                }}
-                            />
-                        );
-
-                        result.push({
-                            children,
-                            xStart: date,
-                            yStart: payload,
-                        });
-                    }
-                }
-            }
-
-            return result;
-        };
-
-    if (secondIdx === "Employee") {
-        return templatedGetItemsGenerator(
-            (shift, employee: Employee) => shift.employee === employee.id,
-            "Employee"
-        );
-    } else {
-        return templatedGetItemsGenerator(
-            (shift, role: Role) => shift.role === role.id,
-            "Role"
-        );
-    }
-};

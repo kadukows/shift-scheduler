@@ -17,7 +17,7 @@ export interface YIndexProvider<Item> {
 export type ItemsGenerator = (
     xIndices: Date[],
     yIndices: (Role | Employee)[]
-) => GenericCssGridProps<Date, Role | Employee>["items"];
+) => any;
 
 interface Props {
     dates: Date[];
@@ -68,7 +68,7 @@ const PlannerGrid = ({ dates, yIndexProvider, itemsGenerator }: Props) => {
                     }}
                     annotateX={annotateX}
                     annotateY={annotate}
-                    items={items}
+                    //items={items}
                     style={{
                         overflowX: "auto",
                         width: "100%",

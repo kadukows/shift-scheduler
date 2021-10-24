@@ -1,5 +1,5 @@
-import { styled } from "@mui/system";
 import * as React from "react";
+import { styled } from "@mui/system";
 
 export interface GridDimensionDefinition<Cell> {
     cells: Cell[];
@@ -134,7 +134,7 @@ export const useGridArea = <Tx, Ty>({
 
     return `row-${context.getIdY(yStart)} / col-${context.getIdX(
         xStart
-    )} / ${xEndText} / ${yEndText}`;
+    )} / ${yEndText} / ${xEndText}`;
 };
 
 interface GridColumnArg<Tx> {
@@ -186,8 +186,36 @@ export const useGridRow = <Ty extends unknown>({
 };
 
 /**
- *
+ * Helper HOC components
  */
+
+interface DefaultItemOnGridBaseProps<Tx, Ty>
+    extends React.ComponentProps<"div"> {
+    xStart: Tx;
+    yStart: Ty;
+    xEnd?: Tx;
+    yEnd?: Ty;
+    useGridAreaHook: (a: GridAreaArg<Tx, Ty>) => string;
+}
+
+const DefaultItemOnGridBase = <Tx, Ty>({
+    xStart,
+    yStart,
+    xEnd,
+    yEnd,
+    style,
+    children,
+    useGridAreaHook,
+    ...rest
+}: React.PropsWithChildren<DefaultItemOnGridBaseProps<Tx, Ty>>) => {
+    const gridArea = useGridAreaHook({ xStart, yStart, xEnd, yEnd });
+
+    return (
+        <div style={{ ...style, gridArea }} {...rest}>
+            {children}
+        </div>
+    );
+};
 
 interface DefaultItemOnGridProps<Tx, Ty> extends React.ComponentProps<"div"> {
     xStart: Tx;
@@ -196,20 +224,39 @@ interface DefaultItemOnGridProps<Tx, Ty> extends React.ComponentProps<"div"> {
     yEnd?: Ty;
 }
 
-export const DefaultItemOnGrid = <Tx, Ty>({
-    xStart,
-    yStart,
-    xEnd,
-    yEnd,
-    style,
-    children,
-    ...rest
-}: React.PropsWithChildren<DefaultItemOnGridProps<Tx, Ty>>) => {
-    const gridArea = useGridArea<Tx, Ty>({ xStart, yStart, xEnd, yEnd });
-
+export const DefaultItemOnGrid = <Tx, Ty>(
+    props: React.PropsWithChildren<DefaultItemOnGridProps<Tx, Ty>>
+) => {
     return (
-        <div style={{ ...style, gridArea }} {...rest}>
-            {children}
-        </div>
+        <DefaultItemOnGridBase<Tx, Ty>
+            {...props}
+            useGridAreaHook={useGridArea}
+        />
+    );
+};
+
+type DefaultColumnItemOnGridProps<Tx> = DefaultItemOnGridProps<Tx, string>;
+
+export const DefaultColumnItemOnGrid = <Tx extends unknown>(
+    props: React.PropsWithChildren<DefaultColumnItemOnGridProps<Tx>>
+) => {
+    return (
+        <DefaultItemOnGridBase<Tx, string>
+            {...props}
+            useGridAreaHook={useGridColumn}
+        />
+    );
+};
+
+type DefaultRowItemOnGridProps<Ty> = DefaultItemOnGridProps<string, Ty>;
+
+export const DefaultRowItemOnGrid = <Ty extends unknown>(
+    props: React.PropsWithChildren<DefaultRowItemOnGridProps<Ty>>
+) => {
+    return (
+        <DefaultItemOnGridBase<string, Ty>
+            {...props}
+            useGridAreaHook={useGridRow}
+        />
     );
 };

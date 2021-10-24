@@ -18,14 +18,10 @@ module.exports = {
                 exclude: /node_modules/,
                 use: "ts-loader",
             },
-            {
-                test: /\.jsx?$/,
-                exclude: /node_modules/,
-                use: "babel-loader",
-            },
         ],
     },
     resolve: {
-        extensions: [".js", ".json", ".ts", ".tsx", ".css"],
+        extensions: [".js", ".ts", ".tsx", ".css"],
     },
+    devtool: "inline-source-map",
 };

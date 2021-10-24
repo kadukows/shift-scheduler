@@ -1,4 +1,10 @@
-import { styled } from "@mui/material";
+import { styled, Typography } from "@mui/material";
+
+export const BorderedDiv = styled("div")({
+    width: "100%",
+    height: "100%",
+    outline: "1px solid rgba(128, 128, 128, 0.4)",
+});
 
 export const StyledDiv = styled("div")({
     width: "100%",
@@ -10,4 +16,10 @@ export const StyledDiv = styled("div")({
     ":hover": {
         backgroundColor: "rgb(148, 148, 148)",
     },
+});
+
+export const BorderTypography = styled(Typography)({
+    width: "100%",
+    height: "100%",
+    outline: "1px solid rgba(128, 128, 128, 0.4)",
 });

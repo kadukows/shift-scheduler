@@ -6,7 +6,6 @@ import DragOnFieldsGrid from "./DragOnFieldsTable";
 
 import GenericCssGrid, {
     GridDefinition,
-    ItemOnGrid,
 } from "../genericCssGrid/GenericCssGrid";
 import AnnotatedGenericCssGrid from "../genericCssGrid/AnnotatedGenericCssGrid";
 
