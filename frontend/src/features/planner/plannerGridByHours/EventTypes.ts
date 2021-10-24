@@ -6,11 +6,18 @@ export enum EventTypes {
     POTENTIAL_NEW_SHIFT_START_DRAG = "POTENTIAL_NEW_SHIFT_START_DRAG",
     POTENTIAL_NEW_SHIFT_HOVER = "POTENTIAL_NEW_SHIFT_HOVER",
     POTENTIAL_NEW_SHIFT_END_DRAG = "POTENTIAL_NEW_SHIFT_END_DRAG",
+    ADD_BY_EMPLOYEE = "ADD_BY_EMPLOYEE",
 }
 
 export interface POTENTIAL_NEW_SHIFT_START_DRAG_EVENT {
     start: number;
     itemId: number;
+}
+
+export interface ADD_BY_EMPLOYEE_EVENT {
+    start: number;
+    end: number;
+    employeeId: number;
 }
 
 export namespace CallbackTypes {
@@ -21,4 +28,5 @@ export namespace CallbackTypes {
     ) => void;
     export type POTENTIAL_NEW_SHIFT_HOVER = (newEnd: number) => void;
     export type POTENTIAL_NEW_SHIFT_END_DRAG = () => void;
+    export type ADD_BY_EMPLOYEE = (args: ADD_BY_EMPLOYEE_EVENT) => void;
 }

@@ -17,6 +17,7 @@ const HourItem = ({ hour, row, style, ...rest }: Props) => {
             style={{ ...style, gridArea }}
             {...rest}
             sx={{ p: 0.7 }}
+            align="center"
         >
             {format(hour, "HH")}
         </BorderTypography>
