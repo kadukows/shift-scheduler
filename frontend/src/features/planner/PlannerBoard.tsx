@@ -24,6 +24,7 @@ import PlannerByHours from "./plannerGridByHours/PlannerByHours";
 import { SECOND_INDEX } from "./plannerGridByHours/SecondIndexType";
 import EmployeeItem from "./plannerGridByHours/items/EmployeeItem";
 import RoleItem from "./plannerGridByHours/items/RoleItem";
+import RedirectWithAlert from "../alerts/RedirectWithAlert";
 
 interface Props {
     schedule: Schedule;
@@ -60,16 +61,21 @@ const PlannerBoard = ({ schedule }: Props) => {
     // planner grid by hours
     //
 
+    const monthYear = DateFns.parse(schedule.month_year, "MM.yyyy", new Date());
+
     const timeRange: DateFns.Interval = {
         start: DateFns.startOfDay(
             shifts
                 .map((shift) => Date.parse(shift.time_from))
-                .reduce((a, b) => Math.min(a, b))
+                .reduce((a, b) => Math.min(a, b), monthYear.getTime())
         ),
         end: DateFns.endOfDay(
             shifts
                 .map((shift) => Date.parse(shift.time_to))
-                .reduce((a, b) => Math.max(a, b))
+                .reduce(
+                    (a, b) => Math.max(a, b),
+                    DateFns.addMonths(monthYear, 1).getTime()
+                )
         ),
     };
 
