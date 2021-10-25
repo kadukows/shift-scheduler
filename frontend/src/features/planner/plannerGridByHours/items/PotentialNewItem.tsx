@@ -4,45 +4,18 @@ import { addHours } from "date-fns";
 
 import { EventTypes, CallbackTypes } from "../EventTypes";
 import { useGridArea } from "../../../genericCssGrid/GenericCssGrid";
-import { useSlot } from "../../../eventProvider/EventProvider";
+import { useSignal, useSlot } from "../../../eventProvider/EventProvider";
 
-interface Props {}
+interface Props {
+    eventType: EventTypes;
+}
 
 interface NumberInterval {
     start: number;
     end: number;
 }
 
-enum NumberIntervalActionType {
-    SET_START = "SET_START",
-    SET_END = "SET_END",
-    RESET = "RESET",
-}
-
-interface NumberIntervalAction {
-    type: NumberIntervalActionType;
-    payload: number;
-}
-
-const reducer = (state: NumberInterval, action: NumberIntervalAction) => {
-    switch (action.type) {
-        case NumberIntervalActionType.SET_START:
-            return { start: action.payload, end: null };
-        case NumberIntervalActionType.SET_END:
-            if (state.end !== action.payload) {
-                console.log("hover on: ", action.payload);
-                return { ...state, end: action.payload };
-            } else {
-                return state;
-            }
-        case NumberIntervalActionType.RESET:
-            return { start: null, end: null };
-        default:
-            return state;
-    }
-};
-
-const PotentialNewItem = (props: Props) => {
+const PotentialNewItem = ({ eventType }: Props) => {
     const [start, setStart] = React.useState<number>(null);
     const [end, setEnd] = React.useState<number>(null);
     const [itemId, setItemId] = React.useState<number>(null);
@@ -61,13 +34,26 @@ const PotentialNewItem = (props: Props) => {
     };
     useSlot(EventTypes.POTENTIAL_NEW_SHIFT_HOVER, hoverCallback);
 
+    const sendArgsToDialog:
+        | CallbackTypes.ADD_BY_EMPLOYEE
+        | CallbackTypes.ADD_BY_ROLE = useSignal(eventType);
+
     const endDragCallback: CallbackTypes.POTENTIAL_NEW_SHIFT_END_DRAG = () => {
+        sendArgsToDialog({
+            start,
+            end,
+            secondIndexItemId: itemId,
+        });
+
         setItemId(null);
         setStart(null);
         setEnd(null);
-        console.log("end drag");
     };
-    useSlot(EventTypes.POTENTIAL_NEW_SHIFT_END_DRAG, endDragCallback);
+    useSlot(EventTypes.POTENTIAL_NEW_SHIFT_END_DRAG, endDragCallback, [
+        start,
+        end,
+        itemId,
+    ]);
 
     const getXDesc = () => {
         if (start === null || end === null)

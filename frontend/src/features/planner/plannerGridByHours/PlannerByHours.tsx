@@ -7,9 +7,11 @@ import PlannerGridByHours, {
     Props as PlannerGridByHoursProps,
 } from "./PlannerGridByHours";
 import { EventTypes } from "./EventTypes";
-import EmployeeDialog from "./dialogs/EmployeeDialog";
+import UpdateEmployeeDialog from "./dialogs/UpdateEmployeeDialog";
 import { Schedule } from "../../schedules/scheduleSlice";
-import RoleDialog from "./dialogs/RoleDialog";
+import UpdateRoleDialog from "./dialogs/UpdateRoleDialog";
+import AddEmployeeDialog from "./dialogs/AddEmployeeDialog";
+import AddRoleDialog from "./dialogs/AddRoleDialog";
 
 interface Props<Item> extends PlannerGridByHoursProps<Item> {
     schedule: Schedule;
@@ -21,8 +23,10 @@ const PlannerByHours = <Item extends Role | Employee>({
 }: Props<Item>) => {
     return (
         <EventProvider events={Object.values(EventTypes)}>
-            <EmployeeDialog />
-            <RoleDialog />
+            <UpdateEmployeeDialog />
+            <UpdateRoleDialog />
+            <AddEmployeeDialog schedule={schedule} />
+            <AddRoleDialog schedule={schedule} />
             <PlannerGridByHours {...rest} />
         </EventProvider>
     );

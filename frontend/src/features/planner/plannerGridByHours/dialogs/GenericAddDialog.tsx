@@ -1,24 +1,26 @@
 import * as React from "react";
 import * as yup from "yup";
 import axios from "axios";
-import {
-    Button,
-    Dialog,
-    DialogActions,
-    DialogContent,
-    DialogTitle,
-} from "@mui/material";
 import { useSelector, useDispatch } from "react-redux";
 import { format } from "date-fns";
+import {
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    DialogActions,
+    Button,
+} from "@mui/material";
 
-import { Shift, updateShift } from "../../../shifts/shiftSlice";
-import { useSlot } from "../../../eventProvider/EventProvider";
-import { EventTypes } from "../EventTypes";
-import { FieldData } from "../../../genericForm/fieldInstance/Field";
-import GenericForm from "../../../genericForm/GenericForm";
-import { getTokenRequestConfig } from "../../../helpers";
 import { RootState } from "../../../../store";
-import { Schedule, scheduleSelectors } from "../../../schedules/scheduleSlice";
+import { Employee } from "../../../employees/employeeSlice";
+import { Role } from "../../../roles/rolesSlice";
+import { Schedule } from "../../../schedules/scheduleSlice";
+import { addShift, Shift } from "../../../shifts/shiftSlice";
+import { ADD_BY_EVENT_ARG, EventTypes } from "../EventTypes";
+import { useSlot } from "../../../eventProvider/EventProvider";
+import { FieldData } from "../../../genericForm/fieldInstance/Field";
+import { getTokenRequestConfig } from "../../../helpers";
+import GenericForm from "../../../genericForm/GenericForm";
 
 interface Inputs {
     time_from: string;
@@ -31,35 +33,33 @@ const TIME_FORMAT = "yyyy-MM-dd'T'HH:mmX";
 interface CommonProps<Item> {
     formId: string;
     label: string;
-    entitySelector: (schedule: Schedule) => (state: RootState) => Item[];
+    schedule: Schedule;
+    entitySelector: (item: Schedule) => (state: RootState) => Item[];
     entityToString: (item: Item) => string;
-    genRequestData: (shift: Shift, inputs: Inputs) => any;
-    getDefaultValue: (shift: Shift) => {
-        [Property in keyof Inputs]?: string | number;
-    };
+    genRequestData: (arg: ADD_BY_EVENT_ARG, inputs: Inputs) => any;
 }
 
 interface Props<Item> extends CommonProps<Item> {
     eventType: EventTypes;
 }
 
-const GenericUpdateDialog = <Item extends { id: number }>({
+const GenericAddDialog = <Item extends Role | Employee>({
     eventType,
     ...rest
 }: Props<Item>) => {
     const [open, setOpen] = React.useState(false);
-    const [shift, setShift] = React.useState<Shift>(null);
+    const [arg, setArg] = React.useState<ADD_BY_EVENT_ARG>(null);
 
-    const eventCallback = (shift: Shift) => {
-        setShift(shift);
+    const eventCallback = (newArg: ADD_BY_EVENT_ARG) => {
+        setArg(newArg);
         setOpen(true);
     };
 
     useSlot(eventType, eventCallback);
 
-    return shift !== null ? (
-        <GenericSetDialog<Item>
-            shift={shift}
+    return arg ? (
+        <GenericAddSetDialog
+            arg={arg}
             open={open}
             setOpen={setOpen}
             {...rest}
@@ -69,29 +69,25 @@ const GenericUpdateDialog = <Item extends { id: number }>({
     );
 };
 
-export default GenericUpdateDialog;
+export default GenericAddDialog;
 
-interface GenericSetDialogProps<Item> extends CommonProps<Item> {
-    shift: Shift;
+interface GenericAddDialogProps<Item> extends CommonProps<Item> {
+    arg: ADD_BY_EVENT_ARG;
     open: boolean;
     setOpen: (a: boolean) => void;
 }
 
-const GenericSetDialog = <Item extends { id: number }>({
-    shift,
+const GenericAddSetDialog = <Item extends Role | Employee>({
+    arg,
     open,
     setOpen,
     label,
+    schedule,
     formId,
     entitySelector,
     entityToString,
     genRequestData,
-    getDefaultValue,
-}: GenericSetDialogProps<Item>) => {
-    const schedule = useSelector((state: RootState) =>
-        scheduleSelectors.selectById(state, shift.schedule)
-    );
-
+}: GenericAddDialogProps<Item>) => {
     const fields: FieldData<Inputs, Item>[] = [
         {
             type: "datetime",
@@ -126,34 +122,24 @@ const GenericSetDialog = <Item extends { id: number }>({
     const dispatch = useDispatch();
 
     const submit = async (inputs: Inputs) => {
-        const response = await axios.put<Shift>(
-            `/api/shift/${shift.id}/`,
-            genRequestData(shift, inputs),
+        const response = await axios.post<Shift>(
+            `/api/shift/`,
+            genRequestData(arg, inputs),
             getTokenRequestConfig(token)
         );
 
-        const { id, ...changes } = response.data;
-
-        dispatch(
-            updateShift({
-                id,
-                changes: { ...changes },
-            })
-        );
+        dispatch(addShift(response.data));
         setOpen(false);
     };
 
-    const defaultValues: any = shift
-        ? {
-              time_from: format(Date.parse(shift.time_from), TIME_FORMAT),
-              time_to: format(Date.parse(shift.time_to), TIME_FORMAT),
-              ...getDefaultValue(shift),
-          }
-        : undefined;
+    const defaultValues: any = {
+        time_from: format(arg.start, TIME_FORMAT),
+        time_to: format(arg.end, TIME_FORMAT),
+    };
 
     return (
         <Dialog open={open} onClose={() => setOpen(false)}>
-            <DialogTitle>Update shift</DialogTitle>
+            <DialogTitle>Add shift</DialogTitle>
             <DialogContent>
                 <GenericForm
                     fields={fields}

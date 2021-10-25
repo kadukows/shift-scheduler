@@ -9,7 +9,7 @@ import { roleSelectors } from "../../../roles/rolesSlice";
 
 interface Props {}
 
-const EmployeeDialog = (props: Props) => {
+const UpdateEmployeeDialog = (props: Props) => {
     return (
         <GenericUpdateDialog
             eventType={EventTypes.EMPLOYEE_ITEM_CLICK}
@@ -35,4 +35,4 @@ const EmployeeDialog = (props: Props) => {
     );
 };
 
-export default EmployeeDialog;
+export default UpdateEmployeeDialog;

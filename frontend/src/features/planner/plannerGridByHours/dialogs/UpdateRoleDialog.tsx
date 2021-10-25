@@ -9,7 +9,7 @@ import { employeeToString } from "../../../employees/helpers";
 
 interface Props {}
 
-const RoleDialog = (props: Props) => {
+const UpdateRoleDialog = (props: Props) => {
     return (
         <GenericUpdateDialog
             eventType={EventTypes.ROLE_ITEM_CLICK}
@@ -37,4 +37,4 @@ const RoleDialog = (props: Props) => {
     );
 };
 
-export default RoleDialog;
+export default UpdateRoleDialog;

@@ -20,6 +20,7 @@ import { RootState } from "../../../store";
 import PotentialNewItem from "./items/PotentialNewItem";
 import HourItem from "./items/HourItem";
 import DayItem from "./items/DayItem";
+import { EventTypes } from "./EventTypes";
 
 export interface SecondIndexHandler<Item> {
     itemSelector: (state: RootState) => Item[];
@@ -118,7 +119,13 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                     padding: 8,
                 }}
             >
-                <PotentialNewItem />
+                <PotentialNewItem
+                    eventType={
+                        secondIndexType === SECOND_INDEX.Employee
+                            ? EventTypes.ADD_BY_EMPLOYEE
+                            : EventTypes.ADD_BY_ROLE
+                    }
+                />
                 {hours.map((hour) => (
                     <HourItem
                         hour={hour}
@@ -138,8 +145,13 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                         xStart={ADDITIONAL_FIELDS.ItemAnnotation}
                         yStart={item}
                         key={item.id}
+                        style={{
+                            alignContent: "center",
+                        }}
                     >
-                        {itemToString(item)}
+                        <Typography noWrap sx={{ mr: 0.7 }}>
+                            {itemToString(item)}
+                        </Typography>
                     </DefaultRowItemOnGrid>
                 ))}
                 {emptyItems}
