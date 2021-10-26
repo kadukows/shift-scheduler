@@ -174,6 +174,18 @@ export const useGridArea = <Tx, Ty>(args: GridAreaArg<Tx, Ty>) => {
     return gridAreaImpl({ ...args, inverse, getIdX, getIdY });
 };
 
+export const useGridAreaMemo = <Tx, Ty>(
+    args: GridAreaArg<Tx, Ty>,
+    deps: React.DependencyList
+) => {
+    const { getIdX, getIdY, inverse } = React.useContext(GenericCssGridContext);
+
+    return React.useMemo(
+        () => gridAreaImpl({ ...args, inverse, getIdX, getIdY }),
+        deps
+    );
+};
+
 interface GridColumnArg<Tx> {
     xStart: Tx;
     yStart: string;

@@ -76,7 +76,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
             for (const item of items) {
                 result.push(
                     <EmptyItem
-                        item={item}
+                        itemId={item.id}
                         hour={hour}
                         key={`${hour.getTime()}-${secondIndexType}-${item.id}`}
                     />
@@ -119,13 +119,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                     padding: 8,
                 }}
             >
-                <PotentialNewItem
-                    eventType={
-                        secondIndexType === SECOND_INDEX.Employee
-                            ? EventTypes.ADD_BY_EMPLOYEE
-                            : EventTypes.ADD_BY_ROLE
-                    }
-                />
+                <PotentialNewItem />
                 {hours.map((hour) => (
                     <HourItem
                         hour={hour}

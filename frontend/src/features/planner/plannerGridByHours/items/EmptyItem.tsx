@@ -4,16 +4,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { useDrag, useDrop } from "react-dnd";
 
 import { DndTypes, ItemPassed, getDndTypeForItemId } from "../DndTypes";
-import { useGridArea } from "../../../genericCssGrid/GenericCssGrid";
+import {
+    useGridArea,
+    useGridAreaMemo,
+} from "../../../genericCssGrid/GenericCssGrid";
 import { Role } from "../../../roles/rolesSlice";
 import { Employee } from "../../../employees/employeeSlice";
 import { BorderedDiv } from "./StyledDiv";
-import { EventTypes, CallbackTypes } from "../EventTypes";
-import { useSignal } from "../../../eventProvider/EventProvider";
+import { set, reset } from "../plannerGridByHoursSlice";
 
-interface Props<Item> {
+interface Props {
     hour: Date;
-    item: Item;
+    itemId: number;
 }
 
 export const MyDiv = styled(BorderedDiv)({
@@ -25,78 +27,48 @@ export const MyDiv = styled(BorderedDiv)({
 
 const EmptyItem = <Item extends Role | Employee>({
     hour,
-    item,
+    itemId,
     ...rest
-}: Props<Item>) => {
+}: Props) => {
     const myRef = React.useRef();
-    const gridArea = useGridArea<Date, Item>({ xStart: hour, yStart: item });
-
-    const startDragSignal: CallbackTypes.POTENTIAL_NEW_SHIFT_START_DRAG =
-        useSignal(EventTypes.POTENTIAL_NEW_SHIFT_START_DRAG);
-    const endDragSignal: CallbackTypes.POTENTIAL_NEW_SHIFT_END_DRAG = useSignal(
-        EventTypes.POTENTIAL_NEW_SHIFT_END_DRAG
-    );
-    const hoverSignal: CallbackTypes.POTENTIAL_NEW_SHIFT_HOVER = useSignal(
-        EventTypes.POTENTIAL_NEW_SHIFT_HOVER
-    );
-    const resetSignal = useSignal(EventTypes.POTENTIAL_NEW_SHIFT_RESET);
-
-    const [shouldReset, setShouldReset] = React.useState(false);
-    React.useEffect(() => {
-        if (shouldReset) {
-            resetSignal();
-            setShouldReset(false);
-        }
-    }, [shouldReset]);
+    const gridArea = useGridAreaMemo({ xStart: hour, yStart: { id: itemId } }, [
+        hour.getTime(),
+        itemId,
+    ]);
+    const dispatch = useDispatch();
 
     const [{}, drag] = useDrag(
         () => ({
-            type: getDndTypeForItemId(DndTypes.EMPTY_ITEM_DRAG, item.id),
-            item: (() => {
-                startDragSignal({ start: hour.getTime(), itemId: item.id });
-                return { hour };
-            }) as () => ItemPassed.EMPTY_ITEM_DRAG,
-            end: (item, monitor) => {
-                if (!monitor.didDrop()) {
-                    console.log("seding reset signal");
-                    setShouldReset(true);
-                } else {
-                    console.log(
-                        "end: got tru-e value from monitor.getDropResult()"
-                    );
-                }
+            type: getDndTypeForItemId(DndTypes.EMPTY_ITEM_DRAG, itemId),
+            item: { itemId, hour: hour.getTime() },
+            end: () => {
+                dispatch(reset());
             },
         }),
-        [hour.getTime(), item.id]
+        [hour.getTime(), itemId]
     );
 
-    const [{ isOver, itemType }, drop] = useDrop(
+    const [{}, drop] = useDrop(
         () => ({
             accept: [
                 DndTypes.SHIFT_ITEM_DRAG,
-                getDndTypeForItemId(DndTypes.EMPTY_ITEM_DRAG, item.id),
+                getDndTypeForItemId(DndTypes.EMPTY_ITEM_DRAG, itemId),
             ],
             drop: (arg: ItemPassed.EMPTY_ITEM_DRAG) => {
-                endDragSignal();
-                return true;
+                //return true;
             },
-            collect: (monitor) => ({
-                isOver: monitor.isOver(),
-                itemType: monitor.getItemType(),
-            }),
+            hover: (item, monitor) => {
+                dispatch(
+                    set({
+                        start: item.hour,
+                        end: hour.getTime(),
+                        secondIndexItemId: item.itemId,
+                    })
+                );
+            },
         }),
-        [hour.getTime(), item.id]
+        [hour.getTime(), itemId]
     );
-
-    //const itemType = "sssss";
-
-    React.useEffect(() => {
-        if (itemType) {
-            if (isOver) {
-                hoverSignal(hour.getTime());
-            }
-        }
-    }, [isOver]);
 
     React.useEffect(() => {
         drag(myRef.current);

@@ -5,7 +5,8 @@ export enum DndTypes {
 
 export namespace ItemPassed {
     export type EMPTY_ITEM_DRAG = {
-        hour: Date;
+        hour: number;
+        itemId: number;
     };
 }
 
