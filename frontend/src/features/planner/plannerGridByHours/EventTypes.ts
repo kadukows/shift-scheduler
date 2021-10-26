@@ -5,6 +5,7 @@ export enum EventTypes {
     ROLE_ITEM_CLICK = "ROLE_ITEM_CLICK",
     POTENTIAL_NEW_SHIFT_START_DRAG = "POTENTIAL_NEW_SHIFT_START_DRAG",
     POTENTIAL_NEW_SHIFT_HOVER = "POTENTIAL_NEW_SHIFT_HOVER",
+    POTENTIAL_NEW_SHIFT_RESET = "POTENTIAL_NEW_SHIFT_RESET",
     POTENTIAL_NEW_SHIFT_END_DRAG = "POTENTIAL_NEW_SHIFT_END_DRAG",
     ADD_BY_EMPLOYEE = "ADD_BY_EMPLOYEE",
     ADD_BY_ROLE = "ADD_BY_ROLE",
@@ -29,6 +30,7 @@ export namespace CallbackTypes {
     ) => void;
     export type POTENTIAL_NEW_SHIFT_HOVER = (newEnd: number) => void;
     export type POTENTIAL_NEW_SHIFT_END_DRAG = () => void;
+    //export type POTENTIAL_NEW_SHIFT_END_DRAG = () => void;
     export type ADD_BY_EMPLOYEE = (args: ADD_BY_EVENT_ARG) => void;
     export type ADD_BY_ROLE = (args: ADD_BY_EVENT_ARG) => void;
 }

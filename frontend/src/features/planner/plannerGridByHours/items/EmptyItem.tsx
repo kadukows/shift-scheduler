@@ -39,6 +39,15 @@ const EmptyItem = <Item extends Role | Employee>({
     const hoverSignal: CallbackTypes.POTENTIAL_NEW_SHIFT_HOVER = useSignal(
         EventTypes.POTENTIAL_NEW_SHIFT_HOVER
     );
+    const resetSignal = useSignal(EventTypes.POTENTIAL_NEW_SHIFT_RESET);
+
+    const [shouldReset, setShouldReset] = React.useState(false);
+    React.useEffect(() => {
+        if (shouldReset) {
+            resetSignal();
+            setShouldReset(false);
+        }
+    }, [shouldReset]);
 
     const [{}, drag] = useDrag(
         () => ({
@@ -47,34 +56,54 @@ const EmptyItem = <Item extends Role | Employee>({
                 startDragSignal({ start: hour.getTime(), itemId: item.id });
                 return { hour };
             }) as () => ItemPassed.EMPTY_ITEM_DRAG,
-            end: () => endDragSignal(),
-        }),
-        [hour.getTime(), item.id]
-    );
-
-    const [{}, drop] = useDrop(
-        () => ({
-            accept: getDndTypeForItemId(DndTypes.EMPTY_ITEM_DRAG, item.id),
-            drop: ({ hour }: ItemPassed.EMPTY_ITEM_DRAG) => {
-                console.log(`Dropped from hour ${hour}`);
+            end: (item, monitor) => {
+                if (!monitor.didDrop()) {
+                    console.log("seding reset signal");
+                    setShouldReset(true);
+                } else {
+                    console.log(
+                        "end: got tru-e value from monitor.getDropResult()"
+                    );
+                }
             },
         }),
         [hour.getTime(), item.id]
     );
+
+    const [{ isOver, itemType }, drop] = useDrop(
+        () => ({
+            accept: [
+                DndTypes.SHIFT_ITEM_DRAG,
+                getDndTypeForItemId(DndTypes.EMPTY_ITEM_DRAG, item.id),
+            ],
+            drop: (arg: ItemPassed.EMPTY_ITEM_DRAG) => {
+                endDragSignal();
+                return true;
+            },
+            collect: (monitor) => ({
+                isOver: monitor.isOver(),
+                itemType: monitor.getItemType(),
+            }),
+        }),
+        [hour.getTime(), item.id]
+    );
+
+    //const itemType = "sssss";
+
+    React.useEffect(() => {
+        if (itemType) {
+            if (isOver) {
+                hoverSignal(hour.getTime());
+            }
+        }
+    }, [isOver]);
 
     React.useEffect(() => {
         drag(myRef.current);
         drop(myRef.current);
     }, [myRef.current]);
 
-    return (
-        <MyDiv
-            onDragEnter={() => hoverSignal(hour.getTime())}
-            style={{ gridArea, zIndex: 1 }}
-            {...rest}
-            ref={myRef}
-        />
-    );
+    return <MyDiv style={{ gridArea, zIndex: 1 }} {...rest} ref={myRef} />;
 };
 
 export default EmptyItem;

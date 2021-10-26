@@ -11,7 +11,7 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { format } from "date-fns";
 
-import { Shift, updateShift } from "../../../shifts/shiftSlice";
+import { removeShift, Shift, updateShift } from "../../../shifts/shiftSlice";
 import { useSlot } from "../../../eventProvider/EventProvider";
 import { EventTypes } from "../EventTypes";
 import { FieldData } from "../../../genericForm/fieldInstance/Field";
@@ -19,6 +19,7 @@ import GenericForm from "../../../genericForm/GenericForm";
 import { getTokenRequestConfig } from "../../../helpers";
 import { RootState } from "../../../../store";
 import { Schedule, scheduleSelectors } from "../../../schedules/scheduleSlice";
+import { addAlert } from "../../../alerts/alertsSlice";
 
 interface Inputs {
     time_from: string;
@@ -143,6 +144,21 @@ const GenericSetDialog = <Item extends { id: number }>({
         setOpen(false);
     };
 
+    const deleteOnClick = async () => {
+        setOpen(false);
+        await axios.delete(
+            `/api/shift/${shift.id}/`,
+            getTokenRequestConfig(token)
+        );
+        dispatch(removeShift(shift.id));
+        dispatch(
+            addAlert({
+                type: "info",
+                message: `Sucessfully deleted shift: ${shift.id}`,
+            })
+        );
+    };
+
     const defaultValues: any = shift
         ? {
               time_from: format(Date.parse(shift.time_from), TIME_FORMAT),
@@ -163,6 +179,10 @@ const GenericSetDialog = <Item extends { id: number }>({
                 />
             </DialogContent>
             <DialogActions>
+                <Button onClick={deleteOnClick} color="secondary">
+                    Delete
+                </Button>
+                <div style={{ flex: 1 }} />
                 <Button onClick={() => setOpen(false)}>Close</Button>
                 <Button type="submit" form={formId}>
                     Submit

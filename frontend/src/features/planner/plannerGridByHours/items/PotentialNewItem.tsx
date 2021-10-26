@@ -15,6 +15,9 @@ interface NumberInterval {
     end: number;
 }
 
+const sort2Numbers = (lhs: number, rhs: number) =>
+    lhs < rhs ? [lhs, rhs] : [rhs, lhs];
+
 const PotentialNewItem = ({ eventType }: Props) => {
     const [start, setStart] = React.useState<number>(null);
     const [end, setEnd] = React.useState<number>(null);
@@ -25,7 +28,6 @@ const PotentialNewItem = ({ eventType }: Props) => {
     ) => {
         setStart(event.start);
         setItemId(event.itemId);
-        console.log("drag start");
     };
     useSlot(EventTypes.POTENTIAL_NEW_SHIFT_START_DRAG, startDragCallback);
 
@@ -39,11 +41,15 @@ const PotentialNewItem = ({ eventType }: Props) => {
         | CallbackTypes.ADD_BY_ROLE = useSignal(eventType);
 
     const endDragCallback: CallbackTypes.POTENTIAL_NEW_SHIFT_END_DRAG = () => {
-        sendArgsToDialog({
-            start,
-            end,
-            secondIndexItemId: itemId,
-        });
+        if (start && end && itemId) {
+            const [newStart, newEnd] = sort2Numbers(start, end);
+
+            sendArgsToDialog({
+                start: newStart,
+                end: newEnd,
+                secondIndexItemId: itemId,
+            });
+        }
 
         setItemId(null);
         setStart(null);
@@ -54,6 +60,13 @@ const PotentialNewItem = ({ eventType }: Props) => {
         end,
         itemId,
     ]);
+
+    const resetCallback = () => {
+        setItemId(null);
+        setStart(null);
+        setEnd(null);
+    };
+    useSlot(EventTypes.POTENTIAL_NEW_SHIFT_RESET, resetCallback);
 
     const getXDesc = () => {
         if (start === null || end === null)
@@ -71,7 +84,11 @@ const PotentialNewItem = ({ eventType }: Props) => {
         ...getXDesc(),
     });
 
-    return <PotentialNewShiftDiv style={{ gridArea }} />;
+    return start && end ? (
+        <PotentialNewShiftDiv style={{ gridArea }} />
+    ) : (
+        <React.Fragment />
+    );
 };
 
 export default PotentialNewItem;

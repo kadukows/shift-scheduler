@@ -61,7 +61,7 @@ const PlannerBoard = ({ schedule }: Props) => {
 
     const timeRange: DateFns.Interval = {
         start: monthYear.getTime(),
-        end: DateFns.addMonths(monthYear, 1).getTime(),
+        end: DateFns.addDays(DateFns.addMonths(monthYear, 1), -25).getTime(),
     };
 
     const secondIndexHandler:
