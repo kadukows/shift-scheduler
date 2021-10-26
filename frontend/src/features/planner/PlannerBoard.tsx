@@ -5,26 +5,21 @@ import * as DateFns from "date-fns";
 
 import { RootState } from "../../store";
 import { Schedule } from "../schedules/scheduleSlice";
-import { workplaceSelectors } from "../workplaces/workplaceSlice";
 import { Shift, shiftSelectors } from "../shifts/shiftSlice";
 import { employeeSelectors } from "../employees/employeeSlice";
-import { Props as GenericCssGridProps } from "../genericCssGrid/GenericCssGrid";
 import { Employee } from "../employees/employeeSlice";
 import { employeeToString } from "../employees/helpers";
 import { Role, roleSelectors } from "../roles/rolesSlice";
-import ItemFactory from "./items/ItemFactory";
-import ClickedEmptyFieldWithEmployeeWidget from "./items/ClickedEmptyFieldWithEmployeeWidget";
-import EventProvider from "../eventProvider/EventProvider";
-import EventTypes from "./EventTypes";
-import EmptyItemDialog from "./dialogs/EmptyItemDialog";
-import PlannerGrid, { YIndexProvider, ItemsGenerator } from "./PlannerGrid";
 
 import { SecondIndexHandler } from "./plannerGridByHours/PlannerGridByHours";
 import PlannerByHours from "./plannerGridByHours/PlannerByHours";
 import { SECOND_INDEX } from "./plannerGridByHours/SecondIndexType";
 import EmployeeItem from "./plannerGridByHours/items/EmployeeItem";
 import RoleItem from "./plannerGridByHours/items/RoleItem";
-import RedirectWithAlert from "../alerts/RedirectWithAlert";
+import AddEmployeeDialog from "./plannerGridByHours/dialogs/AddEmployeeDialog";
+import AddRoleDialog from "./plannerGridByHours/dialogs/AddRoleDialog";
+import UpdateEmployeeDialog from "./plannerGridByHours/dialogs/UpdateEmployeeDialog";
+import UpdateRoleDialog from "./plannerGridByHours/dialogs/UpdateRoleDialog";
 
 interface Props {
     schedule: Schedule;
@@ -125,7 +120,25 @@ const PlannerBoard = ({ schedule }: Props) => {
                 secondIndexHandler={secondIndexHandler}
                 shiftSelector={shiftSelector}
                 schedule={schedule}
-            />
+            >
+                {secondIdx === SECOND_INDEX.Employee ? (
+                    <>
+                        <AddEmployeeDialog
+                            scheduleId={schedule.id}
+                            workplaceId={schedule.workplace}
+                        />
+                        <UpdateEmployeeDialog />
+                    </>
+                ) : (
+                    <>
+                        <AddRoleDialog
+                            scheduleId={schedule.id}
+                            workplaceId={schedule.workplace}
+                        />
+                        <UpdateRoleDialog />
+                    </>
+                )}
+            </PlannerByHours>
         </Paper>
     );
 };

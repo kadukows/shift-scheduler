@@ -9,28 +9,26 @@ import { employeeSelectors } from "../../../employees/employeeSlice";
 import { employeeToString } from "../../../employees/helpers";
 
 interface Props {
-    schedule: Schedule;
+    scheduleId: number;
+    workplaceId: number;
 }
 
-const AddRoleDialog = ({ schedule }: Props) => {
+const AddRoleDialog = ({ scheduleId, workplaceId }: Props) => {
     return (
         <GenericAddDialog
-            eventType={EventTypes.ADD_BY_ROLE}
-            schedule={schedule}
             formId="PLANNER_GRID_BY_HOURS__ADD_ROLE"
             label="Employee"
-            entitySelector={(schedule: Schedule) => (state: RootState) =>
+            entitySelector={(state: RootState) =>
                 employeeSelectors
                     .selectAll(state)
-                    .filter(
-                        (employee) => employee.workplace === schedule.workplace
-                    )}
+                    .filter((employee) => employee.workplace === workplaceId)
+            }
             entityToString={employeeToString}
             genRequestData={(
                 { secondIndexItemId },
                 { time_to, time_from, itemId }
             ) => ({
-                schedule: schedule.id,
+                schedule: scheduleId,
                 employee: itemId,
                 role: secondIndexItemId,
                 time_to,

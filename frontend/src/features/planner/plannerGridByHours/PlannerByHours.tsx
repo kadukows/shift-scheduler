@@ -19,15 +19,13 @@ interface Props<Item> extends PlannerGridByHoursProps<Item> {
 
 const PlannerByHours = <Item extends Role | Employee>({
     schedule,
+    children,
     ...rest
-}: Props<Item>) => {
+}: React.PropsWithChildren<Props<Item>>) => {
     return (
         <EventProvider events={Object.values(EventTypes)}>
-            <UpdateEmployeeDialog />
-            <UpdateRoleDialog />
-            <AddEmployeeDialog schedule={schedule} />
-            <AddRoleDialog schedule={schedule} />
             <PlannerGridByHours {...rest} />
+            {children}
         </EventProvider>
     );
 };

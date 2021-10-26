@@ -17,7 +17,8 @@ import {
 import { draggableThingsReducer } from "./features/draggableOnMuiTable/draggableThingsSlice";
 import { roleReducer, roleObserver } from "./features/roles/rolesSlice";
 import { shiftReducer, shiftObserver } from "./features/shifts/shiftSlice";
-import { plannerGridByHoursReducer } from "./features/planner/plannerGridByHours/plannerGridByHoursSlice";
+import { potentialNewItemReducer } from "./features/planner/plannerGridByHours/potentialNewItemSlice";
+import { addDialogReducer } from "./features/planner/plannerGridByHours/addDialogSlice";
 
 import { observe } from "redux-observers";
 
@@ -32,7 +33,8 @@ export const store = configureStore({
         draggableThingsReducer,
         roleReducer,
         shiftReducer,
-        plannerGridByHoursReducer,
+        potentialNewItemReducer,
+        addDialogReducer,
     },
 });
 

@@ -21,6 +21,7 @@ import { useSlot } from "../../../eventProvider/EventProvider";
 import { FieldData } from "../../../genericForm/fieldInstance/Field";
 import { getTokenRequestConfig } from "../../../helpers";
 import GenericForm from "../../../genericForm/GenericForm";
+import { set } from "../addDialogSlice";
 
 interface Inputs {
     time_from: string;
@@ -33,35 +34,30 @@ const TIME_FORMAT = "yyyy-MM-dd'T'HH:mmX";
 interface CommonProps<Item> {
     formId: string;
     label: string;
-    schedule: Schedule;
-    entitySelector: (item: Schedule) => (state: RootState) => Item[];
+    entitySelector: (state: RootState) => Item[];
     entityToString: (item: Item) => string;
     genRequestData: (arg: ADD_BY_EVENT_ARG, inputs: Inputs) => any;
 }
 
-interface Props<Item> extends CommonProps<Item> {
-    eventType: EventTypes;
-}
+interface Props<Item> extends CommonProps<Item> {}
 
 const GenericAddDialog = <Item extends Role | Employee>({
-    eventType,
     ...rest
 }: Props<Item>) => {
-    const [open, setOpen] = React.useState(false);
-    const [arg, setArg] = React.useState<ADD_BY_EVENT_ARG>(null);
+    const { start, end, secondIndexItemId, open } = useSelector(
+        (state: RootState) => state.addDialogReducer
+    );
+    const dispatch = useDispatch();
 
-    const eventCallback = (newArg: ADD_BY_EVENT_ARG) => {
-        setArg(newArg);
-        setOpen(true);
-    };
-
-    useSlot(eventType, eventCallback);
-
-    return arg ? (
+    return start && end && secondIndexItemId ? (
         <GenericAddSetDialog
-            arg={arg}
+            arg={{
+                start,
+                end,
+                secondIndexItemId,
+            }}
             open={open}
-            setOpen={setOpen}
+            setOpen={(open: boolean) => dispatch(set({ open }))}
             {...rest}
         />
     ) : (
@@ -82,7 +78,6 @@ const GenericAddSetDialog = <Item extends Role | Employee>({
     open,
     setOpen,
     label,
-    schedule,
     formId,
     entitySelector,
     entityToString,
@@ -113,7 +108,7 @@ const GenericAddSetDialog = <Item extends Role | Employee>({
             label,
             validation: yup.number().required(),
             //
-            entitySelector: entitySelector(schedule),
+            entitySelector,
             entityToString,
         },
     ];

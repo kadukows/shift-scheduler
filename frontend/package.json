@@ -4,8 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "dev": "webpack --watch --config webpack.dev.js",
-    "build": "webpack --config webpack.prod.js"
+    "dev": "webpack --watch --mode development",
+    "build": "webpack --mode production"
   },
   "keywords": [],
   "author": "",
@@ -42,6 +42,7 @@
     "ag-grid-react": "^26.0.0",
     "axios": "^0.21.1",
     "date-fns": "^2.23.0",
+    "fork-ts-checker-webpack-plugin": "^6.4.0",
     "react": "^17.0.2",
     "react-dnd": "^14.0.3",
     "react-dnd-html5-backend": "^14.0.1",

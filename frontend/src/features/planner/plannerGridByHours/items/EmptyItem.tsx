@@ -1,7 +1,8 @@
 import * as React from "react";
 import { styled } from "@mui/material";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useDrag, useDrop } from "react-dnd";
+import { addHours } from "date-fns";
 
 import { DndTypes, ItemPassed, getDndTypeForItemId } from "../DndTypes";
 import {
@@ -11,7 +12,8 @@ import {
 import { Role } from "../../../roles/rolesSlice";
 import { Employee } from "../../../employees/employeeSlice";
 import { BorderedDiv } from "./StyledDiv";
-import { set, reset } from "../plannerGridByHoursSlice";
+import { set, reset } from "../potentialNewItemSlice";
+import { set as addDialogSet } from "../addDialogSlice";
 
 interface Props {
     hour: Date;
@@ -31,6 +33,7 @@ const EmptyItem = <Item extends Role | Employee>({
     ...rest
 }: Props) => {
     const myRef = React.useRef();
+    const [entered, setEntered] = React.useState(false);
     const gridArea = useGridAreaMemo({ xStart: hour, yStart: { id: itemId } }, [
         hour.getTime(),
         itemId,
@@ -54,20 +57,33 @@ const EmptyItem = <Item extends Role | Employee>({
                 DndTypes.SHIFT_ITEM_DRAG,
                 getDndTypeForItemId(DndTypes.EMPTY_ITEM_DRAG, itemId),
             ],
-            drop: (arg: ItemPassed.EMPTY_ITEM_DRAG) => {
-                //return true;
-            },
-            hover: (item, monitor) => {
+            drop: (item: ItemPassed.EMPTY_ITEM_DRAG) => {
                 dispatch(
-                    set({
+                    addDialogSet({
                         start: item.hour,
-                        end: hour.getTime(),
+                        end: addHours(hour, 1).getTime(),
                         secondIndexItemId: item.itemId,
+                        open: true,
                     })
                 );
             },
+            canDrop: (item) => {
+                return item.hour !== hour.getTime();
+            },
+            hover: (item, monitor) => {
+                if (entered && monitor.canDrop()) {
+                    dispatch(
+                        set({
+                            start: item.hour,
+                            end: addHours(hour, 1).getTime(),
+                            secondIndexItemId: item.itemId,
+                        })
+                    );
+                    setEntered(false);
+                }
+            },
         }),
-        [hour.getTime(), itemId]
+        [hour.getTime(), itemId, entered]
     );
 
     React.useEffect(() => {
@@ -75,7 +91,14 @@ const EmptyItem = <Item extends Role | Employee>({
         drop(myRef.current);
     }, [myRef.current]);
 
-    return <MyDiv style={{ gridArea, zIndex: 1 }} {...rest} ref={myRef} />;
+    return (
+        <MyDiv
+            style={{ gridArea, zIndex: 1 }}
+            onDragEnter={() => setEntered(true)}
+            ref={myRef}
+            {...rest}
+        />
+    );
 };
 
 export default EmptyItem;

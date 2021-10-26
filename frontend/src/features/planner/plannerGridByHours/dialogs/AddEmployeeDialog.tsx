@@ -7,26 +7,26 @@ import { Schedule } from "../../../schedules/scheduleSlice";
 import { RootState } from "../../../../store";
 
 interface Props {
-    schedule: Schedule;
+    scheduleId: number;
+    workplaceId: number;
 }
 
-const AddEmployeeDialog = ({ schedule }: Props) => {
+const AddEmployeeDialog = ({ scheduleId, workplaceId }: Props) => {
     return (
         <GenericAddDialog
-            eventType={EventTypes.ADD_BY_EMPLOYEE}
-            schedule={schedule}
             formId="PLANNER_GRID_BY_HOURS__ADD_EMPLOYEE"
             label="Role"
-            entitySelector={(schedule: Schedule) => (state: RootState) =>
+            entitySelector={(state: RootState) =>
                 roleSelectors
                     .selectAll(state)
-                    .filter((role) => role.workplace === schedule.workplace)}
+                    .filter((role) => role.workplace === workplaceId)
+            }
             entityToString={(role) => role.name}
             genRequestData={(
                 { secondIndexItemId },
                 { time_to, time_from, itemId }
             ) => ({
-                schedule: schedule.id,
+                schedule: scheduleId,
                 employee: secondIndexItemId,
                 role: itemId,
                 time_to,
