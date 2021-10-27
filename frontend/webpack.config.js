@@ -29,4 +29,5 @@ module.exports = {
         extensions: [".js", ".ts", ".tsx", ".css"],
     },
     plugins: [new ForkTsCheckerWebpackPlugin()],
+    devtool: "inline-source-map",
 };

@@ -2,7 +2,7 @@ import * as React from "react";
 import { styled } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { useDrag, useDrop } from "react-dnd";
-import { addHours } from "date-fns";
+import { addHours, compareAsc, getTime } from "date-fns";
 
 import { DndTypes, ItemPassed, getDndTypeForItemId } from "../DndTypes";
 import {
@@ -33,7 +33,7 @@ const EmptyItem = <Item extends Role | Employee>({
     ...rest
 }: Props) => {
     const myRef = React.useRef();
-    const [entered, setEntered] = React.useState(false);
+    const entered = React.useRef(false);
     const gridArea = useGridAreaMemo({ xStart: hour, yStart: { id: itemId } }, [
         hour.getTime(),
         itemId,
@@ -58,10 +58,12 @@ const EmptyItem = <Item extends Role | Employee>({
                 getDndTypeForItemId(DndTypes.EMPTY_ITEM_DRAG, itemId),
             ],
             drop: (item: ItemPassed.EMPTY_ITEM_DRAG) => {
+                const [start, end] = sort2Dates(item.hour, hour.getTime());
+
                 dispatch(
                     addDialogSet({
-                        start: item.hour,
-                        end: addHours(hour, 1).getTime(),
+                        start: getTime(start),
+                        end: addHours(end, 1).getTime(),
                         secondIndexItemId: item.itemId,
                         open: true,
                     })
@@ -71,19 +73,24 @@ const EmptyItem = <Item extends Role | Employee>({
                 return item.hour !== hour.getTime();
             },
             hover: (item, monitor) => {
-                if (entered && monitor.canDrop()) {
+                if (entered.current) {
+                    const startOffset =
+                        compareAsc(item.hour, hour) === 1 ? 1 : 0;
+                    const endOffset =
+                        compareAsc(item.hour, hour) === -1 ? 1 : 0;
+
                     dispatch(
                         set({
-                            start: item.hour,
-                            end: addHours(hour, 1).getTime(),
+                            start: addHours(item.hour, startOffset).getTime(),
+                            end: addHours(hour, endOffset).getTime(),
                             secondIndexItemId: item.itemId,
                         })
                     );
-                    setEntered(false);
+                    entered.current = false;
                 }
             },
         }),
-        [hour.getTime(), itemId, entered]
+        [hour.getTime(), itemId]
     );
 
     React.useEffect(() => {
@@ -94,7 +101,9 @@ const EmptyItem = <Item extends Role | Employee>({
     return (
         <MyDiv
             style={{ gridArea, zIndex: 1 }}
-            onDragEnter={() => setEntered(true)}
+            onDragEnter={() => {
+                entered.current = true;
+            }}
             ref={myRef}
             {...rest}
         />
@@ -103,4 +112,5 @@ const EmptyItem = <Item extends Role | Employee>({
 
 export default EmptyItem;
 
-//const shouldDispatchSetSendParam()
+const sort2Dates = (lhs: Date | number, rhs: Date | number) =>
+    compareAsc(lhs, rhs) === -1 ? [lhs, rhs] : [rhs, lhs];

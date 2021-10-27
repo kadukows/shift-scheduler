@@ -12,7 +12,6 @@ interface Props {}
 const UpdateEmployeeDialog = (props: Props) => {
     return (
         <GenericUpdateDialog
-            eventType={EventTypes.EMPLOYEE_ITEM_CLICK}
             formId="PLANNER_GRID_BY_HOURS__UPDATE_EMPLOYEE"
             label="Role"
             entitySelector={(schedule: Schedule) => (state: RootState) =>

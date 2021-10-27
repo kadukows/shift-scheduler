@@ -11,7 +11,12 @@ import {
 import { useSelector, useDispatch } from "react-redux";
 import { format } from "date-fns";
 
-import { removeShift, Shift, updateShift } from "../../../shifts/shiftSlice";
+import {
+    removeShift,
+    Shift,
+    shiftSelectors,
+    updateShift,
+} from "../../../shifts/shiftSlice";
 import { useSlot } from "../../../eventProvider/EventProvider";
 import { EventTypes } from "../EventTypes";
 import { FieldData } from "../../../genericForm/fieldInstance/Field";
@@ -20,6 +25,7 @@ import { getTokenRequestConfig } from "../../../helpers";
 import { RootState } from "../../../../store";
 import { Schedule, scheduleSelectors } from "../../../schedules/scheduleSlice";
 import { addAlert } from "../../../alerts/alertsSlice";
+import { set as updateDialogSet } from "../updateDialogSlice";
 
 interface Inputs {
     time_from: string;
@@ -40,31 +46,21 @@ interface CommonProps<Item> {
     };
 }
 
-interface Props<Item> extends CommonProps<Item> {
-    eventType: EventTypes;
-}
+interface Props<Item> extends CommonProps<Item> {}
 
 const GenericUpdateDialog = <Item extends { id: number }>({
-    eventType,
     ...rest
 }: Props<Item>) => {
-    const [open, setOpen] = React.useState(false);
-    const [shift, setShift] = React.useState<Shift>(null);
+    const shiftId = useSelector(
+        (state: RootState) => state.updateDialogReducer.shiftId
+    );
 
-    const eventCallback = (shift: Shift) => {
-        setShift(shift);
-        setOpen(true);
-    };
+    const shift = useSelector((state: RootState) =>
+        shiftSelectors.selectById(state, shiftId)
+    );
 
-    useSlot(eventType, eventCallback);
-
-    return shift !== null ? (
-        <GenericSetDialog<Item>
-            shift={shift}
-            open={open}
-            setOpen={setOpen}
-            {...rest}
-        />
+    return shift ? (
+        <GenericSetDialog<Item> shift={shift} {...rest} />
     ) : (
         <React.Fragment />
     );
@@ -74,21 +70,21 @@ export default GenericUpdateDialog;
 
 interface GenericSetDialogProps<Item> extends CommonProps<Item> {
     shift: Shift;
-    open: boolean;
-    setOpen: (a: boolean) => void;
 }
 
 const GenericSetDialog = <Item extends { id: number }>({
-    shift,
-    open,
-    setOpen,
     label,
+    shift,
     formId,
     entitySelector,
     entityToString,
     genRequestData,
     getDefaultValue,
 }: GenericSetDialogProps<Item>) => {
+    const open = useSelector(
+        (state: RootState) => state.updateDialogReducer.open
+    );
+
     const schedule = useSelector((state: RootState) =>
         scheduleSelectors.selectById(state, shift.schedule)
     );
@@ -141,11 +137,11 @@ const GenericSetDialog = <Item extends { id: number }>({
                 changes: { ...changes },
             })
         );
-        setOpen(false);
+        dispatch(updateDialogSet({ open: false }));
     };
 
     const deleteOnClick = async () => {
-        setOpen(false);
+        dispatch(updateDialogSet({ open: false }));
         await axios.delete(
             `/api/shift/${shift.id}/`,
             getTokenRequestConfig(token)
@@ -168,7 +164,10 @@ const GenericSetDialog = <Item extends { id: number }>({
         : undefined;
 
     return (
-        <Dialog open={open} onClose={() => setOpen(false)}>
+        <Dialog
+            open={open}
+            onClose={() => dispatch(updateDialogSet({ open: false }))}
+        >
             <DialogTitle>Update shift</DialogTitle>
             <DialogContent>
                 <GenericForm
@@ -183,7 +182,11 @@ const GenericSetDialog = <Item extends { id: number }>({
                     Delete
                 </Button>
                 <div style={{ flex: 1 }} />
-                <Button onClick={() => setOpen(false)}>Close</Button>
+                <Button
+                    onClick={() => dispatch(updateDialogSet({ open: false }))}
+                >
+                    Close
+                </Button>
                 <Button type="submit" form={formId}>
                     Submit
                 </Button>
