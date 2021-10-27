@@ -64,9 +64,12 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
                 width: heightWidth.current.w,
                 height: heightWidth.current.h,
             }),
+            canDrag: () => {
+                return !shift.blocked;
+            },
             end: () => dispatch(potentialNewItemReset()),
         }),
-        [shiftId, shift.time_from, shift.time_to]
+        [shiftId, shift.time_from, shift.time_to, shift.blocked]
     );
 
     const myRef = React.useRef<any>();
@@ -80,13 +83,21 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
         heightWidth.current.w = myRef.current.clientWidth;
     }, [myRef.current]);
 
+    const style: any = {};
+    if (shift.blocked) {
+        style.opacity = 0.7;
+    }
+
     return (
         <HoverableDiv sx={{ p: 0.7 }} style={{ gridArea }}>
             <StyledDiv
-                onClick={() =>
-                    dispatch(updateDialogSet({ shiftId, open: true }))
-                }
+                onClick={() => {
+                    if (!shift.blocked) {
+                        dispatch(updateDialogSet({ shiftId, open: true }));
+                    }
+                }}
                 ref={myRef}
+                style={style}
             >
                 <Typography>
                     {getNodeDesc(employee, role)}

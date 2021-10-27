@@ -16,6 +16,8 @@ export interface Shift {
     time_from: string;
     time_to: string;
     role: number;
+    //
+    blocked: boolean;
 }
 
 const shiftAdapter = createEntityAdapter<Shift>();
@@ -35,10 +37,25 @@ const shiftSlice = createSlice({
     name: "shift",
     initialState,
     reducers: {
-        setShifts: shiftAdapter.setAll,
+        /*setShifts: shiftAdapter.setAll,*/
+        setShifts(state, action: PayloadAction<Shift[]>) {
+            // add default 'blocked' property
+            for (const shift of action.payload) {
+                shift.blocked = false;
+            }
+
+            return shiftAdapter.setAll(state, action);
+        },
         resetShifts: shiftAdapter.removeAll,
         //
-        addShift: shiftAdapter.addOne,
+        /*addShift: shiftAdapter.addOne,*/
+        addShift(state, action: PayloadAction<Shift>) {
+            if (!("blocked" in action.payload)) {
+                action.payload.blocked = false;
+            }
+
+            return shiftAdapter.addOne(state, action);
+        },
         removeShift: shiftAdapter.removeOne,
         updateShift: shiftAdapter.updateOne,
         //

@@ -1,11 +1,11 @@
 import * as React from "react";
-import { useSelector } from "react-redux";
-import { Typography, Paper, TextField, MenuItem } from "@mui/material";
+import { useDispatch, useSelector } from "react-redux";
+import { Typography, Paper, TextField, MenuItem, Button } from "@mui/material";
 import * as DateFns from "date-fns";
 
 import { RootState } from "../../store";
 import { Schedule } from "../schedules/scheduleSlice";
-import { Shift, shiftSelectors } from "../shifts/shiftSlice";
+import { Shift, shiftSelectors, updateShift } from "../shifts/shiftSlice";
 import { employeeSelectors } from "../employees/employeeSlice";
 import { Employee } from "../employees/employeeSlice";
 import { employeeToString } from "../employees/helpers";
@@ -47,6 +47,9 @@ const PlannerBoard = ({ schedule }: Props) => {
     const [secondIdx, setSecondIdx] = React.useState<"Employee" | "Role">(
         "Employee"
     );
+
+    const dispatch = useDispatch();
+    const shiftsById = useSelector(shiftSelectors.selectEntities);
 
     //
     // planner grid by hours
@@ -115,6 +118,22 @@ const PlannerBoard = ({ schedule }: Props) => {
                 <MenuItem value="Employee">Employee</MenuItem>
                 <MenuItem value="Role">Role</MenuItem>
             </TextField>
+            <Button
+                variant="contained"
+                sx={{ ml: 1 }}
+                onClick={() =>
+                    dispatch(
+                        updateShift({
+                            id: 17,
+                            changes: {
+                                blocked: !shiftsById[17].blocked,
+                            },
+                        })
+                    )
+                }
+            >
+                Click!
+            </Button>
             <PlannerByHours<Role | Employee>
                 timeRange={timeRange}
                 secondIndexHandler={secondIndexHandler}
