@@ -81,8 +81,8 @@ const GenericSetDialog = <Item extends { id: number }>({
     genRequestData,
     getDefaultValue,
 }: GenericSetDialogProps<Item>) => {
-    const open = useSelector(
-        (state: RootState) => state.updateDialogReducer.open
+    const { open } = useSelector(
+        (state: RootState) => state.updateDialogReducer
     );
 
     const schedule = useSelector((state: RootState) =>

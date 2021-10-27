@@ -8,6 +8,14 @@ export namespace ItemPassed {
         hour: number;
         itemId: number;
     };
+
+    export type SHIFT_ITEM_DRAG = {
+        shiftId: number;
+        shiftTimeFrom: number;
+        shiftTimeTo: number;
+        width: number;
+        height: number;
+    };
 }
 
 export const getDndTypeForItemId = (dndType: DndTypes, itemId: number) =>

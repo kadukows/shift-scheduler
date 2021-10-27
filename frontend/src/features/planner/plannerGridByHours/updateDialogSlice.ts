@@ -1,7 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface UpdateDialogState {
-    shiftId: number;
+    shiftId: number | null;
     open: boolean;
 }
 

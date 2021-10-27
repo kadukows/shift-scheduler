@@ -2,6 +2,7 @@ import * as React from "react";
 import { Typography } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { format } from "date-fns";
+import { useDrag } from "react-dnd";
 import { RootState } from "../../../../../store";
 import {
     Employee,
@@ -10,8 +11,10 @@ import {
 import { useGridAreaMemo } from "../../../../genericCssGrid/GenericCssGrid";
 import { Role, roleSelectors } from "../../../../roles/rolesSlice";
 import { shiftSelectors } from "../../../../shifts/shiftSlice";
-import { set } from "../../updateDialogSlice";
+import { set as updateDialogSet } from "../../updateDialogSlice";
+import { reset as potentialNewItemReset } from "../../potentialNewItemSlice";
 import { HoverableDiv, StyledDiv } from "../StyledDiv";
+import { DndTypes, ItemPassed } from "../../DndTypes";
 
 interface Props<SecondIndex> {
     shiftId: number;
@@ -44,14 +47,47 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
             xEnd: new Date(shift.time_to),
             yStart: secondIndex,
         },
-        [shiftId, secondIndex.id]
+        [shiftId, secondIndex.id, shift.time_from, shift.time_to]
     );
 
     const dispatch = useDispatch();
 
+    const heightWidth = React.useRef({ w: 0, h: 0 });
+
+    const [{}, drag] = useDrag<ItemPassed.SHIFT_ITEM_DRAG, unknown, unknown>(
+        () => ({
+            type: DndTypes.SHIFT_ITEM_DRAG,
+            item: () => ({
+                shiftId: shiftId,
+                shiftTimeFrom: new Date(shift.time_from).getTime(),
+                shiftTimeTo: new Date(shift.time_to).getTime(),
+                width: heightWidth.current.w,
+                height: heightWidth.current.h,
+            }),
+            end: () => dispatch(potentialNewItemReset()),
+        }),
+        [shiftId, shift.time_from, shift.time_to]
+    );
+
+    const myRef = React.useRef<any>();
+
+    React.useEffect(() => {
+        drag(myRef);
+    }, [myRef.current]);
+
+    React.useEffect(() => {
+        heightWidth.current.h = myRef.current.clientHeight;
+        heightWidth.current.w = myRef.current.clientWidth;
+    }, [myRef.current]);
+
     return (
         <HoverableDiv sx={{ p: 0.7 }} style={{ gridArea }}>
-            <StyledDiv onClick={() => dispatch(set({ shiftId, open: true }))}>
+            <StyledDiv
+                onClick={() =>
+                    dispatch(updateDialogSet({ shiftId, open: true }))
+                }
+                ref={myRef}
+            >
                 <Typography>
                     {getNodeDesc(employee, role)}
                     <br />
