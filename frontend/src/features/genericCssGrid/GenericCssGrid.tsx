@@ -1,5 +1,4 @@
 import * as React from "react";
-import { styled } from "@mui/system";
 
 export interface GridDimensionDefinition<Cell> {
     cells: Cell[];

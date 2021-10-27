@@ -20,7 +20,7 @@ import { RootState } from "../../../store";
 import PotentialNewItem from "./items/PotentialNewItem";
 import HourItem from "./items/HourItem";
 import DayItem from "./items/DayItem";
-import { EventTypes } from "./EventTypes";
+import DispatchBatcherProvider from "../../dispatchBatcher/DispatchBatcherProvider";
 
 export interface SecondIndexHandler<Item> {
     itemSelector: (state: RootState) => Item[];
@@ -116,51 +116,53 @@ const PlannerGridByHours = <Item extends Role | Employee>({
 
     return (
         <OverflowHelper>
-            <GenericCssGrid<Date, Item>
-                {...genericCssGridProps}
-                style={{
-                    gap: "1px",
-                    margin: 8,
-                    padding: 8,
-                }}
-            >
-                <PotentialNewItem />
-                {hours.map((hour) => (
-                    <HourItem
-                        hour={hour}
-                        row={ADDITIONAL_FIELDS.HourAnnotation}
-                        key={hour.getTime()}
-                    />
-                ))}
-                {DateFns.eachDayOfInterval(timeRange).map((day) => (
-                    <DayItem
-                        day={day}
-                        row={ADDITIONAL_FIELDS.DateAnnotation}
-                        key={day.getTime()}
-                    />
-                ))}
-                {items.map((item) => (
-                    <DefaultRowItemOnGrid<Item>
-                        xStart={ADDITIONAL_FIELDS.ItemAnnotation}
-                        yStart={item}
-                        key={item.id}
-                        style={{
-                            alignContent: "center",
-                        }}
-                    >
-                        <Typography noWrap sx={{ mr: 0.7 }}>
-                            {itemToString(item)}
-                        </Typography>
-                    </DefaultRowItemOnGrid>
-                ))}
-                {emptyItems}
-                {shifts.map((shift) => (
-                    <ItemComponent
-                        key={`${secondIndexType}-${shift.id}`}
-                        shiftId={shift.id}
-                    />
-                ))}
-            </GenericCssGrid>
+            <DispatchBatcherProvider timeout={30}>
+                <GenericCssGrid<Date, Item>
+                    {...genericCssGridProps}
+                    style={{
+                        gap: "1px",
+                        margin: 8,
+                        padding: 8,
+                    }}
+                >
+                    <PotentialNewItem />
+                    {hours.map((hour) => (
+                        <HourItem
+                            hour={hour}
+                            row={ADDITIONAL_FIELDS.HourAnnotation}
+                            key={hour.getTime()}
+                        />
+                    ))}
+                    {DateFns.eachDayOfInterval(timeRange).map((day) => (
+                        <DayItem
+                            day={day}
+                            row={ADDITIONAL_FIELDS.DateAnnotation}
+                            key={day.getTime()}
+                        />
+                    ))}
+                    {items.map((item) => (
+                        <DefaultRowItemOnGrid<Item>
+                            xStart={ADDITIONAL_FIELDS.ItemAnnotation}
+                            yStart={item}
+                            key={item.id}
+                            style={{
+                                alignContent: "center",
+                            }}
+                        >
+                            <Typography noWrap sx={{ mr: 0.7 }}>
+                                {itemToString(item)}
+                            </Typography>
+                        </DefaultRowItemOnGrid>
+                    ))}
+                    {emptyItems}
+                    {shifts.map((shift) => (
+                        <ItemComponent
+                            key={`${secondIndexType}-${shift.id}`}
+                            shiftId={shift.id}
+                        />
+                    ))}
+                </GenericCssGrid>
+            </DispatchBatcherProvider>
         </OverflowHelper>
     );
 };

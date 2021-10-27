@@ -16,6 +16,7 @@ import { set, reset } from "../potentialNewItemSlice";
 import { set as addDialogSet } from "../addDialogSlice";
 import { asyncUpdateShift } from "../../../shifts/helpers";
 import { Shift } from "../../../shifts/shiftSlice";
+import { useBatchedDispatch } from "../../../dispatchBatcher/DispatchBatcherProvider";
 
 interface Props {
     hour: Date;
@@ -45,6 +46,7 @@ const EmptyItem = <Item extends Role | Employee>({
         itemId,
     ]);
     const dispatch = useDispatch();
+    const batchedDispatch = useBatchedDispatch();
 
     const [{}, drag] = useDrag(
         () => ({
@@ -52,6 +54,7 @@ const EmptyItem = <Item extends Role | Employee>({
             item: { itemId, hour: hour.getTime() },
             end: () => {
                 dispatch(reset());
+                batchedDispatch(reset());
             },
         }),
         [hour.getTime(), itemId]
@@ -103,8 +106,6 @@ const EmptyItem = <Item extends Role | Employee>({
                         hour.getTime()
                     );
 
-                    console.log("dispatching");
-
                     dispatch(
                         asyncUpdateShift({
                             id: shiftId,
@@ -130,7 +131,9 @@ const EmptyItem = <Item extends Role | Employee>({
                         const endOffset =
                             compareAsc(item.hour, hour) === -1 ? 1 : 0;
 
-                        dispatch(
+                        console.log("batchedDisptach()");
+
+                        batchedDispatch(
                             set({
                                 start: addHours(
                                     item.hour,
@@ -146,7 +149,7 @@ const EmptyItem = <Item extends Role | Employee>({
                         const { shiftTimeFrom, shiftTimeTo, width, height } =
                             itemAny as ItemPassed.SHIFT_ITEM_DRAG;
 
-                        dispatch(
+                        batchedDispatch(
                             set({
                                 ...getStartEndForHoveredSecondIndexItem(
                                     monitor,
