@@ -64,33 +64,9 @@ const PlannerBoard = ({ schedule }: Props) => {
         | SecondIndexHandler<Role> = React.useMemo(
         () =>
             secondIdx === "Employee"
-                ? ({
-                      itemSelector: (state: RootState) =>
-                          employeeSelectors
-                              .selectAll(state)
-                              .filter(
-                                  (employee) =>
-                                      employee.workplace === schedule.workplace
-                              ),
-                      getId: (a: Employee) => a.id,
-                      secondIndexType: SECOND_INDEX.Employee,
-                      itemToString: employeeToString,
-                      ItemComponent: EmployeeItem,
-                  } as SecondIndexHandler<Employee>)
-                : ({
-                      itemSelector: (state: RootState) =>
-                          roleSelectors
-                              .selectAll(state)
-                              .filter(
-                                  (role) =>
-                                      role.workplace === schedule.workplace
-                              ),
-                      getId: (a: Role) => a.id,
-                      secondIndexType: SECOND_INDEX.Role,
-                      itemToString: (role: Role) => role.name,
-                      ItemComponent: RoleItem,
-                  } as SecondIndexHandler<Role>),
-        [schedule.workplace, secondIdx]
+                ? getEmployeeSecondIndexHandler(schedule)
+                : getRoleSecondIndexHandler(schedule),
+        [(schedule.workplace, secondIdx)]
     );
 
     const shiftSelector = React.useMemo(
@@ -150,3 +126,31 @@ export default PlannerBoard;
  */
 
 const shiftSelector = (state: RootState) => shiftSelectors.selectAll(state);
+
+const getEmployeeSecondIndexHandler = (
+    schedule: Schedule
+): SecondIndexHandler<Employee> => ({
+    itemSelector: (state: RootState) =>
+        employeeSelectors
+            .selectAll(state)
+            .filter((employee) => employee.workplace === schedule.workplace),
+    getId: (a: Employee) => a.id,
+    secondIndexType: SECOND_INDEX.Employee,
+    itemToString: employeeToString,
+    ItemComponent: EmployeeItem,
+    getShiftComplementaryFromItemId: (itemId: number) => ({ employee: itemId }),
+});
+
+const getRoleSecondIndexHandler = (
+    schedule: Schedule
+): SecondIndexHandler<Role> => ({
+    itemSelector: (state: RootState) =>
+        roleSelectors
+            .selectAll(state)
+            .filter((role) => role.workplace === schedule.workplace),
+    getId: (a: Role) => a.id,
+    secondIndexType: SECOND_INDEX.Role,
+    itemToString: (role: Role) => role.name,
+    ItemComponent: RoleItem,
+    getShiftComplementaryFromItemId: (itemId: number) => ({ role: itemId }),
+});

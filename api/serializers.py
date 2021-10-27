@@ -108,6 +108,9 @@ class ShiftSerializer(serializers.ModelSerializer):
         if data['time_from'] > data['time_to']:
             raise serializers.ValidationError("time_from could not be greater than time_to")
 
+        #from time import sleep
+        #sleep(5.5)
+
         return data
 
 class RoleSerializer(serializers.ModelSerializer):

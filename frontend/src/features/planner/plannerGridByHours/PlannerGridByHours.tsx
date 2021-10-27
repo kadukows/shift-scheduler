@@ -28,6 +28,7 @@ export interface SecondIndexHandler<Item> {
     secondIndexType: SECOND_INDEX;
     itemToString: (item: Item) => string;
     ItemComponent: React.FunctionComponent<{ shiftId: number }>;
+    getShiftComplementaryFromItemId: (itemId: number) => Partial<Shift>;
 }
 
 export interface Props<Item> {
@@ -56,6 +57,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         secondIndexType,
         itemToString,
         ItemComponent,
+        getShiftComplementaryFromItemId,
     },
     shiftSelector,
 }: Props<Item>) => {
@@ -79,6 +81,9 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                         itemId={item.id}
                         hour={hour}
                         key={`${hour.getTime()}-${secondIndexType}-${item.id}`}
+                        getShiftComplementaryFromItemId={
+                            getShiftComplementaryFromItemId
+                        }
                     />
                 );
             }

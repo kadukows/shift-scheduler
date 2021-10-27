@@ -2,7 +2,7 @@ import * as React from "react";
 import { styled } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { DropTargetMonitor, useDrag, useDrop, XYCoord } from "react-dnd";
-import { addHours, compareAsc, getTime } from "date-fns";
+import { addHours, compareAsc, getTime, format } from "date-fns";
 
 import { DndTypes, ItemPassed, getDndTypeForItemId } from "../DndTypes";
 import {
@@ -14,11 +14,13 @@ import { Employee } from "../../../employees/employeeSlice";
 import { BorderedDiv } from "./StyledDiv";
 import { set, reset } from "../potentialNewItemSlice";
 import { set as addDialogSet } from "../addDialogSlice";
-import { set as updateDialogSet } from "../updateDialogSlice";
+import { asyncUpdateShift } from "../../../shifts/helpers";
+import { Shift } from "../../../shifts/shiftSlice";
 
 interface Props {
     hour: Date;
     itemId: number;
+    getShiftComplementaryFromItemId: (itemId: number) => Partial<Shift>;
 }
 
 export const MyDiv = styled(BorderedDiv)({
@@ -28,9 +30,12 @@ export const MyDiv = styled(BorderedDiv)({
     },
 });
 
+const TIME_FORMAT = "yyyy-MM-dd'T'HH:mmX";
+
 const EmptyItem = <Item extends Role | Employee>({
     hour,
     itemId,
+    getShiftComplementaryFromItemId,
     ...rest
 }: Props) => {
     const myRef = React.useRef();
@@ -97,6 +102,19 @@ const EmptyItem = <Item extends Role | Employee>({
                         shiftTimeTo,
                         hour.getTime()
                     );
+
+                    console.log("dispatching");
+
+                    dispatch(
+                        asyncUpdateShift({
+                            id: shiftId,
+                            changes: {
+                                time_from: format(start, TIME_FORMAT),
+                                time_to: format(end, TIME_FORMAT),
+                                ...getShiftComplementaryFromItemId(itemId),
+                            },
+                        })
+                    );
                 }
             },
             hover: (itemAny, monitor) => {
@@ -147,7 +165,7 @@ const EmptyItem = <Item extends Role | Employee>({
                 }
             },
         }),
-        [hour.getTime(), itemId]
+        [hour.getTime(), itemId, getShiftComplementaryFromItemId]
     );
 
     React.useEffect(() => {
