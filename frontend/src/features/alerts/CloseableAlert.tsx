@@ -1,7 +1,7 @@
 import * as React from "react";
 import { useDispatch } from "react-redux";
 import { Collapse } from "@mui/material";
-import { Alert as AlertMui } from "@mui/material";
+import { Alert as AlertMui, Snackbar } from "@mui/material";
 
 import { AlertWithId, removeAlert } from "./alertsSlice";
 
@@ -10,16 +10,46 @@ interface Props {
 }
 
 const CloseableAlert = ({ alert }: Props) => {
-    const [on, setOn] = React.useState(true);
+    const [open, setOpen] = React.useState(true);
     const dispatch = useDispatch();
 
+    const handleClose = (
+        event: React.SyntheticEvent | React.MouseEvent,
+        reason?: string
+    ) => {
+        if (reason === "clickaway") {
+            return;
+        }
+
+        setOpen(false);
+    };
+
+    const handleExited = () => {
+        dispatch(removeAlert(alert.id));
+    };
+
     return (
-        <Collapse in={on} onExited={() => dispatch(removeAlert(alert.id))}>
-            <AlertMui severity={alert.type} onClose={() => setOn(false)}>
+        <Snackbar
+            open={open}
+            autoHideDuration={6000}
+            onClose={handleClose}
+            TransitionProps={{ onExited: handleExited }}
+        >
+            <AlertMui
+                onClose={handleClose}
+                severity={alert.type}
+                sx={{ width: "100%" }}
+                elevation={6}
+                variant="filled"
+            >
                 {alert.message}
             </AlertMui>
-        </Collapse>
+        </Snackbar>
     );
 };
 
 export default CloseableAlert;
+
+/**
+ * <Collapse in={on} onExited={() => dispatch(removeAlert(alert.id))}>
+ */

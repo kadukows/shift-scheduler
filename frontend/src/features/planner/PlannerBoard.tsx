@@ -48,9 +48,6 @@ const PlannerBoard = ({ schedule }: Props) => {
         "Employee"
     );
 
-    const dispatch = useDispatch();
-    const shiftsById = useSelector(shiftSelectors.selectEntities);
-
     //
     // planner grid by hours
     //
@@ -118,22 +115,6 @@ const PlannerBoard = ({ schedule }: Props) => {
                 <MenuItem value="Employee">Employee</MenuItem>
                 <MenuItem value="Role">Role</MenuItem>
             </TextField>
-            <Button
-                variant="contained"
-                sx={{ ml: 1 }}
-                onClick={() =>
-                    dispatch(
-                        updateShift({
-                            id: 17,
-                            changes: {
-                                blocked: !shiftsById[17].blocked,
-                            },
-                        })
-                    )
-                }
-            >
-                Click!
-            </Button>
             <PlannerByHours<Role | Employee>
                 timeRange={timeRange}
                 secondIndexHandler={secondIndexHandler}

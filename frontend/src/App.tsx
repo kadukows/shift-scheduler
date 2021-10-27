@@ -2,10 +2,6 @@ import * as React from "react";
 import { Provider } from "react-redux";
 import { HashRouter as Router, Switch, Route } from "react-router-dom";
 import { CssBaseline, Container, Grid } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
-//import { MuiPickersUtilsProvider } from "@mui/lab";
-//import DateFnsUtils from "@date-io/date-fns";
-
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 
@@ -25,7 +21,6 @@ import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import DraggablePage from "./features/draggableOnMuiTable/DraggablePage";
 import PrivateRoute from "./features/auth/PrivateRote";
-import PlannerBoard from "./features/planner/PlannerBoard";
 import PlannerLoader from "./features/planner/PlannerLoader";
 
 const App = () => {

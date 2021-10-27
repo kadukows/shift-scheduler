@@ -97,8 +97,6 @@ const EmptyItem = <Item extends Role | Employee>({
                         shiftTimeTo,
                         hour.getTime()
                     );
-
-                    console.log(start, end);
                 }
             },
             hover: (itemAny, monitor) => {
