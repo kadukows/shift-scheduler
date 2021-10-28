@@ -56,7 +56,9 @@ const PlannerBoard = ({ schedule }: Props) => {
 
     const timeRange: DateFns.Interval = {
         start: monthYear.getTime(),
-        end: DateFns.addDays(DateFns.addMonths(monthYear, 1), -25).getTime(),
+        end: DateFns.endOfDay(
+            DateFns.addDays(DateFns.addMonths(monthYear, 1), -25)
+        ).getTime(),
     };
 
     const secondIndexHandler:
@@ -73,7 +75,21 @@ const PlannerBoard = ({ schedule }: Props) => {
         () => (state: RootState) =>
             shiftSelectors
                 .selectAll(state)
-                .filter((shift) => shift.schedule === schedule.id),
+                .filter((shift) => shift.schedule === schedule.id)
+                .filter(
+                    (shift) =>
+                        DateFns.compareDesc(
+                            timeRange.start,
+                            Date.parse(shift.time_from)
+                        ) !== -1
+                )
+                .filter(
+                    (shift) =>
+                        DateFns.compareDesc(
+                            Date.parse(shift.time_to),
+                            timeRange.end
+                        ) !== -1
+                ),
         [schedule.id]
     );
 

@@ -16,6 +16,16 @@ const DispatchBatcherProvider = ({
         actions: [],
     });
 
+    const dispatch = useDispatch();
+
+    React.useEffect(() => {
+        return () => {
+            if (context.current.intervalRef !== null) {
+                stopBatchin(context.current, dispatch);
+            }
+        };
+    }, []);
+
     return (
         <DispatchBatcherContext.Provider value={context.current}>
             {children}
@@ -43,32 +53,6 @@ const DispatchBatcherContext =
 
 export const useBatchedDispatch = () => {
     const context = React.useContext(DispatchBatcherContext);
-    /*
-    const dispatch = useDispatch();
-
-    React.useEffect(() => {
-        if (context.intervalRef === null) {
-            //context.intervalRef = tru;
-            const interval = setInterval(() => {
-                if (context.actions.length === 0) {
-                    return;
-                }
-
-                batch(() => {
-                    for (const action of context.actions) {
-                        dispatch(action);
-                    }
-                });
-                context.actions = [];
-            }, context.timeout);
-
-            return () => {
-                context.batching = false;
-                clearInterval(interval);
-            };
-        }
-    });
-    */
 
     return (action: PayloadAction<any>) => context.actions.push(action);
 };
@@ -97,13 +81,6 @@ export const startBatching = (
 
                 context.actions = [];
             });
-
-            return () => {
-                if (context.intervalRef !== null) {
-                    clearInterval(context.intervalRef);
-                    context.intervalRef = null;
-                }
-            };
         }, context.timeout);
     }
 };

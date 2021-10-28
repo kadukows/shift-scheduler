@@ -10,7 +10,7 @@ import {
 } from "../../../../employees/employeeSlice";
 import { useGridAreaMemo } from "../../../../genericCssGrid/GenericCssGrid";
 import { Role, roleSelectors } from "../../../../roles/rolesSlice";
-import { shiftSelectors } from "../../../../shifts/shiftSlice";
+import { Shift, shiftSelectors } from "../../../../shifts/shiftSlice";
 import { set as updateDialogSet } from "../../updateDialogSlice";
 import { reset as potentialNewItemReset } from "../../potentialNewItemSlice";
 import { HoverableDiv, StyledDiv } from "../StyledDiv";
@@ -21,12 +21,18 @@ import {
     useBatchedDispatch,
     useBatchingContext,
 } from "../../../../dispatchBatcher/DispatchBatcherProvider";
+import {
+    asyncAddShiftCopy,
+    asyncUpdateShift,
+} from "../../../../shifts/helpers";
 
 interface Props<SecondIndex> {
     shiftId: number;
     getSecondIndex: (employee: Employee, role: Role) => SecondIndex;
     getNodeDesc: (employee: Employee, role: Role) => string;
 }
+
+const TIME_FORMAT = "yyyy-MM-dd'T'HH:mmX";
 
 const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
     shiftId,
@@ -75,7 +81,43 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
             canDrag: () => {
                 return !shift.blocked;
             },
-            end: () => {
+            end: (item, monitor) => {
+                const dropResult: DropResult = monitor.getDropResult();
+
+                if (dropResult) {
+                    const {
+                        start,
+                        end,
+                        getShiftComplementaryFromItemId,
+                        dropEffect,
+                        itemId,
+                    } = dropResult;
+
+                    if (dropEffect === "move") {
+                        dispatch(
+                            asyncUpdateShift({
+                                id: shiftId,
+                                changes: {
+                                    time_from: format(start, TIME_FORMAT),
+                                    time_to: format(end, TIME_FORMAT),
+                                    ...getShiftComplementaryFromItemId(itemId),
+                                },
+                            })
+                        );
+                    } else {
+                        dispatch(
+                            asyncAddShiftCopy({
+                                id: shiftId,
+                                changes: {
+                                    time_from: format(start, TIME_FORMAT),
+                                    time_to: format(end, TIME_FORMAT),
+                                    ...getShiftComplementaryFromItemId(itemId),
+                                },
+                            })
+                        );
+                    }
+                }
+
                 batchedDispatch(potentialNewItemReset());
                 stopBatchin(batchingContext, dispatch);
             },
@@ -87,9 +129,7 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
 
     React.useEffect(() => {
         drag(myRef);
-    }, [myRef.current]);
 
-    React.useEffect(() => {
         heightWidth.current.h = myRef.current.clientHeight;
         heightWidth.current.w = myRef.current.clientWidth;
     }, [myRef.current]);
@@ -124,3 +164,11 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
 };
 
 export default GenericSecondIndexItem;
+
+interface DropResult {
+    start: number;
+    end: number;
+    dropEffect: "move" | "copy";
+    getShiftComplementaryFromItemId: (a: number) => Partial<Shift>;
+    itemId: number;
+}

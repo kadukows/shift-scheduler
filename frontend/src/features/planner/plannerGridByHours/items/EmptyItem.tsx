@@ -2,7 +2,14 @@ import * as React from "react";
 import { styled } from "@mui/material";
 import { useDispatch } from "react-redux";
 import { DropTargetMonitor, useDrag, useDrop, XYCoord } from "react-dnd";
-import { addHours, compareAsc, getTime, format } from "date-fns";
+import {
+    addHours,
+    compareAsc,
+    getTime,
+    format,
+    roundToNearestMinutes,
+    setMinutes,
+} from "date-fns";
 
 import { DndTypes, ItemPassed, getDndTypeForItemId } from "../DndTypes";
 import {
@@ -14,7 +21,7 @@ import { Employee } from "../../../employees/employeeSlice";
 import { BorderedDiv } from "./StyledDiv";
 import { set, reset } from "../potentialNewItemSlice";
 import { set as addDialogSet } from "../addDialogSlice";
-import { asyncUpdateShift } from "../../../shifts/helpers";
+import { asyncUpdateShift, asyncAddShiftCopy } from "../../../shifts/helpers";
 import { Shift } from "../../../shifts/shiftSlice";
 import {
     startBatching,
@@ -103,7 +110,7 @@ const EmptyItem = <Item extends Role | Employee>({
                         shiftId,
                     } = itemAny as ItemPassed.SHIFT_ITEM_DRAG;
 
-                    const { start, end } = getStartEndForHoveredSecondIndexItem(
+                    let { start, end } = getStartEndForHoveredSecondIndexItem(
                         monitor,
                         width,
                         height,
@@ -112,16 +119,18 @@ const EmptyItem = <Item extends Role | Employee>({
                         hour.getTime()
                     );
 
-                    dispatch(
-                        asyncUpdateShift({
-                            id: shiftId,
-                            changes: {
-                                time_from: format(start, TIME_FORMAT),
-                                time_to: format(end, TIME_FORMAT),
-                                ...getShiftComplementaryFromItemId(itemId),
-                            },
-                        })
-                    );
+                    start = setMinutes(
+                        roundToNearestMinutes(start),
+                        0
+                    ).getTime();
+                    end = setMinutes(roundToNearestMinutes(end), 0).getTime();
+
+                    return {
+                        itemId,
+                        start,
+                        end,
+                        getShiftComplementaryFromItemId,
+                    };
                 }
             },
             hover: (itemAny, monitor) => {
@@ -136,8 +145,6 @@ const EmptyItem = <Item extends Role | Employee>({
                             compareAsc(item.hour, hour) === 1 ? 1 : 0;
                         const endOffset =
                             compareAsc(item.hour, hour) === -1 ? 1 : 0;
-
-                        console.log("batchedDisptach()");
 
                         batchedDispatch(
                             set({
