@@ -16,16 +16,16 @@ import {
     Shift,
     shiftSelectors,
     updateShift,
-} from "../../../shifts/shiftSlice";
-import { useSlot } from "../../../eventProvider/EventProvider";
-import { EventTypes } from "../EventTypes";
-import { FieldData } from "../../../genericForm/fieldInstance/Field";
-import GenericForm from "../../../genericForm/GenericForm";
-import { getTokenRequestConfig, TIME_FORMAT } from "../../../helpers";
-import { RootState } from "../../../../store";
-import { Schedule, scheduleSelectors } from "../../../schedules/scheduleSlice";
-import { addAlert } from "../../../alerts/alertsSlice";
-import { set as updateDialogSet } from "../updateDialogSlice";
+} from "../../shifts/shiftSlice";
+import { useSlot } from "../../eventProvider/EventProvider";
+import { EventTypes } from "../plannerGridByHours/EventTypes";
+import { FieldData } from "../../genericForm/fieldInstance/Field";
+import GenericForm from "../../genericForm/GenericForm";
+import { getTokenRequestConfig, TIME_FORMAT } from "../../helpers";
+import { RootState } from "../../../store";
+import { Schedule, scheduleSelectors } from "../../schedules/scheduleSlice";
+import { addAlert } from "../../alerts/alertsSlice";
+import { set as updateDialogSet } from "./updateDialogSlice";
 
 interface Inputs {
     time_from: Date;

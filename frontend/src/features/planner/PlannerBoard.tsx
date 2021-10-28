@@ -16,10 +16,10 @@ import PlannerByHours from "./plannerGridByHours/PlannerByHours";
 import { SECOND_INDEX } from "./plannerGridByHours/SecondIndexType";
 import EmployeeItem from "./plannerGridByHours/items/secondIndexItems/EmployeeItem";
 import RoleItem from "./plannerGridByHours/items/secondIndexItems/RoleItem";
-import AddEmployeeDialog from "./plannerGridByHours/dialogs/AddEmployeeDialog";
-import AddRoleDialog from "./plannerGridByHours/dialogs/AddRoleDialog";
-import UpdateEmployeeDialog from "./plannerGridByHours/dialogs/UpdateEmployeeDialog";
-import UpdateRoleDialog from "./plannerGridByHours/dialogs/UpdateRoleDialog";
+import AddEmployeeDialog from "./dialogs/AddEmployeeDialog";
+import AddRoleDialog from "./dialogs/AddRoleDialog";
+import UpdateEmployeeDialog from "./dialogs/UpdateEmployeeDialog";
+import UpdateRoleDialog from "./dialogs/UpdateRoleDialog";
 
 interface Props {
     schedule: Schedule;

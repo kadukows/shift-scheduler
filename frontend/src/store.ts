@@ -18,8 +18,8 @@ import { draggableThingsReducer } from "./features/draggableOnMuiTable/draggable
 import { roleReducer, roleObserver } from "./features/roles/rolesSlice";
 import { shiftReducer, shiftObserver } from "./features/shifts/shiftSlice";
 import { potentialNewItemReducer } from "./features/planner/plannerGridByHours/potentialNewItemSlice";
-import { addDialogReducer } from "./features/planner/plannerGridByHours/addDialogSlice";
-import { updateDialogReducer } from "./features/planner/plannerGridByHours/updateDialogSlice";
+import { addDialogReducer } from "./features/planner/dialogs/addDialogSlice";
+import { updateDialogReducer } from "./features/planner/dialogs/updateDialogSlice";
 
 import { observe } from "redux-observers";
 

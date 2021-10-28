@@ -1,10 +1,8 @@
 import * as React from "react";
 
 import GenericAddDialog from "./GenericAddDialog";
-import { ADD_BY_EVENT_ARG, EventTypes } from "../EventTypes";
-import { roleSelectors } from "../../../roles/rolesSlice";
-import { Schedule } from "../../../schedules/scheduleSlice";
-import { RootState } from "../../../../store";
+import { roleSelectors } from "../../roles/rolesSlice";
+import { RootState } from "../../../store";
 
 interface Props {
     scheduleId: number;

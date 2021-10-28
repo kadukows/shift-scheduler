@@ -1,11 +1,10 @@
 import * as React from "react";
 
 import GenericUpdateDialog from "./GenericUpdateDialog";
-import { EventTypes } from "../EventTypes";
-import { Schedule } from "../../../schedules/scheduleSlice";
-import { RootState } from "../../../../store";
-import { Employee, employeeSelectors } from "../../../employees/employeeSlice";
-import { employeeToString } from "../../../employees/helpers";
+import { Schedule } from "../../schedules/scheduleSlice";
+import { RootState } from "../../../store";
+import { Employee, employeeSelectors } from "../../employees/employeeSlice";
+import { employeeToString } from "../../employees/helpers";
 
 interface Props {}
 

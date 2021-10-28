@@ -1,12 +1,12 @@
 import * as React from "react";
 
 import GenericAddDialog from "./GenericAddDialog";
-import { ADD_BY_EVENT_ARG, EventTypes } from "../EventTypes";
-import { roleSelectors } from "../../../roles/rolesSlice";
-import { Schedule } from "../../../schedules/scheduleSlice";
-import { RootState } from "../../../../store";
-import { employeeSelectors } from "../../../employees/employeeSlice";
-import { employeeToString } from "../../../employees/helpers";
+import { ADD_BY_EVENT_ARG, EventTypes } from "../plannerGridByHours/EventTypes";
+import { roleSelectors } from "../../roles/rolesSlice";
+import { Schedule } from "../../schedules/scheduleSlice";
+import { RootState } from "../../../store";
+import { employeeSelectors } from "../../employees/employeeSlice";
+import { employeeToString } from "../../employees/helpers";
 
 interface Props {
     scheduleId: number;

@@ -8,8 +8,6 @@ import PlannerBoard from "./PlannerBoard";
 import { scheduleSelectors } from "../schedules/scheduleSlice";
 import RedirectWithAlert from "../alerts/RedirectWithAlert";
 
-import "./style.css";
-
 interface Props {}
 
 interface RouteMatch {

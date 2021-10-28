@@ -20,7 +20,7 @@ import { Role } from "../../../roles/rolesSlice";
 import { Employee } from "../../../employees/employeeSlice";
 import { BorderedDiv } from "./StyledDiv";
 import { set, reset } from "../potentialNewItemSlice";
-import { set as addDialogSet } from "../addDialogSlice";
+import { set as addDialogSet } from "../../dialogs/addDialogSlice";
 import { asyncUpdateShift, asyncAddShiftCopy } from "../../../shifts/helpers";
 import { Shift } from "../../../shifts/shiftSlice";
 import {

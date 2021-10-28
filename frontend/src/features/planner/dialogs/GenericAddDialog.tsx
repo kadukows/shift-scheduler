@@ -11,17 +11,17 @@ import {
     Button,
 } from "@mui/material";
 
-import { RootState } from "../../../../store";
-import { Employee } from "../../../employees/employeeSlice";
-import { Role } from "../../../roles/rolesSlice";
-import { Schedule } from "../../../schedules/scheduleSlice";
-import { addShift, Shift } from "../../../shifts/shiftSlice";
-import { ADD_BY_EVENT_ARG, EventTypes } from "../EventTypes";
-import { useSlot } from "../../../eventProvider/EventProvider";
-import { FieldData } from "../../../genericForm/fieldInstance/Field";
-import { getTokenRequestConfig, TIME_FORMAT } from "../../../helpers";
-import GenericForm from "../../../genericForm/GenericForm";
-import { set } from "../addDialogSlice";
+import { RootState } from "../../../store";
+import { Employee } from "../../employees/employeeSlice";
+import { Role } from "../../roles/rolesSlice";
+import { Schedule } from "../../schedules/scheduleSlice";
+import { addShift, Shift } from "../../shifts/shiftSlice";
+import { ADD_BY_EVENT_ARG, EventTypes } from "../plannerGridByHours/EventTypes";
+import { useSlot } from "../../eventProvider/EventProvider";
+import { FieldData } from "../../genericForm/fieldInstance/Field";
+import { getTokenRequestConfig, TIME_FORMAT } from "../../helpers";
+import GenericForm from "../../genericForm/GenericForm";
+import { set } from "./addDialogSlice";
 
 interface Inputs {
     time_from: Date;

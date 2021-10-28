@@ -11,7 +11,7 @@ import {
 import { useGridAreaMemo } from "../../../../genericCssGrid/GenericCssGrid";
 import { Role, roleSelectors } from "../../../../roles/rolesSlice";
 import { Shift, shiftSelectors } from "../../../../shifts/shiftSlice";
-import { set as updateDialogSet } from "../../updateDialogSlice";
+import { set as updateDialogSet } from "../../../dialogs/updateDialogSlice";
 import { reset as potentialNewItemReset } from "../../potentialNewItemSlice";
 import { HoverableDiv, StyledDiv } from "../StyledDiv";
 import { DndTypes, ItemPassed } from "../../DndTypes";
