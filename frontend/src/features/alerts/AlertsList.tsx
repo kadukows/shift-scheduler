@@ -1,12 +1,10 @@
 import * as React from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "../../store";
-import { AlertWithId, removeAlert } from "./alertsSlice";
-import { Collapse } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
 
 import CloseableAlert from "./CloseableAlert";
 
+/*
 const AlertsList = () => {
     const alerts = useSelector(
         (state: RootState) => state.alertsReducer.alerts
@@ -23,3 +21,4 @@ const AlertsList = () => {
 };
 
 export default AlertsList;
+*/

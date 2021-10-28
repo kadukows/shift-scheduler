@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { Route, Redirect } from "react-router-dom";
 
 import { RootState } from "../../store";
-import { Alert } from "../alerts/alertsSlice";
+import { BaseAlert } from "../alerts/alertsSlice";
 import Loader from "../loader/Loader";
 import RedirectWithAlert from "../alerts/RedirectWithAlert";
 
@@ -31,7 +31,7 @@ function PrivateRoute({
 
     let RedirectComponent: any;
     if (!noAlert) {
-        const redirectAlert: Alert = {
+        const redirectAlert: BaseAlert = {
             type: "warning",
             message: `You need to be ${
                 !inverse ? "logged in" : "logged out"

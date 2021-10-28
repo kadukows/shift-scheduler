@@ -2,10 +2,10 @@ import * as React from "react";
 import { useDispatch } from "react-redux";
 import { Redirect } from "react-router-dom";
 
-import { Alert, addAlert } from "./alertsSlice";
+import { BaseAlert, addAlert } from "./alertsSlice";
 
 interface Props extends React.ComponentProps<typeof Redirect> {
-    alert: Alert;
+    alert: BaseAlert;
 }
 
 const RedirectWithAlert = ({ alert, ...rest }: Props) => {

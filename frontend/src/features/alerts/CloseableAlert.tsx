@@ -3,10 +3,10 @@ import { useDispatch } from "react-redux";
 import { Collapse } from "@mui/material";
 import { Alert as AlertMui, Snackbar } from "@mui/material";
 
-import { AlertWithId, removeAlert } from "./alertsSlice";
+import { Alert, removeAlert } from "./alertsSlice";
 
 interface Props {
-    alert: AlertWithId;
+    alert: Alert;
 }
 
 const CloseableAlert = ({ alert }: Props) => {

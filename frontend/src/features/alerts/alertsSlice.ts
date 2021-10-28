@@ -4,17 +4,22 @@ import {
     ThunkAction,
     AnyAction,
     nanoid,
+    Update,
 } from "@reduxjs/toolkit";
 
-export interface Alert {
+export interface BaseAlert {
     type: "warning" | "info" | "success";
     message: string;
 }
 
-export type AlertWithId = Alert & { id: string };
+export interface Alert extends BaseAlert {
+    id: string;
+    options?: any;
+    dismissed: boolean;
+}
 
 interface AlertsState {
-    alerts: AlertWithId[];
+    alerts: Alert[];
 }
 
 const initialState: AlertsState = {
@@ -25,8 +30,24 @@ const alertsSlice = createSlice({
     name: "alerts",
     initialState,
     reducers: {
-        addAlert(state, action: PayloadAction<Alert>) {
-            state.alerts.push({ id: nanoid(), ...action.payload });
+        addAlert(state, action: PayloadAction<BaseAlert>) {
+            state.alerts.push({
+                id: nanoid(),
+                dismissed: false,
+                ...action.payload,
+            });
+        },
+        updateAlert(state, action: PayloadAction<Update<Alert>>) {
+            const alertIdx = state.alerts.findIndex(
+                (alert) => alert.id === action.payload.id
+            );
+
+            if (alertIdx !== -1) {
+                state.alerts[alertIdx] = {
+                    ...state.alerts[alertIdx],
+                    ...action.payload.changes,
+                };
+            }
         },
         removeAlert(state, action: PayloadAction<string>) {
             state.alerts = state.alerts.filter(
@@ -36,5 +57,5 @@ const alertsSlice = createSlice({
     },
 });
 
-export const { addAlert, removeAlert } = alertsSlice.actions;
+export const { addAlert, removeAlert, updateAlert } = alertsSlice.actions;
 export const alertsReducer = alertsSlice.reducer;
