@@ -16,7 +16,12 @@ import { set, reset } from "../potentialNewItemSlice";
 import { set as addDialogSet } from "../addDialogSlice";
 import { asyncUpdateShift } from "../../../shifts/helpers";
 import { Shift } from "../../../shifts/shiftSlice";
-import { useBatchedDispatch } from "../../../dispatchBatcher/DispatchBatcherProvider";
+import {
+    startBatching,
+    stopBatchin,
+    useBatchedDispatch,
+    useBatchingContext,
+} from "../../../dispatchBatcher/DispatchBatcherProvider";
 
 interface Props {
     hour: Date;
@@ -47,14 +52,15 @@ const EmptyItem = <Item extends Role | Employee>({
     ]);
     const dispatch = useDispatch();
     const batchedDispatch = useBatchedDispatch();
+    const batchingContext = useBatchingContext();
 
     const [{}, drag] = useDrag(
         () => ({
             type: getDndTypeForItemId(DndTypes.EMPTY_ITEM_DRAG, itemId),
             item: { itemId, hour: hour.getTime() },
             end: () => {
-                dispatch(reset());
                 batchedDispatch(reset());
+                stopBatchin(batchingContext, dispatch);
             },
         }),
         [hour.getTime(), itemId]
@@ -182,6 +188,7 @@ const EmptyItem = <Item extends Role | Employee>({
             onDragEnter={() => {
                 entered.current = true;
             }}
+            onDragStart={() => startBatching(batchingContext, dispatch)}
             ref={myRef}
             {...rest}
         />

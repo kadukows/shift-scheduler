@@ -15,6 +15,12 @@ import { set as updateDialogSet } from "../../updateDialogSlice";
 import { reset as potentialNewItemReset } from "../../potentialNewItemSlice";
 import { HoverableDiv, StyledDiv } from "../StyledDiv";
 import { DndTypes, ItemPassed } from "../../DndTypes";
+import {
+    startBatching,
+    stopBatchin,
+    useBatchedDispatch,
+    useBatchingContext,
+} from "../../../../dispatchBatcher/DispatchBatcherProvider";
 
 interface Props<SecondIndex> {
     shiftId: number;
@@ -51,6 +57,8 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
     );
 
     const dispatch = useDispatch();
+    const batchedDispatch = useBatchedDispatch();
+    const batchingContext = useBatchingContext();
 
     const heightWidth = React.useRef({ w: 0, h: 0 });
 
@@ -67,7 +75,10 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
             canDrag: () => {
                 return !shift.blocked;
             },
-            end: () => dispatch(potentialNewItemReset()),
+            end: () => {
+                batchedDispatch(potentialNewItemReset());
+                stopBatchin(batchingContext, dispatch);
+            },
         }),
         [shiftId, shift.time_from, shift.time_to, shift.blocked]
     );
@@ -98,6 +109,7 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
                 }}
                 ref={myRef}
                 style={style}
+                onDragStart={() => startBatching(batchingContext, dispatch)}
             >
                 <Typography>
                     {getNodeDesc(employee, role)}
