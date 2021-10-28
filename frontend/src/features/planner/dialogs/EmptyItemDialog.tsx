@@ -1,3 +1,4 @@
+/*
 import * as React from "react";
 import * as yup from "yup";
 import axios from "axios";
@@ -128,3 +129,4 @@ const EmptyItemDialog = ({ schedule }: Props) => {
 };
 
 export default EmptyItemDialog;
+*/

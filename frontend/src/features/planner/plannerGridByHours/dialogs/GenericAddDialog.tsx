@@ -19,17 +19,15 @@ import { addShift, Shift } from "../../../shifts/shiftSlice";
 import { ADD_BY_EVENT_ARG, EventTypes } from "../EventTypes";
 import { useSlot } from "../../../eventProvider/EventProvider";
 import { FieldData } from "../../../genericForm/fieldInstance/Field";
-import { getTokenRequestConfig } from "../../../helpers";
+import { getTokenRequestConfig, TIME_FORMAT } from "../../../helpers";
 import GenericForm from "../../../genericForm/GenericForm";
 import { set } from "../addDialogSlice";
 
 interface Inputs {
-    time_from: string;
-    time_to: string;
+    time_from: Date;
+    time_to: Date;
     itemId: number;
 }
-
-const TIME_FORMAT = "yyyy-MM-dd'T'HH:mmX";
 
 interface CommonProps<Item> {
     formId: string;
@@ -88,19 +86,17 @@ const GenericAddSetDialog = <Item extends Role | Employee>({
             type: "datetime",
             name: "time_from",
             label: "Time from",
-            validation: yup.string().required(),
+            validation: yup.date().required(),
             //
             views: ["hours", "day", "month", "year"],
-            format: TIME_FORMAT,
         },
         {
             type: "datetime",
             name: "time_to",
             label: "Time to",
-            validation: yup.string().required(),
+            validation: yup.date().required(),
             //
             views: ["hours", "day", "month", "year"],
-            format: TIME_FORMAT,
         },
         {
             type: "choose_object",
@@ -119,7 +115,11 @@ const GenericAddSetDialog = <Item extends Role | Employee>({
     const submit = async (inputs: Inputs) => {
         const response = await axios.post<Shift>(
             `/api/shift/`,
-            genRequestData(arg, inputs),
+            {
+                ...genRequestData(arg, inputs),
+                time_from: format(inputs.time_from, TIME_FORMAT),
+                time_to: format(inputs.time_to, TIME_FORMAT),
+            },
             getTokenRequestConfig(token)
         );
 
@@ -128,8 +128,8 @@ const GenericAddSetDialog = <Item extends Role | Employee>({
     };
 
     const defaultValues: any = {
-        time_from: format(arg.start, TIME_FORMAT),
-        time_to: format(arg.end, TIME_FORMAT),
+        time_from: new Date(arg.start),
+        time_to: new Date(arg.end),
     };
 
     return (

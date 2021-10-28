@@ -2,13 +2,8 @@ import * as React from "react";
 import * as yup from "yup";
 import axios, { AxiosError } from "axios";
 import { useForm, SubmitHandler, FormProvider } from "react-hook-form";
-import {
-    FormHelperText,
-    LinearProgress,
-    Stack,
-    styled,
-    Paper,
-} from "@mui/material";
+import { FormHelperText, LinearProgress, Stack, styled } from "@mui/material";
+import { format, isDate } from "date-fns";
 
 import { DjangoErrors, handleErrors, WithId } from "../helpers";
 import { yupResolver } from "@hookform/resolvers/yup";
@@ -21,12 +16,6 @@ interface Props<Inputs, Entity extends WithId> {
     formId?: string;
     defaultValues?: Partial<Inputs>;
 }
-
-const Item = styled("div")(({ theme }) => ({
-    ...theme.typography.body2,
-    padding: theme.spacing(1),
-    textAlign: "center",
-}));
 
 function GenericForm<Inputs, Entity extends WithId>({
     fields,
@@ -114,3 +103,19 @@ function GenericForm<Inputs, Entity extends WithId>({
 }
 
 export default GenericForm;
+
+/**
+ *
+ */
+
+const Item = styled("div")(({ theme }) => ({
+    ...theme.typography.body2,
+    padding: theme.spacing(1),
+    textAlign: "center",
+}));
+
+const parseDate =
+    (timeFormat: string) =>
+    (date: any): string => {
+        return isDate(date) ? format(date, timeFormat) : date;
+    };

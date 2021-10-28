@@ -15,20 +15,9 @@ interface BaseInputs {
     role: number;
 }
 
-/*
-interface EmployeeInputs extends BaseInputs {
-
-}
-
-interface RoleInputs extends BaseInputs {
-    role: number;
-}
-*/
-
 export const getFieldDataArray = <Inputs extends Partial<BaseInputs>>(
     schedule: Schedule,
-    secondIdx: "Employee" | "Role",
-    timeFormat: string
+    secondIdx: "Employee" | "Role"
 ): FieldData<Inputs, Role | Employee>[] => {
     const employeeSelector = (state: RootState) =>
         employeeSelectors
@@ -49,19 +38,17 @@ export const getFieldDataArray = <Inputs extends Partial<BaseInputs>>(
             type: "datetime",
             name: "time_from",
             label: "Time from",
-            validation: yup.string().required(),
+            validation: yup.date().required(),
             //
             views: ["day", "hours", "minutes"],
-            format: timeFormat,
         },
         {
             type: "datetime",
             name: "time_to",
             label: "Time to",
-            validation: yup.string().required(),
+            validation: yup.date().required(),
             //
             views: ["day", "hours", "minutes"],
-            format: timeFormat,
         },
         {
             type: "choose_object",

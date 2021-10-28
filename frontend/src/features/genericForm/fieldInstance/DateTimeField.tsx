@@ -1,17 +1,17 @@
 import * as React from "react";
 import * as yup from "yup";
-import { Controller, Control } from "react-hook-form";
-import { TextField } from "@mui/material";
+import { Control } from "react-hook-form";
 import { DateTimePicker, DateTimePickerProps } from "@mui/lab";
-import { parse, format } from "date-fns";
 
 import { BaseFieldProps } from "./BaseFieldProps";
+import GenericDatePicker from "./GenericDatePickerField";
+import GenericDatePickerField from "./GenericDatePickerField";
 
 /**
  * Types definitions
  */
 
-type DateYupValidationBuilderType = ReturnType<typeof yup.string>;
+type DateYupValidationBuilderType = ReturnType<typeof yup.date>;
 
 export interface DateTimeFieldData<Inputs> {
     type: "datetime";
@@ -20,7 +20,6 @@ export interface DateTimeFieldData<Inputs> {
     validation: DateYupValidationBuilderType;
     //
     views: DateTimePickerProps["views"];
-    format: string;
 }
 
 interface Props<Inputs> extends BaseFieldProps<Inputs> {
@@ -33,32 +32,10 @@ const DateTimeField = <Inputs extends unknown>({
     control,
 }: Props<Inputs>) => {
     return (
-        <Controller<Inputs>
+        <GenericDatePickerField
+            field={field}
             control={control}
-            // @ts-expect-error
-            name={field.name}
-            render={({
-                field: { onChange, value, name, ref },
-                fieldState: { invalid, error },
-            }) => (
-                <DateTimePicker
-                    views={field.views}
-                    value={parse(value, field.format, new Date())}
-                    onChange={(val: Date) =>
-                        onChange(format(val, field.format))
-                    }
-                    ampm={false}
-                    renderInput={(props) => (
-                        <TextField
-                            {...props}
-                            fullWidth
-                            label={field.label}
-                            error={invalid}
-                            helperText={error?.message}
-                        />
-                    )}
-                />
-            )}
+            PickerComponent={DateTimePicker}
         />
     );
 };

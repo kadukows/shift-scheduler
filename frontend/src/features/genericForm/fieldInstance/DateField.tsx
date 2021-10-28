@@ -1,11 +1,10 @@
 import * as React from "react";
 import * as yup from "yup";
-import { Controller, Control } from "react-hook-form";
-import { TextField } from "@mui/material";
 import { DatePicker } from "@mui/lab";
-import { parse, format } from "date-fns";
+import { Control } from "react-hook-form";
 
 import { BaseFieldProps } from "./BaseFieldProps";
+import GenericDatePickerField from "./GenericDatePickerField";
 
 /**
  * Types definitions
@@ -38,32 +37,10 @@ const DateField = <Inputs extends unknown>({
     control,
 }: DateFieldDataProps<Inputs>) => {
     return (
-        <Controller<Inputs>
+        <GenericDatePickerField
+            field={field}
             control={control}
-            // @ts-expect-error
-            name={field.name}
-            render={({
-                field: { onChange, value, name, ref },
-                fieldState: { invalid, error },
-            }) => (
-                <DatePicker
-                    views={field.views}
-                    //ref={ref}
-                    value={parse(value, field.format, new Date())}
-                    onChange={(val: Date) =>
-                        onChange(format(val, field.format))
-                    }
-                    renderInput={(props) => (
-                        <TextField
-                            {...props}
-                            fullWidth
-                            label={field.label}
-                            error={invalid}
-                            helperText={error?.message}
-                        />
-                    )}
-                />
-            )}
+            PickerComponent={DatePicker}
         />
     );
 };

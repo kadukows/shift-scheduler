@@ -28,7 +28,7 @@ const updateDialogSlice = createSlice({
                 state.shiftId = shiftId;
             }
 
-            if (typeof open === "boolean") {
+            if (open !== undefined) {
                 state.open = open;
             }
         },

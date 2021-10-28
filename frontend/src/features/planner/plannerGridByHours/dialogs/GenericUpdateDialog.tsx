@@ -21,19 +21,17 @@ import { useSlot } from "../../../eventProvider/EventProvider";
 import { EventTypes } from "../EventTypes";
 import { FieldData } from "../../../genericForm/fieldInstance/Field";
 import GenericForm from "../../../genericForm/GenericForm";
-import { getTokenRequestConfig } from "../../../helpers";
+import { getTokenRequestConfig, TIME_FORMAT } from "../../../helpers";
 import { RootState } from "../../../../store";
 import { Schedule, scheduleSelectors } from "../../../schedules/scheduleSlice";
 import { addAlert } from "../../../alerts/alertsSlice";
 import { set as updateDialogSet } from "../updateDialogSlice";
 
 interface Inputs {
-    time_from: string;
-    time_to: string;
+    time_from: Date;
+    time_to: Date;
     itemId: number;
 }
-
-const TIME_FORMAT = "yyyy-MM-dd'T'HH:mmX";
 
 interface CommonProps<Item> {
     formId: string;
@@ -94,19 +92,17 @@ const GenericSetDialog = <Item extends { id: number }>({
             type: "datetime",
             name: "time_from",
             label: "Time from",
-            validation: yup.string().required(),
+            validation: yup.date().required(),
             //
             views: ["hours", "day", "month", "year"],
-            format: TIME_FORMAT,
         },
         {
             type: "datetime",
             name: "time_to",
             label: "Time to",
-            validation: yup.string().required(),
+            validation: yup.date().required(),
             //
             views: ["hours", "day", "month", "year"],
-            format: TIME_FORMAT,
         },
         {
             type: "choose_object",
@@ -125,7 +121,11 @@ const GenericSetDialog = <Item extends { id: number }>({
     const submit = async (inputs: Inputs) => {
         const response = await axios.put<Shift>(
             `/api/shift/${shift.id}/`,
-            genRequestData(shift, inputs),
+            {
+                ...genRequestData(shift, inputs),
+                time_from: format(inputs.time_from, TIME_FORMAT),
+                time_to: format(inputs.time_to, TIME_FORMAT),
+            },
             getTokenRequestConfig(token)
         );
 
@@ -157,9 +157,9 @@ const GenericSetDialog = <Item extends { id: number }>({
 
     const defaultValues: any = shift
         ? {
-              time_from: format(Date.parse(shift.time_from), TIME_FORMAT),
-              time_to: format(Date.parse(shift.time_to), TIME_FORMAT),
               ...getDefaultValue(shift),
+              time_from: new Date(shift.time_from),
+              time_to: new Date(shift.time_to),
           }
         : undefined;
 

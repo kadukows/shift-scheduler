@@ -133,3 +133,5 @@ export function MyTextField<Inputs>({
 export interface WithId {
     id: number;
 }
+
+export const TIME_FORMAT = "yyyy-MM-dd'T'HH:mmX";

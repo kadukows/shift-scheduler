@@ -41,7 +41,7 @@ const addDialogSlice = createSlice({
                 state.secondIndexItemId = secondIndexItemId;
             }
 
-            if (typeof open === "boolean") {
+            if (open !== undefined) {
                 state.open = open;
             }
         },
