@@ -10,7 +10,6 @@ import { Employee } from "../../employees/employeeSlice";
 import { Role, roleSelectors } from "../../roles/rolesSlice";
 import { Shift } from "../../shifts/shiftSlice";
 import { Box, Typography, styled } from "@mui/material";
-import { SECOND_INDEX } from "./SecondIndexType";
 
 import "./style.css";
 
@@ -21,15 +20,8 @@ import PotentialNewItem from "./items/PotentialNewItem";
 import HourItem from "./items/HourItem";
 import DayItem from "./items/DayItem";
 import DispatchBatcherProvider from "../../dispatchBatcher/DispatchBatcherProvider";
-
-export interface SecondIndexHandler<Item> {
-    itemSelector: (state: RootState) => Item[];
-    getId: (item: Item) => number;
-    secondIndexType: SECOND_INDEX;
-    itemToString: (item: Item) => string;
-    ItemComponent: React.FunctionComponent<{ shiftId: number }>;
-    getShiftComplementaryFromItemId: (itemId: number) => Partial<Shift>;
-}
+import { SecondIndexHandler } from "../SecondIndexHandler";
+import OverflowHelper from "../OverflowHelper";
 
 export interface Props<Item> {
     timeRange: DateFns.Interval;
@@ -168,37 +160,3 @@ const PlannerGridByHours = <Item extends Role | Employee>({
 };
 
 export default PlannerGridByHours;
-
-//
-//
-//
-
-//
-//
-//
-
-const OverflowHelper = ({ children }: React.PropsWithChildren<{}>) => (
-    <div
-        style={{
-            display: "flex",
-            flexDirection: "row",
-        }}
-    >
-        <div
-            style={{
-                width: 0,
-                flex: "1 1 100%",
-            }}
-        >
-            <div
-                style={{
-                    overflowX: "auto",
-                    width: "100%",
-                    height: "100%",
-                }}
-            >
-                {children}
-            </div>
-        </div>
-    </div>
-);

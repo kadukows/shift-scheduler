@@ -7,18 +7,11 @@ import PlannerGridByHours, {
     Props as PlannerGridByHoursProps,
 } from "./PlannerGridByHours";
 import { EventTypes } from "./EventTypes";
-import UpdateEmployeeDialog from "../dialogs/UpdateEmployeeDialog";
 import { Schedule } from "../../schedules/scheduleSlice";
-import UpdateRoleDialog from "../dialogs/UpdateRoleDialog";
-import AddEmployeeDialog from "../dialogs/AddEmployeeDialog";
-import AddRoleDialog from "../dialogs/AddRoleDialog";
 
-interface Props<Item> extends PlannerGridByHoursProps<Item> {
-    schedule: Schedule;
-}
+interface Props<Item> extends PlannerGridByHoursProps<Item> {}
 
 const PlannerByHours = <Item extends Role | Employee>({
-    schedule,
     children,
     ...rest
 }: React.PropsWithChildren<Props<Item>>) => {

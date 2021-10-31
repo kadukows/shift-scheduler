@@ -23,7 +23,7 @@ const DayItem = ({ day, row, style, ...rest }: Props) => {
             align="center"
             {...rest}
         >
-            {format(day, "yyyy-MM-dd")}
+            {format(day, "yyyy-MM-dd, EEEE")}
         </BorderTypography>
     );
 };

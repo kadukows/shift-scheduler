@@ -17,7 +17,6 @@ import { Role } from "../../roles/rolesSlice";
 import { Schedule } from "../../schedules/scheduleSlice";
 import { addShift, Shift } from "../../shifts/shiftSlice";
 import { ADD_BY_EVENT_ARG, EventTypes } from "../plannerGridByHours/EventTypes";
-import { useSlot } from "../../eventProvider/EventProvider";
 import { FieldData } from "../../genericForm/fieldInstance/Field";
 import { getTokenRequestConfig, TIME_FORMAT } from "../../helpers";
 import GenericForm from "../../genericForm/GenericForm";

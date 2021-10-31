@@ -47,6 +47,8 @@ export default EventProvider;
  */
 
 export const useSignal = (event: string) => {
+    throw "Deprecated";
+
     const { eventToCallbacks } = React.useContext(EventContext);
 
     if (event in eventToCallbacks) {
@@ -66,6 +68,8 @@ export const useSlot = (
     callback: (...a: any) => void,
     depends: React.DependencyList = []
 ) => {
+    throw "Deprecated";
+
     const { eventToCallbacks } = React.useContext(EventContext);
 
     React.useEffect(() => {

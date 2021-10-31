@@ -1,23 +1,27 @@
 import * as React from "react";
+import GenericSecondIndexItem from "./GenericSecondIndexItem";
 import { Employee } from "../../../../employees/employeeSlice";
 import { Role } from "../../../../roles/rolesSlice";
-import GenericSecondIndexItemId from "./GenericSecondIndexItem";
 
 interface Props {
-    shiftId: number;
+    shiftsIds: number[];
 }
 
-const RoleItem = ({ shiftId }: Props) => {
+const EmployeeItem = ({ shiftsIds }: Props) => {
     return (
-        <GenericSecondIndexItemId
-            shiftId={shiftId}
+        <GenericSecondIndexItem
+            shiftsId={shiftsIds}
             getSecondIndex={getEmployee}
             getNodeDesc={getNodeDesc}
         />
     );
 };
 
-export default RoleItem;
+export default EmployeeItem;
+
+/**
+ *
+ */
 
 const getEmployee = (employee: Employee, role: Role) => employee;
 const getNodeDesc = (employee: Employee, role: Role) => role.name;
