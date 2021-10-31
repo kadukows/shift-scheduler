@@ -68,7 +68,7 @@ const PlannerBoard = ({ schedule }: Props) => {
         | SecondIndexHandler<Employee>
         | SecondIndexHandler<Role> = React.useMemo(() => {
         return secondIndexDict[timeGrouping][secondIdx](schedule);
-    }, [(schedule.workplace, secondIdx, timeGrouping)]);
+    }, [schedule.workplace, secondIdx, timeGrouping]);
 
     const shiftSelector = (state: RootState) =>
         shiftSelectors

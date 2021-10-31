@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Paper } from "@mui/material";
+import { Paper, Typography } from "@mui/material";
 import { format, addDays } from "date-fns";
 import { useGridColumn } from "../../../genericCssGrid/GenericCssGrid";
 
@@ -16,10 +16,12 @@ const DayItem = ({ day, row }: Props) => {
     });
 
     return (
-        <Paper sx={{ p: 0.7 }} style={{ gridArea }}>
-            {format(day, "yyyy-MM-dd")}
-            <br />
-            {format(day, "EEEE")}
+        <Paper style={{ gridArea }}>
+            <Typography sx={{ p: 2 }} align="center">
+                {format(day, "yyyy-MM-dd")}
+                <br />
+                {format(day, "EEEE")}
+            </Typography>
         </Paper>
     );
 };

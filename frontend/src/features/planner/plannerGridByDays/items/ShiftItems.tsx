@@ -3,7 +3,6 @@ import * as DateFns from "date-fns";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";
 import { Shift } from "../../../shifts/shiftSlice";
-import ShiftGroup from "./ShiftGroup";
 
 interface Props {
     shiftSelector: (state: RootState) => Shift[];
@@ -37,17 +36,7 @@ const ShiftItems = ({
         return [...shiftGroupMap.values()];
     }, [getItemIdFromShift, ...unpackShifts(shifts)]);
 
-    return (
-        <React.Fragment>
-            {groupedShifts.map((shifts) => (
-                <ShiftGroup
-                    key={shifts[0].id}
-                    shiftIds={shifts.map((shift) => shift.id)}
-                    ItemComponent={ItemComponent}
-                />
-            ))}
-        </React.Fragment>
-    );
+    return <React.Fragment></React.Fragment>;
 };
 
 export default ShiftItems;

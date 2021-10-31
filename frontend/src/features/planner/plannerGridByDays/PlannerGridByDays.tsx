@@ -1,6 +1,10 @@
 import * as React from "react";
 import * as DateFns from "date-fns";
-import { SecondIndexHandler } from "../SecondIndexHandler";
+import { Typography } from "@mui/material";
+import {
+    MultipleShiftItemComponent,
+    SecondIndexHandler,
+} from "../SecondIndexHandler";
 import { RootState } from "../../../store";
 import { Shift } from "../../shifts/shiftSlice";
 import { Employee } from "../../employees/employeeSlice";
@@ -10,9 +14,9 @@ import EmptyItem from "./items/EmptyItem";
 import OverflowHelper from "../OverflowHelper";
 import GenericCssGrid, {
     DefaultItemOnGrid,
+    DefaultRowItemOnGrid,
 } from "../../genericCssGrid/GenericCssGrid";
 import DayItem from "./items/DayItem";
-import ShiftGroup from "./items/ShiftGroup";
 
 interface Props<Item> {
     timeRange: DateFns.Interval;
@@ -44,58 +48,66 @@ const PlannerGridByDays = <Item extends Role | Employee>({
     const items = useSelector(itemSelector);
     const shifts = useSelector(shiftSelector);
 
-    const [groupedShifts, emptyItems, genericCssGridProps] =
-        React.useMemo(() => {
-            const shiftGroupMap = new Map<string, Shift[]>();
-            const getKey = (day: Date | number, itemId: number) =>
-                `${DateFns.format(day, TIME_FORMAT)}|${itemId}`;
+    const { dayItemShiftsArray, genericCssGridProps } = React.useMemo(() => {
+        const shiftGroupMap = new Map<string, Shift[]>();
 
-            for (const shift of shifts) {
-                const key = getKey(
-                    Date.parse(shift.time_from),
-                    getItemIdFromShift(shift)
-                );
+        for (const shift of shifts) {
+            const key = getKey(
+                Date.parse(shift.time_from),
+                getItemIdFromShift(shift)
+            );
 
-                if (shiftGroupMap.has(key)) {
-                    shiftGroupMap.get(key).push(shift);
-                } else {
-                    shiftGroupMap.set(key, [shift]);
-                }
+            if (shiftGroupMap.has(key)) {
+                shiftGroupMap.get(key).push(shift);
+            } else {
+                shiftGroupMap.set(key, [shift]);
             }
+        }
 
-            const groupedShifts: Shift[][] = [];
-            for (const [_, shifts] of shiftGroupMap.entries()) {
-                groupedShifts.push(shifts);
+        interface DayItemShifts {
+            day: Date;
+            item: Item;
+            shifts: Shift[];
+        }
+
+        const dayItemShiftsArray = [] as DayItemShifts[];
+
+        for (const day of days) {
+            for (const item of items) {
+                const key = getKey(day, item.id);
+
+                dayItemShiftsArray.push({
+                    day,
+                    item,
+                    shifts: shiftGroupMap.has(key)
+                        ? shiftGroupMap.get(key)
+                        : [],
+                });
             }
+        }
 
-            const emptyItems: JSX.Element[] = [];
+        const genericCssGridProps = {
+            x: {
+                cells: days,
+                getId: (date: Date) => DateFns.format(date, TIME_FORMAT),
+            },
+            y: {
+                cells: items,
+                getId: (item: Item) => getId(item),
+            },
+            additionalRows: [ADDITIONAL_FIELDS.DateAnnotation],
+            additionalCols: [ADDITIONAL_FIELDS.ItemAnnotation],
+        };
 
-            for (const day of days) {
-                for (const item of items) {
-                    emptyItems.push(<EmptyItem itemId={item.id} day={day} />);
-                }
-            }
+        return { dayItemShiftsArray, genericCssGridProps };
+    }, [
+        DateFns.getUnixTime(timeRange.start),
+        DateFns.getUnixTime(timeRange.end),
+        itemSelector,
+        shiftSelector,
+    ]);
 
-            const genericCssGridProps = {
-                x: {
-                    cells: days,
-                    getId: (date: Date) => DateFns.format(date, TIME_FORMAT),
-                },
-                y: {
-                    cells: items,
-                    getId: (item: Item) => getId(item),
-                },
-                additionalRows: [ADDITIONAL_FIELDS.DateAnnotation],
-                additionalCols: [ADDITIONAL_FIELDS.ItemAnnotation],
-            };
-
-            return [groupedShifts, emptyItems, genericCssGridProps];
-        }, [
-            DateFns.getUnixTime(timeRange.start),
-            DateFns.getUnixTime(timeRange.end),
-            itemSelector,
-            shiftSelector,
-        ]);
+    const CastedComponent = ItemComponent as MultipleShiftItemComponent;
 
     return (
         <OverflowHelper>
@@ -114,13 +126,27 @@ const PlannerGridByDays = <Item extends Role | Employee>({
                         key={day.getTime()}
                     />
                 ))}
-                {groupedShifts.map((shiftGroup) => (
-                    <ShiftGroup
-                        key={shiftGroup[0].id}
-                        shiftIds={shiftGroup.map((shift) => shift.id)}
-                        ItemComponent={ItemComponent}
-                    />
+                {items.map((item) => (
+                    <DefaultRowItemOnGrid<Item>
+                        xStart={ADDITIONAL_FIELDS.ItemAnnotation}
+                        yStart={item}
+                        key={item.id}
+                    >
+                        <Typography align="center" sx={{ p: 2 }}>
+                            {itemToString(item)}
+                        </Typography>
+                    </DefaultRowItemOnGrid>
                 ))}
+                {dayItemShiftsArray.map(({ day, item, shifts }) =>
+                    shifts.length === 0 ? (
+                        <React.Fragment key={getKey(day, item.id)} />
+                    ) : (
+                        <CastedComponent
+                            key={shifts[0].id}
+                            shiftsIds={shifts.map((shift) => shift.id)}
+                        />
+                    )
+                )}
             </GenericCssGrid>
         </OverflowHelper>
     );
@@ -138,3 +164,6 @@ enum ADDITIONAL_FIELDS {
     DateAnnotation = "DateAnnotation",
     ItemAnnotation = "ItemAnnotation",
 }
+
+const getKey = (day: Date | number, itemId: number) =>
+    `${DateFns.format(day, TIME_FORMAT)}|${itemId}`;

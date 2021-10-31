@@ -20,7 +20,10 @@ import PotentialNewItem from "./items/PotentialNewItem";
 import HourItem from "./items/HourItem";
 import DayItem from "./items/DayItem";
 import DispatchBatcherProvider from "../../dispatchBatcher/DispatchBatcherProvider";
-import { SecondIndexHandler } from "../SecondIndexHandler";
+import {
+    SecondIndexHandler,
+    SingleShiftItemComponent,
+} from "../SecondIndexHandler";
 import OverflowHelper from "../OverflowHelper";
 
 export interface Props<Item> {
@@ -106,6 +109,8 @@ const PlannerGridByHours = <Item extends Role | Employee>({
 
     const shifts = useSelector(shiftSelector);
 
+    const CastedComponent = ItemComponent as SingleShiftItemComponent;
+
     return (
         <OverflowHelper>
             <DispatchBatcherProvider timeout={30}>
@@ -148,7 +153,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                     ))}
                     {emptyItems}
                     {shifts.map((shift) => (
-                        <ItemComponent
+                        <CastedComponent
                             key={`${secondIndexType}-${shift.id}`}
                             shiftId={shift.id}
                         />

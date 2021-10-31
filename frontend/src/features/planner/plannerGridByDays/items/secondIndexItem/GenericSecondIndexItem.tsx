@@ -50,7 +50,7 @@ const GenericSecondIndexItem = <SecondIndex extends Role | Employee>({
     );
 
     return (
-        <Stack style={{ gridArea }} spacing={1} direction="row">
+        <Stack style={{ gridArea }} spacing="3px" direction="row">
             {shifts.map((shift) => (
                 <GenericSecondIndexItemPartial
                     key={shift.id}
@@ -93,7 +93,7 @@ const GenericSecondIndexItemPartial = <SecondIndex extends Role | Employee>({
 
     return (
         <SecondIndexItemDiv>
-            <Typography sx={{ p: 1 }}>
+            <Typography sx={{ p: 1 }} noWrap>
                 {getNodeDesc(employee, role)}
                 <br />
                 {format(Date.parse(shift.time_from), "HH:mm")}
