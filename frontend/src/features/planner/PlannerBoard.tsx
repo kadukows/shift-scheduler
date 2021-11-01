@@ -48,7 +48,7 @@ const PlannerBoard = ({ schedule }: Props) => {
         SECOND_INDEX.Employee
     );
     const [timeGrouping, setTimeGrouping] = React.useState<TIME_GROUPING>(
-        TIME_GROUPING.ByHours
+        TIME_GROUPING.ByDays
     );
 
     //

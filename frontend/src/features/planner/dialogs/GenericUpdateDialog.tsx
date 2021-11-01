@@ -8,7 +8,7 @@ import {
     DialogContent,
     DialogTitle,
 } from "@mui/material";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector, useDispatch, batch } from "react-redux";
 import { format } from "date-fns";
 
 import {
@@ -131,28 +131,40 @@ const GenericSetDialog = <Item extends { id: number }>({
 
         const { id, ...changes } = response.data;
 
-        dispatch(
-            updateShift({
-                id,
-                changes: { ...changes },
-            })
-        );
-        dispatch(updateDialogSet({ open: false }));
+        batch(() => {
+            dispatch(
+                updateShift({
+                    id,
+                    changes: { ...changes },
+                })
+            );
+            dispatch(updateDialogSet({ open: false }));
+            dispatch(
+                addAlert({
+                    type: "success",
+                    message: `Successfully update shift: ${id}`,
+                })
+            );
+        });
     };
 
     const deleteOnClick = async () => {
         dispatch(updateDialogSet({ open: false }));
+
         await axios.delete(
             `/api/shift/${shift.id}/`,
             getTokenRequestConfig(token)
         );
-        dispatch(removeShift(shift.id));
-        dispatch(
-            addAlert({
-                type: "info",
-                message: `Sucessfully deleted shift: ${shift.id}`,
-            })
-        );
+
+        batch(() => {
+            dispatch(removeShift(shift.id));
+            dispatch(
+                addAlert({
+                    type: "info",
+                    message: `Sucessfully deleted shift: ${shift.id}`,
+                })
+            );
+        });
     };
 
     const defaultValues: any = shift

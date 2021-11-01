@@ -1,6 +1,6 @@
 import * as React from "react";
 import { Typography, Stack } from "@mui/material";
-import { useSelector } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { format, compareAsc } from "date-fns";
 import { RootState } from "../../../../../store";
 import {
@@ -12,6 +12,7 @@ import { Role, roleSelectors } from "../../../../roles/rolesSlice";
 import { shiftSelectors } from "../../../../shifts/shiftSlice";
 import { SecondIndexItemDiv } from "../Divs";
 import { createSelector } from "@reduxjs/toolkit";
+import { set as updateDialogSet } from "../../../dialogs/updateDialogSlice";
 
 interface BaseProps<SecondIndex> {
     getSecondIndex: (employee: Employee, role: Role) => SecondIndex;
@@ -91,8 +92,19 @@ const GenericSecondIndexItemPartial = <SecondIndex extends Role | Employee>({
         employeeSelectors.selectById(state, shift.employee)
     );
 
+    const dispatch = useDispatch();
+
     return (
-        <SecondIndexItemDiv>
+        <SecondIndexItemDiv
+            onClick={() =>
+                dispatch(
+                    updateDialogSet({
+                        open: true,
+                        shiftId,
+                    })
+                )
+            }
+        >
             <Typography sx={{ p: 1 }} noWrap>
                 {getNodeDesc(employee, role)}
                 <br />

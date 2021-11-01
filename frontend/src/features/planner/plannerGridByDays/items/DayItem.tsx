@@ -16,7 +16,7 @@ const DayItem = ({ day, row }: Props) => {
     });
 
     return (
-        <Paper style={{ gridArea }}>
+        <Paper style={{ gridArea }} elevation={4}>
             <Typography sx={{ p: 2 }} align="center">
                 {format(day, "yyyy-MM-dd")}
                 <br />

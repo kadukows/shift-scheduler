@@ -36,7 +36,8 @@ const PlannerGridByDays = <Item extends Role | Employee>({
         getItemIdFromShift,
     },
     shiftSelector,
-}: Props<Item>) => {
+    children,
+}: React.PropsWithChildren<Props<Item>>) => {
     const days = React.useMemo(
         () => DateFns.eachDayOfInterval(timeRange),
         [
@@ -110,45 +111,48 @@ const PlannerGridByDays = <Item extends Role | Employee>({
     const CastedComponent = ItemComponent as MultipleShiftItemComponent;
 
     return (
-        <OverflowHelper>
-            <GenericCssGrid<Date, Item>
-                {...genericCssGridProps}
-                style={{
-                    gap: "3px",
-                    margin: 8,
-                    padding: 8,
-                }}
-            >
-                {days.map((day) => (
-                    <DayItem
-                        day={day}
-                        row={ADDITIONAL_FIELDS.DateAnnotation}
-                        key={day.getTime()}
-                    />
-                ))}
-                {items.map((item) => (
-                    <DefaultRowItemOnGrid<Item>
-                        xStart={ADDITIONAL_FIELDS.ItemAnnotation}
-                        yStart={item}
-                        key={item.id}
-                    >
-                        <Typography align="center" sx={{ p: 2 }}>
-                            {itemToString(item)}
-                        </Typography>
-                    </DefaultRowItemOnGrid>
-                ))}
-                {dayItemShiftsArray.map(({ day, item, shifts }) =>
-                    shifts.length === 0 ? (
-                        <React.Fragment key={getKey(day, item.id)} />
-                    ) : (
-                        <CastedComponent
-                            key={shifts[0].id}
-                            shiftsIds={shifts.map((shift) => shift.id)}
+        <React.Fragment>
+            {children}
+            <OverflowHelper>
+                <GenericCssGrid<Date, Item>
+                    {...genericCssGridProps}
+                    style={{
+                        gap: "3px",
+                        margin: 8,
+                        padding: 8,
+                    }}
+                >
+                    {days.map((day) => (
+                        <DayItem
+                            day={day}
+                            row={ADDITIONAL_FIELDS.DateAnnotation}
+                            key={day.getTime()}
                         />
-                    )
-                )}
-            </GenericCssGrid>
-        </OverflowHelper>
+                    ))}
+                    {items.map((item) => (
+                        <DefaultRowItemOnGrid<Item>
+                            xStart={ADDITIONAL_FIELDS.ItemAnnotation}
+                            yStart={item}
+                            key={item.id}
+                        >
+                            <Typography align="center" sx={{ p: 2 }}>
+                                {itemToString(item)}
+                            </Typography>
+                        </DefaultRowItemOnGrid>
+                    ))}
+                    {dayItemShiftsArray.map(({ day, item, shifts }) =>
+                        shifts.length === 0 ? (
+                            <React.Fragment key={getKey(day, item.id)} />
+                        ) : (
+                            <CastedComponent
+                                key={shifts[0].id}
+                                shiftsIds={shifts.map((shift) => shift.id)}
+                            />
+                        )
+                    )}
+                </GenericCssGrid>
+            </OverflowHelper>
+        </React.Fragment>
     );
 };
 
