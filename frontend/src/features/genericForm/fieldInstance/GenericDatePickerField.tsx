@@ -5,14 +5,20 @@ import { DateTimePicker, DatePicker } from "@mui/lab";
 import { TextField } from "@mui/material";
 //import { TIME_FORMAT } from "../../helpers";
 
+type BaseProps =
+    | React.ComponentProps<typeof DateTimePicker>
+    | React.ComponentProps<typeof DatePicker>;
+
 interface Props<Inputs> {
     PickerComponent: typeof DateTimePicker | typeof DatePicker;
+    PickerComponentProps: Partial<BaseProps>;
     field: DatePickerFieldData<Inputs>;
     control: Control<Inputs>;
 }
 
 const GenericDatePickerField = <Inputs extends unknown>({
     PickerComponent,
+    PickerComponentProps,
     field,
     control,
 }: Props<Inputs>) => {
@@ -22,17 +28,15 @@ const GenericDatePickerField = <Inputs extends unknown>({
             // @ts-expect-error
             name={field.name}
             render={({
-                field: { onChange, value },
+                field: { ref, ...inputProps },
                 fieldState: { invalid, error },
             }) => (
                 <PickerComponent
                     // @ts-expect-error
                     views={field.views}
-                    value={value}
-                    onChange={onChange}
-                    inputFormat={field.inputFormat ?? TIME_FORMAT}
-                    ampm={false}
-                    ampmInClock={false}
+                    inputRef={ref}
+                    {...inputProps}
+                    {...PickerComponentProps}
                     renderInput={(props) => (
                         <TextField
                             {...props}

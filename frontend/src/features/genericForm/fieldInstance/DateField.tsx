@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as yup from "yup";
-import { DatePicker } from "@mui/lab";
+import DatePicker from "@mui/lab/DatePicker";
 import { Control } from "react-hook-form";
 
 import { BaseFieldProps } from "./BaseFieldProps";
@@ -41,6 +41,9 @@ const DateField = <Inputs extends unknown>({
             field={field}
             control={control}
             PickerComponent={DatePicker}
+            PickerComponentProps={{
+                inputFormat: "MM/yyyy",
+            }}
         />
     );
 };

@@ -36,6 +36,11 @@ const DateTimeField = <Inputs extends unknown>({
             field={field}
             control={control}
             PickerComponent={DateTimePicker}
+            PickerComponentProps={{
+                ampm: false,
+                ampmInClock: false,
+                inputFormat: "dd/MM/yyyy HH:mm",
+            }}
         />
     );
 };
