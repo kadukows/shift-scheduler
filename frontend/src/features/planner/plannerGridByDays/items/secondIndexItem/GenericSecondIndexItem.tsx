@@ -13,6 +13,7 @@ import { shiftSelectors } from "../../../../shifts/shiftSlice";
 import { SecondIndexItemDiv } from "../Divs";
 import { createSelector } from "@reduxjs/toolkit";
 import { set as updateDialogSet } from "../../../dialogs/updateDialogSlice";
+import { set as addDialogSet } from "../../../dialogs/addDialogSlice";
 
 interface BaseProps<SecondIndex> {
     getSecondIndex: (employee: Employee, role: Role) => SecondIndex;
@@ -96,14 +97,26 @@ const GenericSecondIndexItemPartial = <SecondIndex extends Role | Employee>({
 
     return (
         <SecondIndexItemDiv
-            onClick={() =>
-                dispatch(
-                    updateDialogSet({
-                        open: true,
-                        shiftId,
-                    })
-                )
-            }
+            onClick={(e) => {
+                if (e.altKey) {
+                    dispatch(
+                        addDialogSet({
+                            open: true,
+                            start: Date.parse(shift.time_from),
+                            end: Date.parse(shift.time_to),
+                            secondIndexItemId: getSecondIndex(employee, role)
+                                .id,
+                        })
+                    );
+                } else {
+                    dispatch(
+                        updateDialogSet({
+                            open: true,
+                            shiftId,
+                        })
+                    );
+                }
+            }}
         >
             <Typography sx={{ p: 1 }} noWrap>
                 {getNodeDesc(employee, role)}

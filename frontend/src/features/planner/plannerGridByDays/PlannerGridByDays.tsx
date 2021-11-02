@@ -106,6 +106,7 @@ const PlannerGridByDays = <Item extends Role | Employee>({
         DateFns.getUnixTime(timeRange.end),
         itemSelector,
         shiftSelector,
+        shifts.length,
     ]);
 
     const CastedComponent = ItemComponent as MultipleShiftItemComponent;
@@ -142,7 +143,11 @@ const PlannerGridByDays = <Item extends Role | Employee>({
                     ))}
                     {dayItemShiftsArray.map(({ day, item, shifts }) =>
                         shifts.length === 0 ? (
-                            <React.Fragment key={getKey(day, item.id)} />
+                            <EmptyItem
+                                key={getKey(day, item.id)}
+                                day={day}
+                                itemId={item.id}
+                            />
                         ) : (
                             <CastedComponent
                                 key={shifts[0].id}

@@ -3,6 +3,7 @@ import * as yup from "yup";
 import { Controller, Control } from "react-hook-form";
 import { DateTimePicker, DatePicker } from "@mui/lab";
 import { TextField } from "@mui/material";
+//import { TIME_FORMAT } from "../../helpers";
 
 interface Props<Inputs> {
     PickerComponent: typeof DateTimePicker | typeof DatePicker;
@@ -29,7 +30,8 @@ const GenericDatePickerField = <Inputs extends unknown>({
                     views={field.views}
                     value={value}
                     onChange={onChange}
-                    ampm={false}
+                    inputFormat={field.inputFormat ?? TIME_FORMAT}
+                    //ampm={false}
                     renderInput={(props) => (
                         <TextField
                             {...props}
@@ -62,4 +64,8 @@ export interface DatePickerFieldData<Inputs> {
     views:
         | React.ComponentProps<typeof DatePicker>["views"]
         | React.ComponentProps<typeof DateTimePicker>["views"];
+    inputFormat?: string;
 }
+
+// export const TIME_FORMAT = "yyyy-MM-dd'T'HH:mmX";
+const TIME_FORMAT = "dd/MM/yyyy HH:mm";

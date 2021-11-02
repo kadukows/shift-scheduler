@@ -151,7 +151,7 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
                 style={style}
                 onDragStart={() => startBatching(batchingContext, dispatch)}
             >
-                <Typography>
+                <Typography noWrap>
                     {getNodeDesc(employee, role)}
                     <br />
                     {format(Date.parse(shift.time_from), "HH:mm")}
