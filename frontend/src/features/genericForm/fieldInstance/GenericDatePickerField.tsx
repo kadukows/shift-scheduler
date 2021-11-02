@@ -31,7 +31,8 @@ const GenericDatePickerField = <Inputs extends unknown>({
                     value={value}
                     onChange={onChange}
                     inputFormat={field.inputFormat ?? TIME_FORMAT}
-                    //ampm={false}
+                    ampm={false}
+                    ampmInClock={false}
                     renderInput={(props) => (
                         <TextField
                             {...props}

@@ -17,6 +17,7 @@ import GenericCssGrid, {
     DefaultRowItemOnGrid,
 } from "../../genericCssGrid/GenericCssGrid";
 import DayItem from "./items/DayItem";
+import GridItemsFactory from "./items/GridItemsFactory";
 
 interface Props<Item> {
     timeRange: DateFns.Interval;
@@ -49,7 +50,7 @@ const PlannerGridByDays = <Item extends Role | Employee>({
     const items = useSelector(itemSelector);
     const shifts = useSelector(shiftSelector);
 
-    const { dayItemShiftsArray, genericCssGridProps } = React.useMemo(() => {
+    const { genericCssGridProps } = React.useMemo(() => {
         const shiftGroupMap = new Map<string, Shift[]>();
 
         for (const shift of shifts) {
@@ -100,16 +101,34 @@ const PlannerGridByDays = <Item extends Role | Employee>({
             additionalCols: [ADDITIONAL_FIELDS.ItemAnnotation],
         };
 
-        return { dayItemShiftsArray, genericCssGridProps };
+        return {
+            dayItems: dayItemShiftsArray.map(({ day, item, ...rest }) => ({
+                day,
+                item,
+            })),
+            genericCssGridProps,
+        };
     }, [
         DateFns.getUnixTime(timeRange.start),
         DateFns.getUnixTime(timeRange.end),
         itemSelector,
-        shiftSelector,
-        shifts.length,
     ]);
 
-    const CastedComponent = ItemComponent as MultipleShiftItemComponent;
+    const gridItems: JSX.Element[] = [];
+
+    for (const day of days) {
+        for (const item of items) {
+            gridItems.push(
+                <GridItemsFactory
+                    day={day}
+                    itemId={item.id}
+                    ItemComponent={ItemComponent as MultipleShiftItemComponent}
+                    getItemIdFromShift={getItemIdFromShift}
+                    key={getKey(day, item.id)}
+                />
+            );
+        }
+    }
 
     return (
         <React.Fragment>
@@ -141,7 +160,7 @@ const PlannerGridByDays = <Item extends Role | Employee>({
                             </Typography>
                         </DefaultRowItemOnGrid>
                     ))}
-                    {dayItemShiftsArray.map(({ day, item, shifts }) =>
+                    {/*dayItemShiftsArray.map(({ day, item, shifts }) =>
                         shifts.length === 0 ? (
                             <EmptyItem
                                 key={getKey(day, item.id)}
@@ -154,7 +173,8 @@ const PlannerGridByDays = <Item extends Role | Employee>({
                                 shiftsIds={shifts.map((shift) => shift.id)}
                             />
                         )
-                    )}
+                        )*/}
+                    {gridItems}
                 </GenericCssGrid>
             </OverflowHelper>
         </React.Fragment>

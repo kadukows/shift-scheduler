@@ -9,16 +9,21 @@ export enum SECOND_INDEX {
 export type SingleShiftItemComponent = React.FunctionComponent<{
     shiftId: number;
 }>;
+
 export type MultipleShiftItemComponent = React.FunctionComponent<{
     shiftsIds: number[];
 }>;
+
+export type ItemComponentType =
+    | SingleShiftItemComponent
+    | MultipleShiftItemComponent;
 
 export interface SecondIndexHandler<Item> {
     itemSelector: (state: RootState) => Item[];
     getId: (item: Item) => number;
     secondIndexType: SECOND_INDEX;
     itemToString: (item: Item) => string;
-    ItemComponent: SingleShiftItemComponent | MultipleShiftItemComponent;
+    ItemComponent: ItemComponentType;
     getShiftComplementaryFromItemId: (itemId: number) => Partial<Shift>;
     getItemIdFromShift: (shift: Shift) => number;
 }
