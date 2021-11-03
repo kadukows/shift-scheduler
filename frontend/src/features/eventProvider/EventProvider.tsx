@@ -48,13 +48,18 @@ export default EventProvider;
 
 export const useSignal = (event: string) => {
     const { eventToCallbacks } = React.useContext(EventContext);
+    const result = React.useMemo(
+        () =>
+            (...args: any[]) => {
+                for (const callback of eventToCallbacks[event]) {
+                    callback(...args);
+                }
+            },
+        [eventToCallbacks, event]
+    );
 
     if (event in eventToCallbacks) {
-        return (...args: any[]) => {
-            for (const callback of eventToCallbacks[event]) {
-                callback(...args);
-            }
-        };
+        return result;
     } else {
         console.warn("useSignal(): event unknown: ", event);
         return (...args: any[]) => {};

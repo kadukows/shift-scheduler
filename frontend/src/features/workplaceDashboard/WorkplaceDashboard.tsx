@@ -1,14 +1,16 @@
 import * as React from "react";
-import { Stack } from "@mui/material";
+import { Stack, Grid } from "@mui/material";
 import RoleWidget from "./roles";
 
 interface Props {}
 
 const WorkplaceDashboard = (props: Props) => {
     return (
-        <Stack spacing={3}>
-            <RoleWidget />
-        </Stack>
+        <Grid container spacing={2}>
+            <Grid item md={5} sm={12}>
+                <RoleWidget />
+            </Grid>
+        </Grid>
     );
 };
 

@@ -10,6 +10,9 @@ import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { rolesByWorkplaceSelector } from "./RoleByWorkplaceSelector";
+import { useSignal } from "../../eventProvider/EventProvider";
+import { CallbackTypes, EventTypes } from "./EventTypes";
+import { Role } from "../../roles/rolesSlice";
 
 interface Props {}
 
@@ -19,8 +22,39 @@ const RoleDataGrid = (props: Props) => {
         rolesByWorkplaceSelector(state, workplaceId)
     );
 
+    const signalUpdate: CallbackTypes.ROLE_UPDATE = useSignal(
+        EventTypes.ROLE_UPDATE
+    );
+
+    const columnDefs = React.useMemo(
+        () => [
+            {
+                field: "id",
+                headerName: "#",
+                type: "number",
+            },
+            {
+                field: "name",
+                headerName: "Name",
+                flex: 5,
+            },
+            {
+                field: "actions",
+                type: "actions",
+                getActions: (params: GridRowParams<Role>) => [
+                    <GridActionsCellItem
+                        icon={<EditIcon />}
+                        label="Edit"
+                        onClick={() => signalUpdate({ roleId: params.row.id })}
+                    />,
+                ],
+            },
+        ],
+        [signalUpdate]
+    );
+
     return (
-        <div style={{ height: 300, width: "100%" }}>
+        <div style={{ height: 500, width: "100%" }}>
             <DataGrid columns={columnDefs} rows={roles} />
         </div>
     );
@@ -31,27 +65,3 @@ export default RoleDataGrid;
 /**
  *
  */
-
-const columnDefs = [
-    {
-        field: "id",
-        headerName: "#",
-        type: "number",
-    },
-    {
-        field: "name",
-        headerName: "Name",
-        flex: 5,
-    },
-    {
-        field: "actions",
-        type: "actions",
-        getActions: (params: GridRowParams) => [
-            <GridActionsCellItem
-                icon={<EditIcon />}
-                label="Edit"
-                onClick={() => alert(`Clicked edit on role: ${params.row.id}`)}
-            />,
-        ],
-    },
-];

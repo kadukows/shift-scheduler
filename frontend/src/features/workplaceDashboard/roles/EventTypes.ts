@@ -1,7 +1,6 @@
 export enum EventTypes {
     ROLE_ADD = "ROLE_ADD",
     ROLE_UPDATE = "ROLE_UPDATE",
-    ROLE_DELETION = "ROLE_DELETION",
 }
 
 export namespace CallbackTypes {
@@ -10,4 +9,5 @@ export namespace CallbackTypes {
     }
 
     export type ROLE_UPDATE = (a: ROLE_UPDATE_ARG_TYPE) => void;
+    export type ROLE_ADD = () => void;
 }

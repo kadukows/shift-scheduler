@@ -14,7 +14,13 @@ import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { getTokenRequestConfig } from "../../helpers";
-import { Role, roleSelectors, updateRole } from "../../roles/rolesSlice";
+import {
+    addRole,
+    removeRole,
+    Role,
+    roleSelectors,
+    updateRole,
+} from "../../roles/rolesSlice";
 import { addAlert } from "../../alerts/alertsSlice";
 import { EventTypes, CallbackTypes } from "./EventTypes";
 import { useSlot } from "../../eventProvider/EventProvider";
@@ -23,7 +29,7 @@ import GenericForm from "../../genericForm/GenericForm";
 
 interface Props {}
 
-const UpdateRoleDialog = (props: Props) => {
+export const UpdateRoleDialog = (props: Props) => {
     const [open, setOpen] = React.useState(false);
     const [roleId, setRoleId] = React.useState<number>(null);
 
@@ -45,7 +51,56 @@ const UpdateRoleDialog = (props: Props) => {
     );
 };
 
-export default UpdateRoleDialog;
+export const AddRoleDialog = (props: Props) => {
+    const [open, setOpen] = React.useState(false);
+    const workplaceId = useWorkplaceId();
+    const token = useSelector((state: RootState) => state.authReducer.token);
+    const dispatch = useDispatch();
+    useSlot(EventTypes.ROLE_ADD, () => setOpen(true), [setOpen]);
+
+    const submit = async ({ name }: Inputs) => {
+        const res = await axios.post<Role>(
+            `/api/role/`,
+            {
+                name,
+                workplace: workplaceId,
+            },
+            getTokenRequestConfig(token)
+        );
+
+        dispatch(addRole(res.data));
+
+        dispatch(
+            addAlert({
+                type: "info",
+                message: `Successfully added a role: ${res.data.id}`,
+            })
+        );
+
+        setOpen(false);
+    };
+
+    return (
+        <Dialog open={open} onClose={() => setOpen(false)}>
+            <DialogTitle>Add a Role</DialogTitle>
+            <DialogContent>
+                <GenericForm
+                    formId={FORM_ID_ADD_ROLE}
+                    fields={fields}
+                    submit={submit}
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button color="primary" onClick={() => setOpen(false)}>
+                    Close
+                </Button>
+                <Button color="primary" type="submit" form={FORM_ID}>
+                    Update
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+};
 
 /**
  *
@@ -88,10 +143,33 @@ const UpdateRoleDialogImpl = ({
         dispatch(
             addAlert({
                 type: "info",
-                message: `Successfully updated a shift: ${id}`,
+                message: `Successfully updated a role: ${id}`,
             })
         );
+
+        setOpen(false);
     };
+
+    const onDelete = React.useMemo(
+        () => async () => {
+            setOpen(false);
+
+            await axios.delete(
+                `/api/role/${role.id}/`,
+                getTokenRequestConfig(token)
+            );
+
+            dispatch(removeRole(role.id));
+
+            dispatch(
+                addAlert({
+                    type: "info",
+                    message: `Removed a role: ${role.id}`,
+                })
+            );
+        },
+        [role.id, token]
+    );
 
     const defaultValues = {
         name: role.name,
@@ -109,7 +187,10 @@ const UpdateRoleDialogImpl = ({
                 />
             </DialogContent>
             <DialogActions>
-                <Button color="secondary">Delete (NYI)</Button>
+                <Button color="secondary" onClick={onDelete}>
+                    Delete
+                </Button>
+
                 <div style={{ flex: 1 }} />
 
                 <Button color="primary" onClick={() => setOpen(false)}>
@@ -137,3 +218,4 @@ const fields: FieldData<Inputs, Workplace>[] = [
 ];
 
 const FORM_ID = "UPDATE_ROLE";
+const FORM_ID_ADD_ROLE = "ADD_ROLE";
