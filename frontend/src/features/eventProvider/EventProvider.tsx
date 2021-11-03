@@ -85,7 +85,7 @@ export const useSlot = (
         } else {
             console.warn("useSlot(): event unknown: ", event);
         }
-    }, depends);
+    }, [event, ...depends]);
 };
 
 /**
