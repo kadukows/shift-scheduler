@@ -1,15 +1,18 @@
 import * as React from "react";
-import { CircularProgress, Typography, Grid } from "@mui/material";
+import { CircularProgress, Typography, Grid, Skeleton } from "@mui/material";
 
 interface Props<SliceStateType> {
     useSlice: () => SliceStateType;
     precondition: (a: SliceStateType) => boolean;
+
+    SkeletonProps?: React.ComponentProps<typeof Skeleton>;
 }
 
 function Loader<SliceStateType>({
     useSlice,
     precondition,
     children,
+    SkeletonProps,
 }: React.PropsWithChildren<Props<SliceStateType>>) {
     const slice = useSlice();
 
@@ -21,13 +24,19 @@ function Loader<SliceStateType>({
                 justifyContent="center"
                 direction="column"
             >
-                <CircularProgress
-                    size="8rem"
-                    style={{ marginBottom: "3rem" }}
-                />
-                <Typography component="h4" variant="h4">
-                    Loading...
-                </Typography>
+                {SkeletonProps ? (
+                    <Skeleton {...SkeletonProps} />
+                ) : (
+                    <>
+                        <CircularProgress
+                            size="8rem"
+                            style={{ marginBottom: "3rem" }}
+                        />
+                        <Typography component="h4" variant="h4">
+                            Loading...
+                        </Typography>
+                    </>
+                )}
             </Grid>
         );
     }

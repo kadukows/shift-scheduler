@@ -10,7 +10,6 @@ import { store } from "./store";
 
 import DarkThemeProvider from "./features/darkThemeProvider/DarkThemeProvider";
 import Navbar from "./features/navbar/Navbar";
-//import AlertsList from "./features/alerts/AlertsList";
 import IndexPage from "./features/index/IndexPage";
 import LoginForm from "./features/login/LoginForm";
 import LogoutPage from "./features/auth/LogoutPage";
@@ -24,6 +23,8 @@ import DraggablePage from "./features/draggableOnMuiTable/DraggablePage";
 import PrivateRoute from "./features/auth/PrivateRote";
 import PlannerLoader from "./features/planner/PlannerLoader";
 import NotifierComponent from "./features/alerts/NotifierComponent";
+
+import WorkplaceDashboardPage from "./features/workplaceDashboard/WorkplacePage";
 
 const App = () => {
     return (
@@ -82,6 +83,12 @@ const App = () => {
                                                     path="/draggables"
                                                 >
                                                     <DraggablePage />
+                                                </PrivateRoute>
+                                                <PrivateRoute
+                                                    exact
+                                                    path="/workplaceDashboard/:workplaceId"
+                                                >
+                                                    <WorkplaceDashboardPage />
                                                 </PrivateRoute>
                                             </Switch>
                                         </Grid>

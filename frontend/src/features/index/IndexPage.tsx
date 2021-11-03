@@ -3,6 +3,7 @@ import { useDispatch } from "react-redux";
 import { Paper, Typography, Button, Grid } from "@mui/material";
 
 import { addAlert } from "../alerts/alertsSlice";
+import { useHistory } from "react-router-dom";
 
 const MyButton = (props: React.ComponentProps<typeof Button>) => (
     <Button color="primary" variant="contained" {...props} />
@@ -10,6 +11,7 @@ const MyButton = (props: React.ComponentProps<typeof Button>) => (
 
 const IndexPage = () => {
     const dispatch = useDispatch();
+    const history = useHistory();
 
     return (
         <Grid container justifyContent="center">
@@ -60,6 +62,16 @@ const IndexPage = () => {
                                     </MyButton>
                                 </Grid>
                             </Grid>
+                        </Grid>
+                        <Grid item>
+                            <Button
+                                variant="contained"
+                                onClick={() =>
+                                    history.push("/workplaceDashboard/2")
+                                }
+                            >
+                                Dashboard
+                            </Button>
                         </Grid>
                     </Grid>
                 </Paper>

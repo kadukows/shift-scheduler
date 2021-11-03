@@ -24,16 +24,12 @@ interface Props {
     objectToModify?: Schedule;
 }
 
-function parseDate(value: any, originalValue: string) {
-    return parse(originalValue, "MM.yyyy", new Date());
-}
-
 const fields: FieldData<Inputs, Workplace>[] = [
     {
         type: "date",
         name: "month_year",
         label: "Date",
-        validation: yup.string().required() as any,
+        validation: yup.date().required(),
         //
         views: ["month", "year"],
         format: "MM.yyyy",
