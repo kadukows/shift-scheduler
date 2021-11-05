@@ -94,8 +94,8 @@ export const AddRoleDialog = (props: Props) => {
                 <Button color="primary" onClick={() => setOpen(false)}>
                     Close
                 </Button>
-                <Button color="primary" type="submit" form={FORM_ID}>
-                    Update
+                <Button color="primary" type="submit" form={FORM_ID_ADD_ROLE}>
+                    Create
                 </Button>
             </DialogActions>
         </Dialog>
