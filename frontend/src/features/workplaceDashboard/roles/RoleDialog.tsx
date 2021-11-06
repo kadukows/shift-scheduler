@@ -48,24 +48,30 @@ const getItemId = (arg: CallbackTypes.ROLE_UPDATE_ARG_TYPE) => arg.roleId;
 const itemSelector = (roleId: number) => (state: RootState) =>
     roleSelectors.selectById(state, roleId);
 
-const submit: SubmitType<Inputs> =
-    (dispatch, workplaceId, token) =>
+const submit: SubmitType<Inputs, Role> =
+    (dispatch, item, token) =>
     async ({ name }: Inputs) => {
-        const res = await axios.post<Role>(
-            `/api/role/`,
+        const res = await axios.put<Role>(
+            `/api/role/${item.id}/`,
             {
                 name,
-                workplace: workplaceId,
+                workplace: item.workplace,
             },
             getTokenRequestConfig(token)
         );
 
-        dispatch(addRole(res.data));
+        const { id, ...rest } = res.data;
+        dispatch(
+            updateRole({
+                id,
+                changes: rest,
+            })
+        );
 
         dispatch(
             addAlert({
                 type: "info",
-                message: `Successfully added a role: ${res.data.id}`,
+                message: `Successfully update a role: ${res.data.id}`,
             })
         );
     };
