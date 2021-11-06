@@ -61,4 +61,9 @@ const StringField = <Inputs extends unknown>({
     );
 };
 
+StringField.whyDidYouRender = {
+    logOnDifferentValues: true,
+    customName: "StringField",
+};
+
 export default StringField;

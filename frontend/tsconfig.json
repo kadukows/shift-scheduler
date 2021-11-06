@@ -8,7 +8,6 @@
       "allowJs": true,
       "moduleResolution": "node",
       "downlevelIteration": true,
-      "isolatedModules": true
+      "isolatedModules": true,
     },
-    //"include": ["src"]
   }

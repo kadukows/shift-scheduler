@@ -4,35 +4,44 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
 import { useSignal } from "../../eventProvider/EventProvider";
 import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
+import { styled } from "@mui/material";
 
 interface Props<Item> {
     itemSelector: (workplaceId: number) => (state: RootState) => Item[];
     updateEvent: string;
-    makeColumnDefs: (signalFunc: SignalFuncType) => GridColDef[];
+    //makeColumnDefs: (signalFunc: SignalFuncType) => GridColDef[];
+    useColumnDefs: (signalFunc: SignalFuncType) => GridColDef[];
     //DivProps?: React.ComponentProps<"div">;
-    DivComponent: React.ComponentType<React.ComponentProps<"div">>;
+    //DivComponent: React.ComponentType<React.ComponentProps<"div">>;
+    //height: 350;
 }
+
+const MyDiv = styled("div")({
+    width: "100%",
+    height: 350,
+});
 
 const GenericDashboardDataGrid = <Item extends unknown>({
     itemSelector,
     updateEvent,
-    makeColumnDefs,
-    DivComponent,
+    useColumnDefs,
 }: React.PropsWithChildren<Props<Item>>) => {
     const workplaceId = useWorkplaceId();
     const items = useSelector(itemSelector(workplaceId));
     const updateSignal = useSignal(updateEvent);
 
-    const colDefs = React.useMemo(
-        () => makeColumnDefs(updateSignal),
-        [updateSignal, makeColumnDefs]
-    );
+    const colDefs = useColumnDefs(updateSignal);
 
     return (
-        <DivComponent>
+        <MyDiv>
             <DataGrid columns={colDefs} rows={items} />
-        </DivComponent>
+        </MyDiv>
     );
+};
+
+GenericDashboardDataGrid.whyDidYouRender = {
+    logOnDifferentValues: true,
+    customName: "GenericDashboardDataGrid",
 };
 
 export default GenericDashboardDataGrid;

@@ -39,7 +39,6 @@ export const UpdateRoleDialog = () => {
             getDefaultValues={getDefaultValues}
             title="Update Role"
             fields={fields}
-            formId="DASHBOARD_UPDATE_ROLE_FORM_ID"
         />
     );
 };

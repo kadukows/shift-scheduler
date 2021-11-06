@@ -34,7 +34,7 @@ interface GenericUpdateDialogBaseProps<Item, Inputs> {
     getDefaultValues: (item: Item) => any;
     title: string;
     fields: FieldData<Inputs, any>[];
-    formId: string;
+    formId?: string;
 }
 
 interface GenericUpdateDialogProps<CallbackArgType, Item, Inputs>
@@ -60,7 +60,6 @@ export const GenericUpdateDialog = <
     useSlot(
         eventType,
         (a: CallbackArgType) => {
-            console.log("hello");
             setItemId(getItemId(a));
             setOpen(true);
         },
@@ -118,6 +117,9 @@ const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
         [workplaceId, submit, dispatch, item, token, setOpen]
     );
 
+    const nanoIdRef = React.useRef<string>(nanoid());
+    const formIdProcessed = formId ?? nanoIdRef.current;
+
     return (
         <Dialog open={open} onClose={() => setOpen(false)}>
             <DialogTitle>{title}</DialogTitle>
@@ -125,7 +127,7 @@ const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
                 <GenericForm
                     submit={memoSubmit}
                     fields={fields}
-                    formId={FORM_ID}
+                    formId={formIdProcessed}
                     defaultValues={getDefaultValues(item)}
                 />
             </DialogContent>
@@ -138,7 +140,7 @@ const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
                 </Button>
                 <div style={{ flex: 1 }} />
                 <Button onClick={() => setOpen(false)}>Close</Button>
-                <Button type="submit" form={FORM_ID}>
+                <Button type="submit" form={formIdProcessed}>
                     Update
                 </Button>
             </DialogActions>

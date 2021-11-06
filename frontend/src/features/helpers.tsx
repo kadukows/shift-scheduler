@@ -135,3 +135,16 @@ export interface WithId {
 }
 
 export const TIME_FORMAT = "yyyy-MM-dd'T'HH:mmX";
+
+
+export const useEffectWithoutFirst = (effect: () => void, deps: React.DependencyList) => {
+    const isFirst = React.useRef(true);
+
+    React.useEffect(() => {
+        if (isFirst.current) {
+            isFirst.current = false;
+        } else {
+            effect();
+        }
+    }, deps);
+}
