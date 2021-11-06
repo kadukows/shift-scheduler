@@ -26,32 +26,70 @@ import { EventTypes, CallbackTypes } from "./EventTypes";
 import { useSlot } from "../../eventProvider/EventProvider";
 import { Shift } from "../../shifts/shiftSlice";
 import GenericForm from "../../genericForm/GenericForm";
+import { GenericUpdateDialog, SubmitType, OnDeleteType } from "../generics";
 
-interface Props {}
-
-export const UpdateRoleDialog = (props: Props) => {
-    const [open, setOpen] = React.useState(false);
-    const [roleId, setRoleId] = React.useState<number>(null);
-
-    const updateRoleCallback: CallbackTypes.ROLE_UPDATE = ({ roleId }) => {
-        setRoleId(roleId);
-        setOpen(true);
-    };
-
-    useSlot(EventTypes.ROLE_UPDATE, updateRoleCallback, [setRoleId, setOpen]);
-
-    const role = useSelector((state: RootState) =>
-        roleSelectors.selectById(state, roleId)
-    );
-
-    return role ? (
-        <UpdateRoleDialogImpl role={role} open={open} setOpen={setOpen} />
-    ) : (
-        <React.Fragment />
+export const UpdateRoleDialog = () => {
+    return (
+        <GenericUpdateDialog<CallbackTypes.ROLE_UPDATE_ARG_TYPE, Role, Inputs>
+            getItemId={getItemId}
+            itemSelector={itemSelector}
+            eventType={EventTypes.ROLE_UPDATE}
+            submit={submit}
+            onDelete={onDelete}
+            getDefaultValues={getDefaultValues}
+            title="Update Role"
+            fields={fields}
+        />
     );
 };
 
-export const AddRoleDialog = (props: Props) => {
+const getItemId = (arg: CallbackTypes.ROLE_UPDATE_ARG_TYPE) => arg.roleId;
+
+const itemSelector = (roleId: number) => (state: RootState) =>
+    roleSelectors.selectById(state, roleId);
+
+const submit: SubmitType<Inputs> =
+    (dispatch, workplaceId, token) =>
+    async ({ name }: Inputs) => {
+        const res = await axios.post<Role>(
+            `/api/role/`,
+            {
+                name,
+                workplace: workplaceId,
+            },
+            getTokenRequestConfig(token)
+        );
+
+        dispatch(addRole(res.data));
+
+        dispatch(
+            addAlert({
+                type: "info",
+                message: `Successfully added a role: ${res.data.id}`,
+            })
+        );
+    };
+
+const onDelete: OnDeleteType = async (dispatch, roleId, token) => {
+    await axios.delete(`/api/role/${roleId}/`, getTokenRequestConfig(token));
+
+    dispatch(removeRole(roleId));
+
+    dispatch(
+        addAlert({
+            type: "info",
+            message: `Removed a role: ${roleId}`,
+        })
+    );
+};
+
+const getDefaultValues = (role: Role) => ({ name: role.name });
+
+/**
+ *
+ */
+
+export const AddRoleDialog = () => {
     const [open, setOpen] = React.useState(false);
     const workplaceId = useWorkplaceId();
     const token = useSelector((state: RootState) => state.authReducer.token);

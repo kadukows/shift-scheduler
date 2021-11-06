@@ -28,34 +28,9 @@ const RoleWidget = (props: Props) => {
                     </div>
 
                     <GenericDashboardDataGrid
-                        itemSelector={(workplaceId) => (state) =>
-                            rolesByWorkplaceSelector(state, workplaceId)}
+                        itemSelector={itemSelector}
                         updateEvent={EventTypes.ROLE_UPDATE}
-                        makeColumnDefs={(signal: CallbackTypes.ROLE_UPDATE) => [
-                            {
-                                field: "id",
-                                headerName: "#",
-                                type: "number",
-                            },
-                            {
-                                field: "name",
-                                headerName: "Name",
-                                flex: 1,
-                            },
-                            {
-                                field: "actions",
-                                type: "actions",
-                                getActions: (params: GridRowParams<Role>) => [
-                                    <GridActionsCellItem
-                                        icon={<EditIcon />}
-                                        label="Edit"
-                                        onClick={() =>
-                                            signal({ roleId: params.row.id })
-                                        }
-                                    />,
-                                ],
-                            },
-                        ]}
+                        makeColumnDefs={makeColumnDefs}
                         DivProps={{
                             style: {
                                 height: 350,
@@ -83,3 +58,30 @@ const rolesByWorkplaceSelector = createSelector(
     (roles, workplaceId) =>
         roles.filter((role) => role.workplace === workplaceId)
 );
+
+const itemSelector = (workplaceId: number) => (state: RootState) =>
+    rolesByWorkplaceSelector(state, workplaceId);
+
+const makeColumnDefs = (signal: CallbackTypes.ROLE_UPDATE) => [
+    {
+        field: "id",
+        headerName: "#",
+        type: "number",
+    },
+    {
+        field: "name",
+        headerName: "Name",
+        flex: 1,
+    },
+    {
+        field: "actions",
+        type: "actions",
+        getActions: (params: GridRowParams<Role>) => [
+            <GridActionsCellItem
+                icon={<EditIcon />}
+                label="Edit"
+                onClick={() => signal({ roleId: params.row.id })}
+            />,
+        ],
+    },
+];

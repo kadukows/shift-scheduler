@@ -64,7 +64,7 @@ function GenericForm<Inputs, Entity extends WithId>({
         }
     };
 
-    let i = 0;
+    //let i = 0;
 
     const baseProps: BaseFieldProps<Inputs> = {
         register,
@@ -77,7 +77,7 @@ function GenericForm<Inputs, Entity extends WithId>({
             <form onSubmit={handleSubmit(onSubmit)} id={formId}>
                 <Stack spacing={2}>
                     {fields.map((field) => (
-                        <Item key={i++}>
+                        <Item key={field.name as string}>
                             <Field
                                 control={control}
                                 field={field}
@@ -92,7 +92,7 @@ function GenericForm<Inputs, Entity extends WithId>({
                     )}
                     {nonFieldErrors &&
                         nonFieldErrors.map((error) => (
-                            <Item key={i++}>
+                            <Item key={error}>
                                 <FormHelperText error>{error}</FormHelperText>
                             </Item>
                         ))}

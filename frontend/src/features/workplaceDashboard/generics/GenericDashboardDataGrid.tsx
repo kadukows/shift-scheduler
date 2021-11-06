@@ -24,7 +24,7 @@ const GenericDashboardDataGrid = <Item extends unknown>({
 
     const colDefs = React.useMemo(
         () => makeColumnDefs(updateSignal),
-        [updateSignal]
+        [updateSignal, makeColumnDefs]
     );
 
     return (

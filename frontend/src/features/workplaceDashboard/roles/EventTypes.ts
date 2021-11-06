@@ -4,7 +4,7 @@ export enum EventTypes {
 }
 
 export namespace CallbackTypes {
-    interface ROLE_UPDATE_ARG_TYPE {
+    export interface ROLE_UPDATE_ARG_TYPE {
         roleId: number;
     }
 
