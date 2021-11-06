@@ -18,16 +18,15 @@ module.exports = {
             {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
-                loader: "ts-loader",
-                options: {
-                    transpileOnly: true,
-                },
+                loader: "babel-loader",
             },
         ],
     },
     resolve: {
         extensions: [".js", ".ts", ".tsx", ".css"],
     },
-    plugins: [new ForkTsCheckerWebpackPlugin()],
+    plugins: [
+        //new ForkTsCheckerWebpackPlugin()
+    ],
     devtool: "inline-source-map",
 };
