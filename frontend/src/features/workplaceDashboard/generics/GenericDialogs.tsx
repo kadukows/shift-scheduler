@@ -16,9 +16,9 @@ import GenericForm from "../../genericForm/GenericForm";
 
 type DispatchType = ReturnType<typeof useDispatch>;
 
-export type SubmitType<Inputs> = (
+export type SubmitType<Inputs, Item> = (
     dispatch: DispatchType,
-    workplaceId: number,
+    item: Item,
     token: string
 ) => (inputs: Inputs) => void;
 
@@ -29,7 +29,7 @@ export type OnDeleteType = (
 ) => void;
 
 interface GenericUpdateDialogBaseProps<Item, Inputs> {
-    submit: SubmitType<Inputs>;
+    submit: SubmitType<Inputs, Item>;
     onDelete: OnDeleteType;
     getDefaultValues: (item: Item) => any;
     title: string;
@@ -115,11 +115,7 @@ const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
             <DialogContent>
                 <GenericForm
                     submit={async (inputs: Inputs) => {
-                        const asyncSubmit = submit(
-                            dispatch,
-                            workplaceId,
-                            token
-                        );
+                        const asyncSubmit = submit(dispatch, item, token);
                         await asyncSubmit(inputs);
                         setOpen(false);
                     }}

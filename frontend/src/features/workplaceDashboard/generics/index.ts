@@ -6,10 +6,6 @@ import {
     OnDeleteType,
 } from "./GenericDialogs";
 
-export {
-    GenericDashboardDataGrid,
-    GenericAddButton,
-    GenericUpdateDialog,
-    SubmitType,
-    OnDeleteType,
-};
+export { GenericDashboardDataGrid, GenericAddButton, GenericUpdateDialog };
+
+export type { SubmitType, OnDeleteType };
