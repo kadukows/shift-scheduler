@@ -26,7 +26,15 @@ module.exports = {
         extensions: [".js", ".ts", ".tsx", ".css"],
     },
     plugins: [
-        //new ForkTsCheckerWebpackPlugin()
+        new ForkTsCheckerWebpackPlugin({
+            typescript: {
+                diagnosticOptions: {
+                    semantic: true,
+                    syntactic: true,
+                },
+                mode: "write-references",
+            },
+        }),
     ],
     devtool: "inline-source-map",
 };
