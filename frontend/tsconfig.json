@@ -1,17 +1,17 @@
 {
-    "compilerOptions": {
-      "outDir": "./dist/",
-      "noImplicitAny": true,
-      "module": "es6",
-      "target": "esnext",
-      "jsx": "react",
-      "allowJs": true,
-      "moduleResolution": "node",
-      "downlevelIteration": true,
-      "noEmit": true,
-      "isolatedModules": true
-    },
-    "include": [
-      "src"
-    ]
-  }
+  "compilerOptions": {
+    "outDir": "./dist/",
+    "noImplicitAny": true,
+    "module": "es6",
+    "target": "esnext",
+    "jsx": "react",
+    "allowJs": true,
+    "moduleResolution": "node",
+    "downlevelIteration": true,
+    "noEmit": true,
+    "isolatedModules": true
+  },
+  "include": [
+    "src"
+  ],
+}

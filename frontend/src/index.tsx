@@ -5,4 +5,11 @@ import "regenerator-runtime/runtime";
 
 import App from "./App";
 
-render(<App />, document.querySelector("#root"));
+const unused = "seomthing";
+
+render(
+    <React.StrictMode>
+        <App />
+    </React.StrictMode>,
+    document.querySelector("#root")
+);
