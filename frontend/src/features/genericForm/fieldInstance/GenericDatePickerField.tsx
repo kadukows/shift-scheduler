@@ -43,7 +43,7 @@ const GenericDatePickerField = <Inputs extends unknown>({
                             fullWidth
                             label={field.label}
                             error={invalid}
-                            // @ts-expect-error
+                            // @ts-ignore
                             helperText={error?.message}
                         />
                     )}
