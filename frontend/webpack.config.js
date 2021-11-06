@@ -15,6 +15,7 @@ module.exports = {
                 test: /\.css$/,
                 use: ["style-loader", "css-loader"],
             },
+            /*
             {
                 test: /\.tsx?$/,
                 exclude: /node_modules/,
@@ -22,6 +23,12 @@ module.exports = {
                 options: {
                     transpileOnly: true,
                 },
+            },
+            */
+            {
+                test: /\.[jt]sx?$/,
+                exclude: /node_modules/,
+                loader: "babel-loader",
             },
         ],
     },
