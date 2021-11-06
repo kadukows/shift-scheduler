@@ -34,7 +34,7 @@ interface GenericUpdateDialogBaseProps<Item, Inputs> {
     getDefaultValues: (item: Item) => any;
     title: string;
     fields: FieldData<Inputs, any>[];
-    formId?: string;
+    formId: string;
 }
 
 interface GenericUpdateDialogProps<CallbackArgType, Item, Inputs>
@@ -92,6 +92,8 @@ interface GenericUpdateDialogImplProps<Item, Inputs>
     setOpen: (a: boolean) => void;
 }
 
+const FORM_ID = "GHAGIUH324Y83294YH";
+
 const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
     item,
     submit,
@@ -107,20 +109,23 @@ const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
     const token = useSelector((state: RootState) => state.authReducer.token);
     const dispatch = useDispatch();
 
-    const formIdMemo = React.useMemo(() => formId ?? nanoid(), [formId]);
+    const memoSubmit = React.useMemo(
+        () => async (inputs: Inputs) => {
+            const asyncSubmit = submit(dispatch, item, token);
+            await asyncSubmit(inputs);
+            setOpen(false);
+        },
+        [workplaceId, submit, dispatch, item, token, setOpen]
+    );
 
     return (
         <Dialog open={open} onClose={() => setOpen(false)}>
             <DialogTitle>{title}</DialogTitle>
             <DialogContent>
                 <GenericForm
-                    submit={async (inputs: Inputs) => {
-                        const asyncSubmit = submit(dispatch, item, token);
-                        await asyncSubmit(inputs);
-                        setOpen(false);
-                    }}
+                    submit={memoSubmit}
                     fields={fields}
-                    formId={formIdMemo}
+                    formId={FORM_ID}
                     defaultValues={getDefaultValues(item)}
                 />
             </DialogContent>
@@ -133,7 +138,7 @@ const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
                 </Button>
                 <div style={{ flex: 1 }} />
                 <Button onClick={() => setOpen(false)}>Close</Button>
-                <Button type="submit" form={formIdMemo}>
+                <Button type="submit" form={FORM_ID}>
                     Update
                 </Button>
             </DialogActions>

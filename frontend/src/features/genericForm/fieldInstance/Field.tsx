@@ -46,7 +46,9 @@ const Field = <Inputs, Entity extends WithId>({
     switch (field.type) {
         case "string":
             const stringField = field as StringFieldData<Inputs>;
-            return <StringField field={stringField} {...baseProps} />;
+            return (
+                <StringField<Inputs> field={stringField} control={control} />
+            );
 
         case "choose_object":
             const chooseObjectField = field as ChooseObjectIdFieldData<

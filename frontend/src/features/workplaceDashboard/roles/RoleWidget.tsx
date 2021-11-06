@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Typography, Paper, Stack, Button } from "@mui/material";
+import { Typography, Paper, Stack, styled } from "@mui/material";
 import { Person as PersonIcon, Edit as EditIcon } from "@mui/icons-material";
 import EventProvider from "../../eventProvider/EventProvider";
 import { CallbackTypes, EventTypes } from "./EventTypes";
@@ -31,12 +31,7 @@ const RoleWidget = (props: Props) => {
                         itemSelector={itemSelector}
                         updateEvent={EventTypes.ROLE_UPDATE}
                         makeColumnDefs={makeColumnDefs}
-                        DivProps={{
-                            style: {
-                                height: 350,
-                                width: "100%",
-                            },
-                        }}
+                        DivComponent={DivComponent}
                     />
                 </Stack>
             </Paper>
@@ -85,3 +80,8 @@ const makeColumnDefs = (signal: CallbackTypes.ROLE_UPDATE) => [
         ],
     },
 ];
+
+const DivComponent = styled("div")({
+    height: 350,
+    width: "100%",
+});

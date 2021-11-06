@@ -22,7 +22,7 @@ export interface DateTimeFieldData<Inputs> {
     views: DateTimePickerProps["views"];
 }
 
-interface Props<Inputs> extends BaseFieldProps<Inputs> {
+interface Props<Inputs> {
     field: DateTimeFieldData<Inputs>;
     control: Control<Inputs>;
 }

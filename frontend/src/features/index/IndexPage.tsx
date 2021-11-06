@@ -67,7 +67,7 @@ const IndexPage = () => {
                             <Button
                                 variant="contained"
                                 onClick={() =>
-                                    history.push("/workplaceDashboard/2")
+                                    history.push("/workplaceDashboard/1")
                                 }
                             >
                                 Dashboard

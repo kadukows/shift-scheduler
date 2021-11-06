@@ -9,14 +9,15 @@ interface Props<Item> {
     itemSelector: (workplaceId: number) => (state: RootState) => Item[];
     updateEvent: string;
     makeColumnDefs: (signalFunc: SignalFuncType) => GridColDef[];
-    DivProps?: React.ComponentProps<"div">;
+    //DivProps?: React.ComponentProps<"div">;
+    DivComponent: React.ComponentType<React.ComponentProps<"div">>;
 }
 
 const GenericDashboardDataGrid = <Item extends unknown>({
     itemSelector,
     updateEvent,
     makeColumnDefs,
-    DivProps,
+    DivComponent,
 }: React.PropsWithChildren<Props<Item>>) => {
     const workplaceId = useWorkplaceId();
     const items = useSelector(itemSelector(workplaceId));
@@ -28,9 +29,9 @@ const GenericDashboardDataGrid = <Item extends unknown>({
     );
 
     return (
-        <div {...DivProps}>
+        <DivComponent>
             <DataGrid columns={colDefs} rows={items} />
-        </div>
+        </DivComponent>
     );
 };
 

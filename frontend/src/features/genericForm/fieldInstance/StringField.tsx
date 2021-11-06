@@ -1,4 +1,6 @@
 import * as React from "react";
+import { TextField } from "@mui/material";
+import { Control, useController, Controller } from "react-hook-form";
 import { MyTextField, capitalize } from "../../helpers";
 import {
     StringYupValidationBuilderObject,
@@ -16,8 +18,9 @@ export interface StringFieldData<Inputs> {
     validation: StringYupValidationBuilderObject;
 }
 
-interface StringFieldProps<Inputs> extends BaseFieldProps<Inputs> {
+interface StringFieldProps<Inputs> {
     field: StringFieldData<Inputs>;
+    control: Control<Inputs>;
 }
 
 /**
@@ -25,11 +28,10 @@ interface StringFieldProps<Inputs> extends BaseFieldProps<Inputs> {
  */
 
 const StringField = <Inputs extends unknown>({
-    errors,
-    register,
-    isSubmitting,
     field,
+    control,
 }: StringFieldProps<Inputs>) => {
+    /*
     return (
         <MyTextField<Inputs>
             errors={errors}
@@ -37,6 +39,24 @@ const StringField = <Inputs extends unknown>({
             isSubmitting={isSubmitting}
             register={register}
             label={field.label ? field.label : capitalize(field.name as string)}
+        />
+    );
+    */
+    const {
+        field: { ref, onBlur, ...inputProps },
+        fieldState: { invalid, error },
+    } = useController({
+        name: field.name as any,
+        control,
+    });
+
+    return (
+        <TextField
+            {...inputProps}
+            inputRef={ref}
+            label={field.label ?? capitalize(field.name as any)}
+            error={invalid}
+            helperText={error?.message}
         />
     );
 };
