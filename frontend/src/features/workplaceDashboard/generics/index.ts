@@ -1,4 +1,6 @@
-import GenericDashboardDataGrid from "./GenericDashboardDataGrid";
+import GenericDashboardDataGrid, {
+    Props as GenericDashboardDataGridProps,
+} from "./GenericDashboardDataGrid";
 import GenericAddButton from "./GenericAddButton";
 import {
     GenericUpdateDialog,
@@ -23,4 +25,5 @@ export type {
     OnDeleteType,
     GenericAddDialogProps,
     GenericUpdateDialogProps,
+    GenericDashboardDataGridProps,
 };

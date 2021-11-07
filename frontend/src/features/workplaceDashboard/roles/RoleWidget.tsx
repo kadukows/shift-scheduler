@@ -38,8 +38,6 @@ const RoleWidget = (props: Props) => {
                     <GenericDashboardDataGrid
                         itemSelector={itemSelector}
                         updateEvent={EventTypes.ROLE_UPDATE}
-                        /*makeColumnDefs={makeColumnDefs}*/
-                        /*DivComponent={DivComponent}*/
                         useColumnDefs={useColumnDefs}
                     />
                 </Stack>

@@ -6,14 +6,10 @@ import { useSignal } from "../../eventProvider/EventProvider";
 import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 import { styled } from "@mui/material";
 
-interface Props<Item> {
+export interface Props<Item> {
     itemSelector: (workplaceId: number) => (state: RootState) => Item[];
     updateEvent: string;
-    //makeColumnDefs: (signalFunc: SignalFuncType) => GridColDef[];
     useColumnDefs: (signalFunc: SignalFuncType) => GridColDef[];
-    //DivProps?: React.ComponentProps<"div">;
-    //DivComponent: React.ComponentType<React.ComponentProps<"div">>;
-    //height: 350;
 }
 
 const MyDiv = styled("div")({

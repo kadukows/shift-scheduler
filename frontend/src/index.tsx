@@ -1,4 +1,4 @@
-import "./wdyr";
+//import "./wdyr";
 
 import "core-js/stable";
 import "regenerator-runtime/runtime";
