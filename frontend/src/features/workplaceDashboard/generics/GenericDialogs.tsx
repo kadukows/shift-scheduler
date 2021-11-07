@@ -16,9 +16,15 @@ import GenericForm from "../../genericForm/GenericForm";
 
 type DispatchType = ReturnType<typeof useDispatch>;
 
-export type SubmitType<Inputs, Item> = (
+export type SubmitUpdateType<Inputs, Item> = (
     dispatch: DispatchType,
     item: Item,
+    token: string
+) => (inputs: Inputs) => void;
+
+export type SubmitAddType<Inputs> = (
+    dispatch: DispatchType,
+    workplaceId: number,
     token: string
 ) => (inputs: Inputs) => void;
 
@@ -29,7 +35,7 @@ export type OnDeleteType = (
 ) => void;
 
 interface GenericUpdateDialogBaseProps<Item, Inputs> {
-    submit: SubmitType<Inputs, Item>;
+    submit: SubmitUpdateType<Inputs, Item>;
     onDelete: OnDeleteType;
     getDefaultValues: (item: Item) => any;
     title: string;
@@ -91,8 +97,6 @@ interface GenericUpdateDialogImplProps<Item, Inputs>
     setOpen: (a: boolean) => void;
 }
 
-const FORM_ID = "GHAGIUH324Y83294YH";
-
 const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
     item,
     submit,
@@ -108,13 +112,13 @@ const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
     const token = useSelector((state: RootState) => state.authReducer.token);
     const dispatch = useDispatch();
 
-    const memoSubmit = React.useMemo(
-        () => async (inputs: Inputs) => {
+    const memoSubmit = React.useCallback(
+        async (inputs: Inputs) => {
             const asyncSubmit = submit(dispatch, item, token);
             await asyncSubmit(inputs);
             setOpen(false);
         },
-        [workplaceId, submit, dispatch, item, token, setOpen]
+        [submit, dispatch, item, token, setOpen]
     );
 
     const nanoIdRef = React.useRef<string>(nanoid());
@@ -142,6 +146,66 @@ const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
                 <Button onClick={() => setOpen(false)}>Close</Button>
                 <Button type="submit" form={formIdProcessed}>
                     Update
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+};
+
+/**
+ *
+ *
+ *
+ */
+
+export interface GenericAddDialogProps<Inputs> {
+    submit: SubmitAddType<Inputs>;
+    addEvent: string;
+    formId?: string;
+    title: string;
+    fields: FieldData<Inputs, any>[];
+}
+
+export const GenericAddDialog = <Inputs, Item>({
+    submit,
+    addEvent,
+    formId,
+    title,
+    fields,
+}: GenericAddDialogProps<Inputs>) => {
+    const [open, setOpen] = React.useState(false);
+    const workplaceId = useWorkplaceId();
+    const token = useSelector((state: RootState) => state.authReducer.token);
+    const dispatch = useDispatch();
+
+    useSlot(addEvent, () => setOpen(true), []);
+
+    const nanoIdRef = React.useRef<string>(nanoid());
+    const formIdProcessed = formId ?? nanoIdRef.current;
+
+    const memoSubmit = React.useCallback(
+        async (inputs: Inputs) => {
+            const asyncSubmit = submit(dispatch, workplaceId, token);
+            await asyncSubmit(inputs);
+            setOpen(false);
+        },
+        [submit, dispatch, workplaceId, token, setOpen]
+    );
+
+    return (
+        <Dialog open={open} onClose={() => setOpen(false)}>
+            <DialogTitle>{title}</DialogTitle>
+            <DialogContent>
+                <GenericForm
+                    submit={memoSubmit}
+                    fields={fields}
+                    formId={formIdProcessed}
+                />
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => setOpen(false)}>Close</Button>
+                <Button type="submit" form={formIdProcessed}>
+                    Create
                 </Button>
             </DialogActions>
         </Dialog>

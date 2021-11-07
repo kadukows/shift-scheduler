@@ -26,7 +26,13 @@ import { EventTypes, CallbackTypes } from "./EventTypes";
 import { useSlot } from "../../eventProvider/EventProvider";
 import { Shift } from "../../shifts/shiftSlice";
 import GenericForm from "../../genericForm/GenericForm";
-import { GenericUpdateDialog, SubmitType, OnDeleteType } from "../generics";
+import {
+    GenericUpdateDialog,
+    SubmitUpdateType,
+    OnDeleteType,
+    GenericAddDialog,
+    GenericAddDialogProps,
+} from "../generics";
 
 export const UpdateRoleDialog = () => {
     return (
@@ -48,7 +54,7 @@ const getItemId = (arg: CallbackTypes.ROLE_UPDATE_ARG_TYPE) => arg.roleId;
 const itemSelector = (roleId: number) => (state: RootState) =>
     roleSelectors.selectById(state, roleId);
 
-const submit: SubmitType<Inputs, Role> =
+const submit: SubmitUpdateType<Inputs, Role> =
     (dispatch, item, token) =>
     async ({ name }: Inputs) => {
         const res = await axios.put<Role>(
@@ -96,6 +102,7 @@ const getDefaultValues = (role: Role) => ({ name: role.name });
  */
 
 export const AddRoleDialog = () => {
+    /*
     const [open, setOpen] = React.useState(false);
     const workplaceId = useWorkplaceId();
     const token = useSelector((state: RootState) => state.authReducer.token);
@@ -144,12 +151,15 @@ export const AddRoleDialog = () => {
             </DialogActions>
         </Dialog>
     );
+    */
+    return <GenericAddDialog {...ADD_ROLE_PROPS} />;
 };
 
 /**
  *
  */
 
+/*
 interface UpdateRoleDialogImplProps {
     role: Role;
     open: boolean;
@@ -247,12 +257,13 @@ const UpdateRoleDialogImpl = ({
         </Dialog>
     );
 };
+*/
 
 interface Inputs {
     name: string;
 }
 
-const fields: FieldData<Inputs, Workplace>[] = [
+const fields: FieldData<Inputs, any>[] = [
     {
         type: "string",
         name: "name",
@@ -261,5 +272,29 @@ const fields: FieldData<Inputs, Workplace>[] = [
     },
 ];
 
-const FORM_ID = "UPDATE_ROLE";
-const FORM_ID_ADD_ROLE = "ADD_ROLE";
+const ADD_ROLE_PROPS: GenericAddDialogProps<Inputs> = {
+    addEvent: EventTypes.ROLE_ADD,
+    title: "Add Role",
+    fields: fields,
+    formId: "ADD_ROLE_WORKPLACE_DASHBOARD_FORM",
+    submit:
+        (dispatch, workplaceId, token) =>
+        async ({ name }) => {
+            const res = await axios.post<Role>(
+                "/api/role/",
+                {
+                    name,
+                    workplace: workplaceId,
+                },
+                getTokenRequestConfig(token)
+            );
+
+            dispatch(addRole(res.data));
+            dispatch(
+                addAlert({
+                    type: "info",
+                    message: `Successfully added a role ${res.data.id}`,
+                })
+            );
+        },
+};

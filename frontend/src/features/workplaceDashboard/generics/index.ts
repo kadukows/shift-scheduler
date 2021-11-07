@@ -2,10 +2,23 @@ import GenericDashboardDataGrid from "./GenericDashboardDataGrid";
 import GenericAddButton from "./GenericAddButton";
 import {
     GenericUpdateDialog,
-    SubmitType,
+    GenericAddDialog,
+    SubmitUpdateType,
+    SubmitAddType,
     OnDeleteType,
+    GenericAddDialogProps,
 } from "./GenericDialogs";
 
-export { GenericDashboardDataGrid, GenericAddButton, GenericUpdateDialog };
+export {
+    GenericDashboardDataGrid,
+    GenericAddButton,
+    GenericUpdateDialog,
+    GenericAddDialog,
+};
 
-export type { SubmitType, OnDeleteType };
+export type {
+    SubmitUpdateType,
+    SubmitAddType,
+    OnDeleteType,
+    GenericAddDialogProps,
+};
