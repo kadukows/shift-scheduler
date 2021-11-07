@@ -4,7 +4,7 @@ export enum EventTypes {
 }
 
 export namespace CallbackTypes {
-    interface EMPLOYEE_UPDATE_ARG_TYPE {
+    export interface EMPLOYEE_UPDATE_ARG_TYPE {
         employeeId: number;
     }
 

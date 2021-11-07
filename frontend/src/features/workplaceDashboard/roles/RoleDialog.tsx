@@ -107,7 +107,7 @@ const UPDATE_ROLE_PROPS: GenericUpdateDialogProps<
             dispatch(
                 addAlert({
                     type: "info",
-                    message: `Successfully update a role: ${res.data.id}`,
+                    message: `Successfully updated a role: ${res.data.id}`,
                 })
             );
         },
