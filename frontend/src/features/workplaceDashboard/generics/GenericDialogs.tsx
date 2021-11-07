@@ -43,7 +43,7 @@ interface GenericUpdateDialogBaseProps<Item, Inputs> {
     formId?: string;
 }
 
-interface GenericUpdateDialogProps<CallbackArgType, Item, Inputs>
+export interface GenericUpdateDialogProps<CallbackArgType, Item, Inputs>
     extends GenericUpdateDialogBaseProps<Item, Inputs> {
     getItemId: (a: CallbackArgType) => number;
     itemSelector: (itemId: number) => (state: RootState) => Item;

@@ -7,6 +7,7 @@ import {
     SubmitAddType,
     OnDeleteType,
     GenericAddDialogProps,
+    GenericUpdateDialogProps,
 } from "./GenericDialogs";
 
 export {
@@ -21,4 +22,5 @@ export type {
     SubmitAddType,
     OnDeleteType,
     GenericAddDialogProps,
+    GenericUpdateDialogProps,
 };
