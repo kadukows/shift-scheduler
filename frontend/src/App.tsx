@@ -45,7 +45,6 @@ const App = () => {
                                         spacing={2}
                                         direction="column"
                                     >
-                                        <Grid item>{/*<AlertsList />*/}</Grid>
                                         <Grid item>
                                             <Switch>
                                                 <Route exact path="/">

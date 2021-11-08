@@ -15,12 +15,7 @@ const PlannerByHours = <Item extends Role | Employee>({
     children,
     ...rest
 }: React.PropsWithChildren<Props<Item>>) => {
-    return (
-        <EventProvider events={Object.values(EventTypes)}>
-            <PlannerGridByHours {...rest} />
-            {children}
-        </EventProvider>
-    );
+    return <PlannerGridByHours {...rest} />;
 };
 
 export default PlannerByHours;

@@ -12,7 +12,6 @@ const DayItem = ({ day, row }: Props) => {
     const gridArea = useGridColumn<Date>({
         xStart: day,
         yStart: row,
-        xEnd: addDays(day, 1),
     });
 
     return (

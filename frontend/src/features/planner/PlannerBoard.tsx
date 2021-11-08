@@ -60,7 +60,7 @@ const PlannerBoard = ({ schedule }: Props) => {
     const timeRange: DateFns.Interval = {
         start: monthYear.getTime(),
         end: DateFns.endOfDay(
-            DateFns.addDays(DateFns.addMonths(monthYear, 1), -25)
+            DateFns.addDays(DateFns.addMonths(monthYear, 1), -20)
         ).getTime(),
     };
 
@@ -91,7 +91,9 @@ const PlannerBoard = ({ schedule }: Props) => {
 
     interface PlannerProps {
         timeRange: DateFns.Interval;
-        secondIndexHandler: SecondIndexHandler<Role | Employee>;
+        secondIndexHandler:
+            | SecondIndexHandler<Role>
+            | SecondIndexHandler<Employee>;
         shiftSelector: (state: RootState) => Shift[];
     }
 
@@ -133,25 +135,24 @@ const PlannerBoard = ({ schedule }: Props) => {
                 timeRange={timeRange}
                 secondIndexHandler={secondIndexHandler}
                 shiftSelector={shiftSelector}
-            >
-                {secondIdx === SECOND_INDEX.Employee ? (
-                    <>
-                        <AddEmployeeDialog
-                            scheduleId={schedule.id}
-                            workplaceId={schedule.workplace}
-                        />
-                        <UpdateEmployeeDialog />
-                    </>
-                ) : (
-                    <>
-                        <AddRoleDialog
-                            scheduleId={schedule.id}
-                            workplaceId={schedule.workplace}
-                        />
-                        <UpdateRoleDialog />
-                    </>
-                )}
-            </PlannerComponent>
+            />
+            {secondIdx === SECOND_INDEX.Employee ? (
+                <>
+                    <AddEmployeeDialog
+                        scheduleId={schedule.id}
+                        workplaceId={schedule.workplace}
+                    />
+                    <UpdateEmployeeDialog />
+                </>
+            ) : (
+                <>
+                    <AddRoleDialog
+                        scheduleId={schedule.id}
+                        workplaceId={schedule.workplace}
+                    />
+                    <UpdateRoleDialog />
+                </>
+            )}
         </Paper>
     );
 };
