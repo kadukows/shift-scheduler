@@ -41,9 +41,11 @@ const DateField = <Inputs extends unknown>({
             field={field}
             control={control}
             PickerComponent={DatePicker}
-            PickerComponentProps={{
-                inputFormat: "MM/yyyy",
-            }}
+            PickerComponentProps={
+                {
+                    //inputFormat: "MM/yyyy",
+                }
+            }
         />
     );
 };
