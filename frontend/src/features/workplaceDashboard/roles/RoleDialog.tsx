@@ -18,6 +18,7 @@ import {
     GenericAddDialogProps,
     GenericUpdateDialogProps,
 } from "../generics";
+import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 
 export const UpdateRoleDialog = () => {
     return (
@@ -49,26 +50,32 @@ const ADD_ROLE_PROPS: GenericAddDialogProps<Inputs> = {
     title: "Add Role",
     fields: fields,
     formId: "ADD_ROLE_WORKPLACE_DASHBOARD_FORM",
-    submit:
-        (dispatch, workplaceId, token) =>
-        async ({ name }) => {
-            const res = await axios.post<Role>(
-                "/api/role/",
-                {
-                    name,
-                    workplace: workplaceId,
-                },
-                getTokenRequestConfig(token)
-            );
+    useSubmit: () => {
+        const workplaceId = useWorkplaceId();
 
-            dispatch(addRole(res.data));
-            dispatch(
-                addAlert({
-                    type: "info",
-                    message: `Successfully added a role ${res.data.id}`,
-                })
-            );
-        },
+        return React.useCallback(
+            (dispatch, token) =>
+                async ({ name }) => {
+                    const res = await axios.post<Role>(
+                        "/api/role/",
+                        {
+                            name,
+                            workplace: workplaceId,
+                        },
+                        getTokenRequestConfig(token)
+                    );
+
+                    dispatch(addRole(res.data));
+                    dispatch(
+                        addAlert({
+                            type: "info",
+                            message: `Successfully added a role ${res.data.id}`,
+                        })
+                    );
+                },
+            [workplaceId]
+        );
+    },
 };
 
 const UPDATE_ROLE_PROPS: GenericUpdateDialogProps<

@@ -1,34 +1,34 @@
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { useParams } from "react-router-dom";
+import { Grid } from "@mui/material";
 import { RootState } from "../../store";
 import RedirectWithAlert from "../alerts/RedirectWithAlert";
-import Loader from "../loader/Loader";
+import WorkplaceLoader from "./WorkplaceLoader";
 import WorkplaceProvider from "../workplaces/WorkplaceProvider";
 import { workplaceSelectors } from "../workplaces/workplaceSlice";
-import WorkplaceDashboard from "./WorkplaceDashboard";
+import RoleWidget from "./roles";
+import EmployeeWidget from "./employees";
+import ScheduleWidget from "./schedules";
+import WorkplaceBanner from "./workplaceBanner";
 
-interface Props {}
+const WorkplaceDashboardPage = () => (
+    <WorkplaceLoader>
+        <WorkplaceDashboardPageImpl />
+    </WorkplaceLoader>
+);
 
-const WorkplacePage = (props: Props) => {
-    const useSlice = () =>
-        useSelector((state: RootState) => state.workplaceReducer.loaded);
-    const predicate = (loaded: boolean) => loaded;
+export default WorkplaceDashboardPage;
 
-    return (
-        <Loader useSlice={useSlice} precondition={predicate}>
-            <WorkplacePageImpl />
-        </Loader>
-    );
-};
-
-export default WorkplacePage;
+/**
+ *
+ */
 
 interface Params {
     workplaceId: string;
 }
 
-const WorkplacePageImpl = () => {
+const WorkplaceDashboardPageImpl = () => {
     const workplaceId = parseInt(useParams<Params>().workplaceId);
     const workplace = useSelector((state: RootState) =>
         workplaceSelectors.selectById(state, workplaceId)
@@ -48,7 +48,20 @@ const WorkplacePageImpl = () => {
 
     return (
         <WorkplaceProvider workplaceId={workplaceId}>
-            <WorkplaceDashboard />
+            <Grid container spacing={2}>
+                <Grid item sm={12}>
+                    <WorkplaceBanner />
+                </Grid>
+                <Grid item md={5} sm={12}>
+                    <RoleWidget />
+                </Grid>
+                <Grid item md={7} sm={12}>
+                    <EmployeeWidget />
+                </Grid>
+                <Grid item sm={12}>
+                    <ScheduleWidget />
+                </Grid>
+            </Grid>
         </WorkplaceProvider>
     );
 };

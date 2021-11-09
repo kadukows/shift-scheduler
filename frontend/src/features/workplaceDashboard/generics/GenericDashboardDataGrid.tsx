@@ -7,7 +7,8 @@ import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 import { styled } from "@mui/material";
 
 export interface Props<Item> {
-    itemSelector: (workplaceId: number) => (state: RootState) => Item[];
+    //itemSelector: (workplaceId: number) => (state: RootState) => Item[];
+    useItemSelector: () => (state: RootState) => Item[];
     updateEvent: string;
     useColumnDefs: (signalFunc: SignalFuncType) => GridColDef[];
 }
@@ -18,12 +19,11 @@ const MyDiv = styled("div")({
 });
 
 const GenericDashboardDataGrid = <Item extends unknown>({
-    itemSelector,
+    useItemSelector,
     updateEvent,
     useColumnDefs,
 }: React.PropsWithChildren<Props<Item>>) => {
-    const workplaceId = useWorkplaceId();
-    const items = useSelector(itemSelector(workplaceId));
+    const items = useSelector(useItemSelector());
     const updateSignal = useSignal(updateEvent);
 
     const colDefs = useColumnDefs(updateSignal);

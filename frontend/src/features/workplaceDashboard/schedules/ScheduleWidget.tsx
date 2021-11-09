@@ -24,6 +24,8 @@ import {
     Schedule,
     scheduleSelectors,
     addSchedule,
+    updateSchedule,
+    removeSchedule,
 } from "../../schedules/scheduleSlice";
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../../../store";
@@ -31,12 +33,13 @@ import { GridRowParams } from "@mui/x-data-grid";
 import { FieldData } from "../../genericForm/fieldInstance/Field";
 import { getTokenRequestConfig } from "../../helpers";
 import { addAlert } from "../../alerts/alertsSlice";
+import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 
 const ScheduleWidget = () => {
     return (
         <EventProvider events={Object.values(EventTypes)}>
             <GenericAddDialog {...addScheduleDialogProps} />
-            {}
+            {/* TODO */}
             <Paper sx={{ p: 4 }}>
                 <Stack spacing={2}>
                     <Stack direction="row">
@@ -77,8 +80,10 @@ const scheduleByWorkplaceSelector = createSelector(
 );
 
 const dataGridProps: GenericDashboardDataGridProps<Schedule> = {
-    itemSelector: (workplaceId) => (state) =>
-        scheduleByWorkplaceSelector(state, workplaceId),
+    useItemSelector: () => {
+        const workplaceId = useWorkplaceId();
+        return (state) => scheduleByWorkplaceSelector(state, workplaceId);
+    },
     updateEvent: EventTypes.SCHEDULE_UPDATE,
     useColumnDefs: (signal: CallbackTypes.SCHEDULE_UPDATE) => {
         const history = useHistory();
@@ -144,25 +149,87 @@ const addScheduleDialogProps: GenericAddDialogProps<Inputs> = {
     addEvent: EventTypes.SCHEDULE_ADD,
     title: "Add Schedule",
     fields,
-    formId: "UPDATE_SCHEDULE_WORKPLACE_DASHBOARD_FORM",
+    useSubmit: () => {
+        const workplaceId = useWorkplaceId();
+
+        return React.useCallback(
+            (dispatch, token) =>
+                async ({ month_year }) => {
+                    const res = await axios.post<Schedule>(
+                        "/api/schedule/",
+                        {
+                            month_year: format(month_year, TIME_FORMAT),
+                            workplace: workplaceId,
+                        },
+                        getTokenRequestConfig(token)
+                    );
+
+                    dispatch(addSchedule(res.data));
+                    dispatch(
+                        addAlert({
+                            type: "info",
+                            message: `Added a schedule: ${res.data.month_year}`,
+                        })
+                    );
+                },
+            [workplaceId]
+        );
+    },
+};
+
+const updateScheduleDialogProps: GenericUpdateDialogProps<
+    CallbackTypes.SCHEDULE_UPDATE_ARG_TYPE,
+    Schedule,
+    Inputs
+> = {
+    getItemId: (arg) => arg.scheduleId,
+    itemSelector: (itemId) => (state) =>
+        scheduleSelectors.selectById(state, itemId),
+    eventType: EventTypes.SCHEDULE_UPDATE,
+    title: "Update Schedule",
+    fields,
+    getDefaultValues: (schedule: Schedule) => ({
+        month_year: schedule.month_year,
+    }),
     submit:
-        (dispatch, workplaceId, token) =>
+        (dispatch, item, token) =>
         async ({ month_year }) => {
-            const res = await axios.post<Schedule>(
-                "/api/schedule/",
+            const res = await axios.put<Schedule>(
+                `/api/schedule/${item.id}/`,
                 {
-                    month_year: format(month_year, TIME_FORMAT),
-                    workplace: workplaceId,
+                    month_year,
+                    workplace: item.workplace,
                 },
                 getTokenRequestConfig(token)
             );
 
-            dispatch(addSchedule(res.data));
+            const { id, ...rest } = res.data;
+            dispatch(
+                updateSchedule({
+                    id,
+                    changes: rest,
+                })
+            );
+
             dispatch(
                 addAlert({
                     type: "info",
-                    message: `Added a schedule: ${res.data.month_year}`,
+                    message: `Successfully updated a schedule: ${id}`,
                 })
             );
         },
+    onDelete: async (dispatch, scheduleId, token) => {
+        await axios.delete(
+            `/api/schedule/${scheduleId}/`,
+            getTokenRequestConfig(token)
+        );
+
+        dispatch(removeSchedule(scheduleId));
+        dispatch(
+            addAlert({
+                type: "info",
+                message: `Removed a schedule: ${scheduleId}`,
+            })
+        );
+    },
 };

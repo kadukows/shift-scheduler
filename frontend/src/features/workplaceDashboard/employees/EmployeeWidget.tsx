@@ -27,6 +27,7 @@ import { createSelector } from "@reduxjs/toolkit";
 import { FieldData } from "../../genericForm/fieldInstance/Field";
 import { getTokenRequestConfig } from "../../helpers";
 import { addAlert } from "../../alerts/alertsSlice";
+import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 
 const EmployeeWidget = () => {
     return (
@@ -73,8 +74,14 @@ const getFullName = (params: any) =>
     )}`;
 
 const dataGridProps: GenericDashboardDataGridProps<Employee> = {
-    itemSelector: (workplaceId) => (state) =>
-        employeesByWorkplaceSelector(state, workplaceId),
+    useItemSelector: () => {
+        const workplaceId = useWorkplaceId();
+
+        return React.useCallback(
+            (state) => employeesByWorkplaceSelector(state, workplaceId),
+            [workplaceId]
+        );
+    },
     updateEvent: EventTypes.EMPLOYEE_UPDATE,
     useColumnDefs: (signal) => [
         {
@@ -136,27 +143,33 @@ const addEmployeeDialogProps: GenericAddDialogProps<Inputs> = {
     title: "Add Employee",
     fields,
     formId: "ADD_EMPLOYEE_WORKPLACE_DASHBOARD_FORM",
-    submit:
-        (dispatch, workplaceId, token) =>
-        async ({ first_name, last_name }) => {
-            const res = await axios.post<Employee>(
-                "/api/employee/",
-                {
-                    first_name,
-                    last_name,
-                    workplace: workplaceId,
-                },
-                getTokenRequestConfig(token)
-            );
+    useSubmit: () => {
+        const workplaceId = useWorkplaceId();
 
-            dispatch(addEmployee(res.data));
-            dispatch(
-                addAlert({
-                    type: "info",
-                    message: "Added an Employee",
-                })
-            );
-        },
+        return React.useCallback(
+            (dispatch, token) =>
+                async ({ first_name, last_name }) => {
+                    const res = await axios.post<Employee>(
+                        "/api/employee/",
+                        {
+                            first_name,
+                            last_name,
+                            workplace: workplaceId,
+                        },
+                        getTokenRequestConfig(token)
+                    );
+
+                    dispatch(addEmployee(res.data));
+                    dispatch(
+                        addAlert({
+                            type: "info",
+                            message: "Added an Employee",
+                        })
+                    );
+                },
+            [workplaceId]
+        );
+    },
 };
 
 const updateEmployeeDialogProps: GenericUpdateDialogProps<

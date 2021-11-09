@@ -24,7 +24,7 @@ import PrivateRoute from "./features/auth/PrivateRote";
 import PlannerLoader from "./features/planner/PlannerLoader";
 import NotifierComponent from "./features/alerts/NotifierComponent";
 
-import WorkplaceDashboardPage from "./features/workplaceDashboard/WorkplacePage";
+import { WorkplaceDashboardPage, WorkplaceListPage } from "./features/workplaceDashboard";
 
 const App = () => {
     return (
@@ -60,8 +60,9 @@ const App = () => {
                                                     exact
                                                     path="/workplaces"
                                                 >
-                                                    <WorkplacesPage />
+                                                    <WorkplaceListPage />
                                                 </PrivateRoute>
+                                                {/*
                                                 <PrivateRoute
                                                     exact
                                                     path="/employees"
@@ -77,6 +78,7 @@ const App = () => {
                                                 <PrivateRoute path="/planner/:schedule_id">
                                                     <PlannerLoader />
                                                 </PrivateRoute>
+                                                */}
                                                 <PrivateRoute
                                                     exact
                                                     path="/draggables"

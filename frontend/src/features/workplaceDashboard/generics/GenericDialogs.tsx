@@ -24,7 +24,6 @@ export type SubmitUpdateType<Inputs, Item> = (
 
 export type SubmitAddType<Inputs> = (
     dispatch: DispatchType,
-    workplaceId: number,
     token: string
 ) => (inputs: Inputs) => void;
 
@@ -108,7 +107,6 @@ const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
     onDelete,
     getDefaultValues,
 }: GenericUpdateDialogImplProps<Item, Inputs>) => {
-    const workplaceId = useWorkplaceId();
     const token = useSelector((state: RootState) => state.authReducer.token);
     const dispatch = useDispatch();
 
@@ -159,7 +157,7 @@ const GenericUpdateDialogImpl = <Item extends { id: number }, Inputs>({
  */
 
 export interface GenericAddDialogProps<Inputs> {
-    submit: SubmitAddType<Inputs>;
+    useSubmit: () => SubmitAddType<Inputs>;
     addEvent: string;
     formId?: string;
     title: string;
@@ -167,14 +165,14 @@ export interface GenericAddDialogProps<Inputs> {
 }
 
 export const GenericAddDialog = <Inputs, Item>({
-    submit,
+    useSubmit,
     addEvent,
     formId,
     title,
     fields,
 }: GenericAddDialogProps<Inputs>) => {
     const [open, setOpen] = React.useState(false);
-    const workplaceId = useWorkplaceId();
+    const submit = useSubmit();
     const token = useSelector((state: RootState) => state.authReducer.token);
     const dispatch = useDispatch();
 
@@ -185,11 +183,11 @@ export const GenericAddDialog = <Inputs, Item>({
 
     const memoSubmit = React.useCallback(
         async (inputs: Inputs) => {
-            const asyncSubmit = submit(dispatch, workplaceId, token);
+            const asyncSubmit = submit(dispatch, token);
             await asyncSubmit(inputs);
             setOpen(false);
         },
-        [submit, dispatch, workplaceId, token, setOpen]
+        [submit, dispatch, token, setOpen]
     );
 
     return (

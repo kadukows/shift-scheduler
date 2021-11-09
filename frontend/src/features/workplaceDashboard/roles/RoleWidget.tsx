@@ -17,6 +17,7 @@ import { Role, roleSelectors } from "../../roles/rolesSlice";
 import { createSelector } from "@reduxjs/toolkit";
 import { RootState } from "../../../store";
 import { useEffectWithoutFirst } from "../../helpers";
+import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 
 interface Props {}
 
@@ -36,7 +37,7 @@ const RoleWidget = (props: Props) => {
                     </div>
 
                     <GenericDashboardDataGrid
-                        itemSelector={itemSelector}
+                        useItemSelector={useItemSelector}
                         updateEvent={EventTypes.ROLE_UPDATE}
                         useColumnDefs={useColumnDefs}
                     />
@@ -61,8 +62,10 @@ const rolesByWorkplaceSelector = createSelector(
         roles.filter((role) => role.workplace === workplaceId)
 );
 
-const itemSelector = (workplaceId: number) => (state: RootState) =>
-    rolesByWorkplaceSelector(state, workplaceId);
+const useItemSelector = () => {
+    const workplaceId = useWorkplaceId();
+    return (state: RootState) => rolesByWorkplaceSelector(state, workplaceId);
+};
 
 const useColumnDefs = (signal: CallbackTypes.ROLE_UPDATE) => {
     const memoMapRef = React.useRef<Map<number, () => void>>(new Map());
