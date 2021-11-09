@@ -20,11 +20,15 @@ import {
     GenericAddButton,
     GenericAddDialog,
     GenericAddDialogProps,
+    GenericUpdateDialog,
+    GenericUpdateDialogProps,
     GenericDashboardDataGrid,
     GenericDashboardDataGridProps,
 } from "../generics";
 import {
     addWorkplace,
+    removeWorkplace,
+    updateWorkplace,
     Workplace,
     workplaceSelectors,
 } from "../../workplaces/workplaceSlice";
@@ -39,6 +43,7 @@ const WorkplaceWidget = () => {
     return (
         <EventProvider events={Object.values(EventTypes)}>
             <GenericAddDialog {...addWorkplaceDialogProps} />
+            <GenericUpdateDialog {...updateWorkplaceDialogProps} />
             <Paper sx={{ p: 4 }}>
                 <Stack spacing={2}>
                     <Stack direction="row">
@@ -149,6 +154,60 @@ const addWorkplaceDialogProps: GenericAddDialogProps<Inputs> = {
                     );
                 },
             [workplaceId]
+        );
+    },
+};
+
+const updateWorkplaceDialogProps: GenericUpdateDialogProps<
+    CallbackTypes.UPDATE_WORPLACE_ARG_TYPE,
+    Workplace,
+    Inputs
+> = {
+    getItemId: (arg) => arg.workplaceId,
+    itemSelector: (itemId) => (state) =>
+        workplaceSelectors.selectById(state, itemId),
+    eventType: EventTypes.UPDATE_WORKPLACE,
+    title: "Update Workplace",
+    fields,
+    getDefaultValues: (workplace) => ({ name: workplace.name }),
+    submit:
+        (dispatch, item, token) =>
+        async ({ name }) => {
+            const res = await axios.put<Workplace>(
+                `/api/workplace/${item.id}/`,
+                {
+                    name,
+                },
+                getTokenRequestConfig(token)
+            );
+
+            const { id, ...rest } = res.data;
+            dispatch(
+                updateWorkplace({
+                    id,
+                    changes: rest,
+                })
+            );
+
+            dispatch(
+                addAlert({
+                    type: "info",
+                    message: `Updated a workplace: ${id}`,
+                })
+            );
+        },
+    onDelete: async (dispatch, workplaceId, token) => {
+        await axios.delete(
+            `/api/workplace/${workplaceId}/`,
+            getTokenRequestConfig(token)
+        );
+
+        dispatch(removeWorkplace(workplaceId));
+        dispatch(
+            addAlert({
+                type: "info",
+                message: `Removed a workplace: ${workplaceId}`,
+            })
         );
     },
 };
