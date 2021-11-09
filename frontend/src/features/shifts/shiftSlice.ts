@@ -2,7 +2,11 @@ import {
     createSlice,
     createEntityAdapter,
     PayloadAction,
+    createSelector,
+    ThunkAction,
+    AnyAction,
 } from "@reduxjs/toolkit";
+import { observer } from "redux-observers";
 import {
     getApiGenericThunkAction,
     makeDispatchActionWhenAuthedObserver,
@@ -57,6 +61,7 @@ const shiftSlice = createSlice({
             return shiftAdapter.addOne(state, action);
         },
         removeShift: shiftAdapter.removeOne,
+        removeManyShift: shiftAdapter.removeMany,
         updateShift: shiftAdapter.updateOne,
         //
         setLoading(state, action: PayloadAction<boolean>) {
@@ -66,6 +71,20 @@ const shiftSlice = createSlice({
 
             state.loading = action.payload;
         },
+        //
+        /*
+        deleteAllShiftsWithPropertyNotInGivenSet(
+            state,
+            action: PayloadAction<IdsAndPropertyGetter>
+        ) {
+            const { set, propertyGetter } = action.payload;
+            const toDeleteIds = state.ids.filter((id) => {
+                return !set.has(propertyGetter(state.entities[id]));
+            });
+
+            shiftAdapter.removeMany(toDeleteIds)
+        },
+        */
     },
 });
 
@@ -78,6 +97,7 @@ export const {
     resetShifts,
     addShift,
     removeShift,
+    removeManyShift,
     updateShift,
     setLoading,
 } = shiftSlice.actions;
@@ -93,4 +113,73 @@ const getShifts = getApiGenericThunkAction(
 export const shiftObserver = makeDispatchActionWhenAuthedObserver(
     getShifts,
     resetShifts
+);
+
+/**
+ *
+ */
+
+interface IdsAndPropertyGetter {
+    set: Set<number>;
+    propertyGetter: (shift: Shift) => number;
+}
+
+const cascadeDeleteShift =
+    ({
+        set,
+        propertyGetter,
+    }: IdsAndPropertyGetter): ThunkAction<
+        void,
+        RootState,
+        unknown,
+        AnyAction
+    > =>
+    (dispatch, getState) => {
+        const { ids, entities } = getState().shiftReducer;
+        const toDeleteIds = ids.filter((id) => {
+            return !set.has(propertyGetter(entities[id]));
+        });
+        dispatch(removeManyShift(toDeleteIds));
+    };
+
+export const deleteShiftWhenRoleDeletedObserver = observer(
+    (state: RootState) => state.roleReducer.ids,
+    (dispatch, current, previous) => {
+        if (current.length < previous.length) {
+            dispatch(
+                cascadeDeleteShift({
+                    set: new Set(current) as any,
+                    propertyGetter: (shift) => shift.role,
+                }) as any
+            );
+        }
+    }
+);
+
+export const deleteShiftWhenEmployeeDeletedObserver = observer(
+    (state: RootState) => state.employeeReducer.ids,
+    (dispatch, current, previous) => {
+        if (current.length < previous.length) {
+            dispatch(
+                cascadeDeleteShift({
+                    set: new Set(current) as any,
+                    propertyGetter: (shift) => shift.employee,
+                }) as any
+            );
+        }
+    }
+);
+
+export const deleteShiftWhenScheduleDeletedObserver = observer(
+    (state: RootState) => state.scheduleReducer.ids,
+    (dispatch, current, previous) => {
+        if (current.length < previous.length) {
+            dispatch(
+                cascadeDeleteShift({
+                    set: new Set(current) as any,
+                    propertyGetter: (shift) => shift.schedule,
+                }) as any
+            );
+        }
+    }
 );

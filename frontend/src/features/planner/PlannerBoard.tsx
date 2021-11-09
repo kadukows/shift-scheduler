@@ -38,6 +38,7 @@ import AddEmployeeDialog from "./dialogs/AddEmployeeDialog";
 import AddRoleDialog from "./dialogs/AddRoleDialog";
 import UpdateEmployeeDialog from "./dialogs/UpdateEmployeeDialog";
 import UpdateRoleDialog from "./dialogs/UpdateRoleDialog";
+import PlannerGridByHours from "./plannerGridByHours/PlannerGridByHours";
 
 interface Props {
     schedule: Schedule;
@@ -60,7 +61,7 @@ const PlannerBoard = ({ schedule }: Props) => {
     const timeRange: DateFns.Interval = {
         start: monthYear.getTime(),
         end: DateFns.endOfDay(
-            DateFns.addDays(DateFns.addMonths(monthYear, 1), -20)
+            DateFns.addDays(DateFns.addMonths(monthYear, 1), -15)
         ).getTime(),
     };
 
@@ -99,7 +100,7 @@ const PlannerBoard = ({ schedule }: Props) => {
 
     const PlannerComponent: React.ComponentType<PlannerProps> =
         timeGrouping === TIME_GROUPING.ByHours
-            ? PlannerByHours
+            ? PlannerGridByHours
             : PlannerGridByDays;
 
     return (

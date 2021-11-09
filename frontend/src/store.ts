@@ -16,7 +16,13 @@ import {
 } from "./features/schedules/scheduleSlice";
 import { draggableThingsReducer } from "./features/draggableOnMuiTable/draggableThingsSlice";
 import { roleReducer, roleObserver } from "./features/roles/rolesSlice";
-import { shiftReducer, shiftObserver } from "./features/shifts/shiftSlice";
+import {
+    shiftReducer,
+    shiftObserver,
+    deleteShiftWhenRoleDeletedObserver,
+    deleteShiftWhenEmployeeDeletedObserver,
+    deleteShiftWhenScheduleDeletedObserver,
+} from "./features/shifts/shiftSlice";
 import { potentialNewItemReducer } from "./features/planner/plannerGridByHours/potentialNewItemSlice";
 import { addDialogReducer } from "./features/planner/dialogs/addDialogSlice";
 import { updateDialogReducer } from "./features/planner/dialogs/updateDialogSlice";
@@ -48,4 +54,7 @@ observe(store, [
     scheduleObserver,
     roleObserver,
     shiftObserver,
+    deleteShiftWhenRoleDeletedObserver,
+    deleteShiftWhenEmployeeDeletedObserver,
+    deleteShiftWhenScheduleDeletedObserver,
 ]);

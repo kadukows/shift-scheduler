@@ -113,7 +113,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
 
     return (
         <OverflowHelper>
-            <DispatchBatcherProvider timeout={30}>
+            <DispatchBatcherProvider timeout={100}>
                 <GenericCssGrid<Date, Item>
                     {...genericCssGridProps}
                     style={{
