@@ -13,7 +13,7 @@ interface Props {}
 const sort2Numbers = (lhs: number, rhs: number) =>
     lhs < rhs ? [lhs, rhs] : [rhs, lhs];
 
-const PotentialNewItem = (props: Props) => {
+const PotentialNewItem = () => {
     const { start, end, secondIndexItemId } = useSelector(
         (state: RootState) => state.potentialNewItemReducer
     );

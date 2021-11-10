@@ -1,4 +1,5 @@
 import * as React from "react";
+import { styled } from "@mui/material";
 
 export interface GridDimensionDefinition<Cell> {
     cells: Cell[];
@@ -21,7 +22,7 @@ export interface Props<Tx, Ty>
         React.ComponentProps<"div"> {
     additionalRows?: string[];
     additionalCols?: string[];
-    inverse?: boolean;
+    gap?: string | number;
 }
 
 interface GenericCssGridContextValueType<Tx, Ty> {
@@ -49,40 +50,37 @@ const GenericCssGrid = <Tx, Ty>({
     additionalRows,
     additionalCols,
     children,
-    inverse,
-    ...rest
+    gap,
 }: React.PropsWithChildren<Props<Tx, Ty>>) => {
-    const { style, ...restWoStyle } = rest;
-
-    inverse = !!inverse;
-
     const gridArea = React.useMemo(
-        () =>
-            generateCssForGrid(
+        () => ({
+            ...generateCssForGrid(
                 { x, y },
                 additionalRows,
                 additionalCols,
-                inverse
+                false
             ),
-        [x, y, additionalRows, additionalCols, inverse]
+            gap,
+        }),
+        [x, y, additionalRows, additionalCols, gap]
     );
 
     return (
         <GenericCssGridContext.Provider
             value={{
-                getIdX: !inverse ? x.getId : y.getId,
-                getIdY: !inverse ? y.getId : x.getId,
-                inverse,
+                getIdX: x.getId,
+                getIdY: y.getId,
+                inverse: false,
             }}
         >
-            <div style={{ ...gridArea, ...style }} {...restWoStyle}>
-                {children}
-            </div>
+            <div style={gridArea}>{children}</div>
         </GenericCssGridContext.Provider>
     );
 };
 
-export default GenericCssGrid;
+export default React.memo(GenericCssGrid) as typeof GenericCssGrid;
+
+GenericCssGrid.whyDidYouRender = true;
 
 function generateDimensionArray<T>(
     unique_key: string,
@@ -212,7 +210,7 @@ export const useGridRow = <Ty extends unknown>(args: GridRowArg<Ty>) => {
 };
 
 /**
- * Helper HOC components
+ * Helper components
  */
 
 interface DefaultItemOnGridBaseProps<Tx, Ty>
@@ -286,3 +284,5 @@ export const DefaultRowItemOnGrid = <Ty extends unknown>(
         />
     );
 };
+
+const SimpleDiv = styled("div")({});

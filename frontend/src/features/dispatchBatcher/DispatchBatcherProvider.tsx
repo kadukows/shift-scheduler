@@ -74,13 +74,15 @@ export const startBatching = (
                 return;
             }
 
-            batch(() => {
-                for (const action of context.actions) {
-                    dispatch(action);
-                }
+            (dispatch as any)((dispatch: any, getState: any) =>
+                batch(() => {
+                    for (const action of context.actions) {
+                        dispatch(action);
+                    }
 
-                context.actions = [];
-            });
+                    context.actions = [];
+                })
+            );
         }, context.timeout);
     }
 };
@@ -92,13 +94,15 @@ export const stopBatchin = (
     if (context.intervalRef !== null) {
         console.log("Batching end");
 
-        batch(() => {
-            for (const action of context.actions) {
-                dispatch(action);
-            }
+        (dispatch as any)((dispatch: any) =>
+            batch(() => {
+                for (const action of context.actions) {
+                    dispatch(action);
+                }
 
-            context.actions = [];
-        });
+                context.actions = [];
+            })
+        );
 
         clearInterval(context.intervalRef);
         context.intervalRef = null;

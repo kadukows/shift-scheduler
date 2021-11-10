@@ -91,7 +91,7 @@ const PlannerGridByDays = <Item extends Role | Employee>({
 
     return (
         <OverflowHelper>
-            <StyledGenericCssGrid {...genericCssGridProps}>
+            <GenericCssGrid {...genericCssGridProps} gap="3px">
                 {days.map((day) => (
                     <DayItem
                         day={day}
@@ -111,7 +111,7 @@ const PlannerGridByDays = <Item extends Role | Employee>({
                     </DefaultRowItemOnGrid>
                 ))}
                 {gridItems}
-            </StyledGenericCssGrid>
+            </GenericCssGrid>
         </OverflowHelper>
     );
 };
@@ -131,9 +131,3 @@ enum ADDITIONAL_FIELDS {
 
 const getKey = (day: Date | number, itemId: number) =>
     `${DateFns.format(day, TIME_FORMAT)}|${itemId}`;
-
-const StyledGenericCssGrid = styled(GenericCssGrid)({
-    gap: "3px",
-    margin: 8,
-    padding: 8,
-});

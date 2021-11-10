@@ -58,7 +58,8 @@ const EmptyItem = <Item extends Role | Employee>({
         itemId,
     ]);
     const dispatch = useDispatch();
-    const batchedDispatch = useBatchedDispatch();
+    //const batchedDispatch = useBatchedDispatch();
+    const batchedDispatch = dispatch;
     const batchingContext = useBatchingContext();
 
     const [{}, drag] = useDrag(
@@ -67,7 +68,7 @@ const EmptyItem = <Item extends Role | Employee>({
             item: { itemId, hour: hour.getTime() },
             end: () => {
                 batchedDispatch(reset());
-                stopBatchin(batchingContext, dispatch);
+                //stopBatchin(batchingContext, dispatch);
             },
         }),
         [hour.getTime(), itemId]
@@ -195,7 +196,9 @@ const EmptyItem = <Item extends Role | Employee>({
             onDragEnter={() => {
                 entered.current = true;
             }}
-            onDragStart={() => startBatching(batchingContext, dispatch)}
+            onDragStart={() => {
+                //startBatching(batchingContext, dispatch)
+            }}
             ref={myRef}
             {...rest}
         />

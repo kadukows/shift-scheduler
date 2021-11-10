@@ -49,7 +49,7 @@ const PlannerBoard = ({ schedule }: Props) => {
         SECOND_INDEX.Employee
     );
     const [timeGrouping, setTimeGrouping] = React.useState<TIME_GROUPING>(
-        TIME_GROUPING.ByDays
+        TIME_GROUPING.ByHours
     );
 
     //
@@ -58,10 +58,10 @@ const PlannerBoard = ({ schedule }: Props) => {
 
     const monthYear = DateFns.parse(schedule.month_year, "MM.yyyy", new Date());
 
-    const timeRange: DateFns.Interval = {
+    const timeRange = {
         start: monthYear.getTime(),
         end: DateFns.endOfDay(
-            DateFns.addDays(DateFns.addMonths(monthYear, 1), -15)
+            DateFns.addDays(DateFns.addMonths(monthYear, 1), -2)
         ).getTime(),
     };
 
@@ -71,24 +71,27 @@ const PlannerBoard = ({ schedule }: Props) => {
         return secondIndexDict[timeGrouping][secondIdx](schedule);
     }, [schedule.workplace, secondIdx, timeGrouping]);
 
-    const shiftSelector = (state: RootState) =>
-        shiftSelectors
-            .selectAll(state)
-            .filter((shift) => shift.schedule === schedule.id)
-            .filter(
-                (shift) =>
-                    DateFns.compareDesc(
-                        timeRange.start,
-                        Date.parse(shift.time_from)
-                    ) !== -1
-            )
-            .filter(
-                (shift) =>
-                    DateFns.compareDesc(
-                        Date.parse(shift.time_to),
-                        timeRange.end
-                    ) !== -1
-            );
+    const shiftSelector = React.useCallback(
+        (state: RootState) =>
+            shiftSelectors
+                .selectAll(state)
+                .filter((shift) => shift.schedule === schedule.id)
+                .filter(
+                    (shift) =>
+                        DateFns.compareDesc(
+                            timeRange.start,
+                            Date.parse(shift.time_from)
+                        ) !== -1
+                )
+                .filter(
+                    (shift) =>
+                        DateFns.compareDesc(
+                            Date.parse(shift.time_to),
+                            timeRange.end
+                        ) !== -1
+                ),
+        [timeRange.start, timeRange.end, schedule.id]
+    );
 
     interface PlannerProps {
         timeRange: DateFns.Interval;

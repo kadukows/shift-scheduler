@@ -44,6 +44,11 @@ enum ADDITIONAL_FIELDS {
 //
 //
 
+const EmptyItemLogged = (props: React.ComponentProps<typeof EmptyItem>) => (
+    <EmptyItem {...props} />
+);
+EmptyItemLogged.whyDidYouRender = true;
+
 const PlannerGridByHours = <Item extends Role | Employee>({
     timeRange,
     secondIndexHandler: {
@@ -56,18 +61,17 @@ const PlannerGridByHours = <Item extends Role | Employee>({
     },
     shiftSelector,
 }: Props<Item>) => {
-    const hours = React.useMemo(
-        () => DateFns.eachHourOfInterval(timeRange),
-        [
-            DateFns.getUnixTime(timeRange.start),
-            DateFns.getUnixTime(timeRange.end),
-        ]
-    );
-
     const items = useSelector(itemSelector);
+    const shifts = useSelector(shiftSelector);
 
-    const [emptyItems, genericCssGridProps] = React.useMemo(() => {
+    const [jsxElements, genericCssGridProps] = React.useMemo(() => {
+        console.log("Calculating jsxElements");
+
         const result: JSX.Element[] = [];
+
+        result.push(<PotentialNewItem key="PotentialNewItem" />);
+
+        const hours = DateFns.eachHourOfInterval(timeRange);
 
         for (const hour of hours) {
             for (const item of items) {
@@ -75,13 +79,64 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                     <EmptyItem
                         itemId={item.id}
                         hour={hour}
-                        key={`${hour.getTime()}-${secondIndexType}-${item.id}`}
+                        key={`empty-${hour.getTime()}-${secondIndexType}-${
+                            item.id
+                        }`}
                         getShiftComplementaryFromItemId={
                             getShiftComplementaryFromItemId
                         }
                     />
                 );
             }
+        }
+
+        for (const hour of hours) {
+            result.push(
+                <HourItem
+                    hour={hour}
+                    row={ADDITIONAL_FIELDS.HourAnnotation}
+                    key={`hour-${hour.getTime()}`}
+                />
+            );
+        }
+
+        const days = DateFns.eachDayOfInterval(timeRange);
+        for (const day of days) {
+            result.push(
+                <DayItem
+                    day={day}
+                    row={ADDITIONAL_FIELDS.DateAnnotation}
+                    key={`day-${day.getTime()}`}
+                />
+            );
+        }
+
+        for (const item of items) {
+            result.push(
+                <DefaultRowItemOnGrid<Item>
+                    xStart={ADDITIONAL_FIELDS.ItemAnnotation}
+                    yStart={item}
+                    key={`item-${item.id}`}
+                    style={{
+                        alignContent: "center",
+                    }}
+                >
+                    <Typography noWrap sx={{ mr: 0.7 }}>
+                        {itemToString(item)}
+                    </Typography>
+                </DefaultRowItemOnGrid>
+            );
+        }
+
+        const CastedComponent = ItemComponent as SingleShiftItemComponent;
+
+        for (const shift of shifts) {
+            result.push(
+                <CastedComponent
+                    key={`shift-${secondIndexType}-${shift.id}`}
+                    shiftId={shift.id}
+                />
+            );
         }
 
         const genericCssGridProps = {
@@ -105,63 +160,36 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         DateFns.getUnixTime(timeRange.start),
         DateFns.getUnixTime(timeRange.end),
         itemSelector,
+        shiftSelector,
     ]);
-
-    const shifts = useSelector(shiftSelector);
-
-    const CastedComponent = ItemComponent as SingleShiftItemComponent;
 
     return (
         <OverflowHelper>
-            <DispatchBatcherProvider timeout={100}>
-                <GenericCssGrid<Date, Item>
-                    {...genericCssGridProps}
-                    style={{
-                        gap: "1px",
-                        margin: 8,
-                        padding: 8,
-                    }}
-                >
-                    <PotentialNewItem />
-                    {hours.map((hour) => (
-                        <HourItem
-                            hour={hour}
-                            row={ADDITIONAL_FIELDS.HourAnnotation}
-                            key={hour.getTime()}
-                        />
-                    ))}
-                    {DateFns.eachDayOfInterval(timeRange).map((day) => (
-                        <DayItem
-                            day={day}
-                            row={ADDITIONAL_FIELDS.DateAnnotation}
-                            key={day.getTime()}
-                        />
-                    ))}
-                    {items.map((item) => (
-                        <DefaultRowItemOnGrid<Item>
-                            xStart={ADDITIONAL_FIELDS.ItemAnnotation}
-                            yStart={item}
-                            key={item.id}
-                            style={{
-                                alignContent: "center",
-                            }}
-                        >
-                            <Typography noWrap sx={{ mr: 0.7 }}>
-                                {itemToString(item)}
-                            </Typography>
-                        </DefaultRowItemOnGrid>
-                    ))}
-                    {emptyItems}
-                    {shifts.map((shift) => (
-                        <CastedComponent
-                            key={`${secondIndexType}-${shift.id}`}
-                            shiftId={shift.id}
-                        />
-                    ))}
-                </GenericCssGrid>
+            <DispatchBatcherProvider timeout={30}>
+                <Box sx={{ m: 2, p: 2 }}>
+                    <GenericCssGrid<Date, Item>
+                        {...genericCssGridProps}
+                        gap="1px"
+                    >
+                        {jsxElements}
+                    </GenericCssGrid>
+                </Box>
             </DispatchBatcherProvider>
         </OverflowHelper>
     );
 };
 
-export default PlannerGridByHours;
+const arePropsEqual = (prev: Props<any>, curr: Props<any>) => {
+    return (
+        DateFns.isEqual(prev.timeRange.start, curr.timeRange.start) &&
+        DateFns.isEqual(prev.timeRange.end, curr.timeRange.end) &&
+        Object.is(prev.secondIndexHandler, curr.secondIndexHandler) &&
+        Object.is(prev.shiftSelector, curr.shiftSelector)
+    );
+};
+
+export default React.memo(PlannerGridByHours);
+
+//
+
+PlannerGridByHours.whyDidYouRender = true;
