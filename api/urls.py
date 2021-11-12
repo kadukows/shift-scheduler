@@ -9,11 +9,11 @@ from .views import (
 
 router = DefaultRouter()
 router.register(r'user', UserViewSet)
-router.register(r'workplace', WorkplaceViewSet)
-router.register(r'employee', EmployeeViewSet)
-router.register(r'schedule', ScheduleViewSet)
-router.register(r'shift', ShiftViewSet)
-router.register(r'role', RoleViewSet)
+router.register(r'manager/workplace', WorkplaceViewSet)
+router.register(r'manager/employee', EmployeeViewSet)
+router.register(r'manager/schedule', ScheduleViewSet)
+router.register(r'manager/shift', ShiftViewSet)
+router.register(r'manager/role', RoleViewSet)
 
 urlpatterns = [
     path('', include(router.urls)),

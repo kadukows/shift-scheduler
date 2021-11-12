@@ -5,13 +5,13 @@ import {
     ThunkAction,
     AnyAction,
 } from "@reduxjs/toolkit";
-
 import {
     getApiGenericThunkAction,
     makeDispatchActionWhenAuthedObserver,
     sortByLastModified,
 } from "../helpers";
 import { RootState } from "../../store";
+import { MANAGER_API_ROUTES } from "../../ApiRoutes";
 
 export interface Employee {
     id: number;
@@ -73,7 +73,7 @@ export const employeeReducer = employeeSlice.reducer;
 export const getEmployees = getApiGenericThunkAction(
     setLoading,
     setEmployees,
-    "/api/employee/"
+    MANAGER_API_ROUTES.employee
 );
 
 export const employeeObserver = makeDispatchActionWhenAuthedObserver(

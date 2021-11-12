@@ -19,6 +19,7 @@ import {
     GenericUpdateDialogProps,
 } from "../generics";
 import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
+import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
 
 export const UpdateRoleDialog = () => {
     return (
@@ -57,7 +58,7 @@ const ADD_ROLE_PROPS: GenericAddDialogProps<Inputs> = {
             (dispatch, token) =>
                 async ({ name }) => {
                     const res = await axios.post<Role>(
-                        "/api/role/",
+                        MANAGER_API_ROUTES.role,
                         {
                             name,
                             workplace: workplaceId,
@@ -95,7 +96,7 @@ const UPDATE_ROLE_PROPS: GenericUpdateDialogProps<
         (dispatch, item, token) =>
         async ({ name }: Inputs) => {
             const res = await axios.put<Role>(
-                `/api/role/${item.id}/`,
+                `${MANAGER_API_ROUTES.role}${item.id}/`,
                 {
                     name,
                     workplace: item.workplace,
@@ -120,7 +121,7 @@ const UPDATE_ROLE_PROPS: GenericUpdateDialogProps<
         },
     onDelete: async (dispatch, roleId, token) => {
         await axios.delete(
-            `/api/role/${roleId}/`,
+            `${MANAGER_API_ROUTES.role}${roleId}/`,
             getTokenRequestConfig(token)
         );
 

@@ -14,9 +14,6 @@ import IndexPage from "./features/index/IndexPage";
 import LoginForm from "./features/login/LoginForm";
 import LogoutPage from "./features/auth/LogoutPage";
 import TryAuthWithCurrentToken from "./features/auth/TryAuthWithCurrentToken";
-import WorkplacesPage from "./features/workplaces/WorkplacesPage";
-import EmployeePage from "./features/employees/EmployeePage";
-import SchedulePage from "./features/schedules/SchedulesPage";
 import { DndProvider } from "react-dnd";
 import { HTML5Backend } from "react-dnd-html5-backend";
 import DraggablePage from "./features/draggableOnMuiTable/DraggablePage";
@@ -65,20 +62,6 @@ const App = () => {
                                                 >
                                                     <WorkplaceListPage />
                                                 </PrivateRoute>
-                                                {/*
-                                                <PrivateRoute
-                                                    exact
-                                                    path="/employees"
-                                                >
-                                                    <EmployeePage />
-                                                </PrivateRoute>
-                                                <PrivateRoute
-                                                    exact
-                                                    path="/schedules"
-                                                >
-                                                    <SchedulePage />
-                                                </PrivateRoute>
-                                                */}
                                                 <PrivateRoute path="/planner/:schedule_id">
                                                     <PlannerLoader />
                                                 </PrivateRoute>

@@ -12,6 +12,7 @@ import {
     makeDispatchActionWhenAuthedObserver,
 } from "../helpers";
 import { RootState } from "../../store";
+import { MANAGER_API_ROUTES } from "../../ApiRoutes";
 
 export interface Shift {
     id: number;
@@ -71,20 +72,6 @@ const shiftSlice = createSlice({
 
             state.loading = action.payload;
         },
-        //
-        /*
-        deleteAllShiftsWithPropertyNotInGivenSet(
-            state,
-            action: PayloadAction<IdsAndPropertyGetter>
-        ) {
-            const { set, propertyGetter } = action.payload;
-            const toDeleteIds = state.ids.filter((id) => {
-                return !set.has(propertyGetter(state.entities[id]));
-            });
-
-            shiftAdapter.removeMany(toDeleteIds)
-        },
-        */
     },
 });
 
@@ -107,7 +94,7 @@ export const shiftReducer = shiftSlice.reducer;
 const getShifts = getApiGenericThunkAction(
     setLoading,
     setShifts,
-    "/api/shift/"
+    MANAGER_API_ROUTES.shift
 );
 
 export const shiftObserver = makeDispatchActionWhenAuthedObserver(

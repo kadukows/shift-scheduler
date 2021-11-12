@@ -4,6 +4,7 @@ import { RootState } from "../../store";
 import { addAlert } from "../alerts/alertsSlice";
 import { getTokenRequestConfig } from "../helpers";
 import { addShift, Shift, updateShift } from "./shiftSlice";
+import { MANAGER_API_ROUTES } from "../../ApiRoutes";
 
 export const asyncUpdateShift =
     (update: Update<Shift>): ThunkAction<void, RootState, unknown, AnyAction> =>
@@ -18,7 +19,7 @@ export const asyncUpdateShift =
             const token = getState().authReducer.token;
 
             res = await axios.put<Shift>(
-                `/api/shift/${update.id}/`,
+                `${MANAGER_API_ROUTES.shift}${update.id}/`,
                 {
                     ...oldShift,
                     ...update.changes,
@@ -66,7 +67,7 @@ export const asyncAddShiftCopy =
             const token = getState().authReducer.token;
 
             const res = await axios.post<Shift>(
-                `/api/shift/`,
+                MANAGER_API_ROUTES.shift,
                 {
                     ...shift,
                     ...update.changes,

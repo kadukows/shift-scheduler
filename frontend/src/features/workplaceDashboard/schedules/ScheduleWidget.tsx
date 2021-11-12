@@ -34,12 +34,13 @@ import { FieldData } from "../../genericForm/fieldInstance/Field";
 import { getTokenRequestConfig } from "../../helpers";
 import { addAlert } from "../../alerts/alertsSlice";
 import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
+import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
 
 const ScheduleWidget = () => {
     return (
         <EventProvider events={Object.values(EventTypes)}>
             <GenericAddDialog {...addScheduleDialogProps} />
-            {/* TODO */}
+            <GenericUpdateDialog {...updateScheduleDialogProps} />
             <Paper sx={{ p: 4 }}>
                 <Stack spacing={2}>
                     <Stack direction="row">
@@ -156,7 +157,7 @@ const addScheduleDialogProps: GenericAddDialogProps<Inputs> = {
             (dispatch, token) =>
                 async ({ month_year }) => {
                     const res = await axios.post<Schedule>(
-                        "/api/schedule/",
+                        MANAGER_API_ROUTES.schedule,
                         {
                             month_year: format(month_year, TIME_FORMAT),
                             workplace: workplaceId,
@@ -195,7 +196,7 @@ const updateScheduleDialogProps: GenericUpdateDialogProps<
         (dispatch, item, token) =>
         async ({ month_year }) => {
             const res = await axios.put<Schedule>(
-                `/api/schedule/${item.id}/`,
+                `${MANAGER_API_ROUTES.schedule}${item.id}/`,
                 {
                     month_year,
                     workplace: item.workplace,
@@ -220,7 +221,7 @@ const updateScheduleDialogProps: GenericUpdateDialogProps<
         },
     onDelete: async (dispatch, scheduleId, token) => {
         await axios.delete(
-            `/api/schedule/${scheduleId}/`,
+            `${MANAGER_API_ROUTES.schedule}${scheduleId}/`,
             getTokenRequestConfig(token)
         );
 

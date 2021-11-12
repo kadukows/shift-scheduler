@@ -19,7 +19,6 @@ import {
 } from "@mui/material";
 import { Lock } from "@mui/icons-material";
 import { yupResolver } from "@hookform/resolvers/yup";
-
 import { DjangoErrors, handleErrors, MyTextField } from "../helpers";
 import { addAlert } from "../alerts/alertsSlice";
 import { tryAuthWithToken } from "../auth/authSlice";

@@ -1,14 +1,7 @@
 import * as React from "react";
 import * as yup from "yup";
 import axios from "axios";
-import {
-    Stack,
-    Paper,
-    Typography,
-    styled,
-    IconButton,
-    InputOwnerState,
-} from "@mui/material";
+import { Stack, Paper, Typography, styled, IconButton } from "@mui/material";
 import {
     Edit as EditIcon,
     List as ListIcon,
@@ -38,6 +31,7 @@ import { FieldData } from "../../genericForm/fieldInstance/Field";
 import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 import { getTokenRequestConfig } from "../../helpers";
 import { addAlert } from "../../alerts/alertsSlice";
+import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
 
 const WorkplaceWidget = () => {
     return (
@@ -138,7 +132,7 @@ const addWorkplaceDialogProps: GenericAddDialogProps<Inputs> = {
             (dispatch, token) =>
                 async ({ name }) => {
                     const res = await axios.post<Workplace>(
-                        "/api/workplace/",
+                        MANAGER_API_ROUTES.workplace,
                         {
                             name,
                         },
@@ -174,7 +168,7 @@ const updateWorkplaceDialogProps: GenericUpdateDialogProps<
         (dispatch, item, token) =>
         async ({ name }) => {
             const res = await axios.put<Workplace>(
-                `/api/workplace/${item.id}/`,
+                `${MANAGER_API_ROUTES.workplace}${item.id}/`,
                 {
                     name,
                 },
@@ -198,7 +192,7 @@ const updateWorkplaceDialogProps: GenericUpdateDialogProps<
         },
     onDelete: async (dispatch, workplaceId, token) => {
         await axios.delete(
-            `/api/workplace/${workplaceId}/`,
+            `${MANAGER_API_ROUTES.workplace}${workplaceId}/`,
             getTokenRequestConfig(token)
         );
 

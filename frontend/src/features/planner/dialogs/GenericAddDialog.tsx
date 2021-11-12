@@ -21,6 +21,7 @@ import { FieldData } from "../../genericForm/fieldInstance/Field";
 import { getTokenRequestConfig, TIME_FORMAT } from "../../helpers";
 import GenericForm from "../../genericForm/GenericForm";
 import { set } from "./addDialogSlice";
+import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
 
 interface Inputs {
     time_from: Date;
@@ -113,7 +114,7 @@ const GenericAddSetDialog = <Item extends Role | Employee>({
 
     const submit = async (inputs: Inputs) => {
         const response = await axios.post<Shift>(
-            `/api/shift/`,
+            MANAGER_API_ROUTES.shift,
             {
                 ...genRequestData(arg, inputs),
                 time_from: format(inputs.time_from, TIME_FORMAT),

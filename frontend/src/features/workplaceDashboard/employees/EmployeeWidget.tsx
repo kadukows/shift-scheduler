@@ -28,6 +28,7 @@ import { FieldData } from "../../genericForm/fieldInstance/Field";
 import { getTokenRequestConfig } from "../../helpers";
 import { addAlert } from "../../alerts/alertsSlice";
 import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
+import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
 
 const EmployeeWidget = () => {
     return (
@@ -150,7 +151,7 @@ const addEmployeeDialogProps: GenericAddDialogProps<Inputs> = {
             (dispatch, token) =>
                 async ({ first_name, last_name }) => {
                     const res = await axios.post<Employee>(
-                        "/api/employee/",
+                        MANAGER_API_ROUTES.employee,
                         {
                             first_name,
                             last_name,
@@ -192,7 +193,7 @@ const updateEmployeeDialogProps: GenericUpdateDialogProps<
         (dispatch, item, token) =>
         async ({ first_name, last_name }) => {
             const res = await axios.put<Employee>(
-                `/api/employee/${item.id}/`,
+                `${MANAGER_API_ROUTES.employee}${item.id}/`,
                 {
                     first_name,
                     last_name,
@@ -212,7 +213,7 @@ const updateEmployeeDialogProps: GenericUpdateDialogProps<
         },
     onDelete: async (dispatch, employeeId, token) => {
         await axios.delete(
-            `/api/employee/${employeeId}/`,
+            `${MANAGER_API_ROUTES.employee}${employeeId}/`,
             getTokenRequestConfig(token)
         );
 

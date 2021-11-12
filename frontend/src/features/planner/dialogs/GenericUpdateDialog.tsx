@@ -26,6 +26,7 @@ import { RootState } from "../../../store";
 import { Schedule, scheduleSelectors } from "../../schedules/scheduleSlice";
 import { addAlert } from "../../alerts/alertsSlice";
 import { set as updateDialogSet } from "./updateDialogSlice";
+import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
 
 interface Inputs {
     time_from: Date;
@@ -120,7 +121,7 @@ const GenericSetDialog = <Item extends { id: number }>({
 
     const submit = async (inputs: Inputs) => {
         const response = await axios.put<Shift>(
-            `/api/shift/${shift.id}/`,
+            `${MANAGER_API_ROUTES.shift}${shift.id}/`,
             {
                 ...genRequestData(shift, inputs),
                 time_from: format(inputs.time_from, TIME_FORMAT),
@@ -152,7 +153,7 @@ const GenericSetDialog = <Item extends { id: number }>({
         dispatch(updateDialogSet({ open: false }));
 
         await axios.delete(
-            `/api/shift/${shift.id}/`,
+            `${MANAGER_API_ROUTES.shift}${shift.id}/`,
             getTokenRequestConfig(token)
         );
 

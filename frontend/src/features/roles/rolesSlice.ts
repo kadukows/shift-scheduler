@@ -3,12 +3,12 @@ import {
     createEntityAdapter,
     PayloadAction,
 } from "@reduxjs/toolkit";
-
 import {
     getApiGenericThunkAction,
     makeDispatchActionWhenAuthedObserver,
 } from "../helpers";
 import { RootState } from "../../store";
+import { MANAGER_API_ROUTES } from "../../ApiRoutes";
 
 export interface Role {
     id: number;
@@ -23,7 +23,7 @@ interface RoleState extends ReturnType<typeof roleAdapter.getInitialState> {
     loaded: boolean;
 }
 
-const initialState = {
+const initialState: RoleState = {
     loading: false,
     loaded: false,
     ...roleAdapter.getInitialState(),
@@ -65,7 +65,11 @@ export const {
 
 export const roleReducer = roleSlice.reducer;
 
-const getRoles = getApiGenericThunkAction(setLoading, setRoles, "/api/role/");
+const getRoles = getApiGenericThunkAction(
+    setLoading,
+    setRoles,
+    MANAGER_API_ROUTES.role
+);
 
 export const roleObserver = makeDispatchActionWhenAuthedObserver(
     getRoles,

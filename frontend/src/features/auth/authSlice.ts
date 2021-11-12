@@ -5,9 +5,9 @@ import {
     AnyAction,
 } from "@reduxjs/toolkit";
 import axios from "axios";
-
 import { RootState } from "../../store";
 import { getTokenRequestConfig } from "../helpers";
+import { GENERAL_API_ROUTES } from "../../ApiRoutes";
 
 interface AuthState {
     loading: boolean;
@@ -73,7 +73,7 @@ export const tryAuthWithCurrentToken =
 
         try {
             const user = await axios.get(
-                "/api/user/",
+                GENERAL_API_ROUTES.user,
                 getTokenRequestConfig(getState().authReducer.token)
             );
             // download workplaces, emplyees, schedules and shifts
@@ -96,7 +96,7 @@ export const tryAuthWithToken =
 
         try {
             const user = await axios.get(
-                "/api/user/",
+                GENERAL_API_ROUTES.user,
                 getTokenRequestConfig(token)
             );
             dispatch(setToken(token));

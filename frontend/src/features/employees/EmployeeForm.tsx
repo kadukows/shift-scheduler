@@ -1,11 +1,10 @@
 import * as React from "react";
 import * as yup from "yup";
-
-import GenericForm from "../genericForm/GenericForm";
 import { FieldData } from "../genericForm/fieldInstance/Field";
 import GenericAddOrUpdateForm from "../genericForm/GenericAddOrUpdateForm";
-import { Employee, employeeSelectors } from "../employees/employeeSlice";
+import { Employee } from "../employees/employeeSlice";
 import { Workplace, workplaceSelectors } from "../workplaces/workplaceSlice";
+import { MANAGER_API_ROUTES } from "../../ApiRoutes";
 
 export interface Inputs {
     first_name: string;
@@ -47,7 +46,7 @@ const EmployeeForm = ({ formId, onSubmitted, objectToModify }: Props) => {
     return (
         <GenericAddOrUpdateForm<Inputs, Employee, Workplace>
             fields={fields}
-            baseUrl="/api/employee/"
+            baseUrl={MANAGER_API_ROUTES.employee}
             onSubmitted={onSubmitted}
             formId={formId}
             objectToModify={objectToModify}

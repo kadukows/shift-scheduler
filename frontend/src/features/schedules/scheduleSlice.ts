@@ -3,12 +3,12 @@ import {
     createEntityAdapter,
     PayloadAction,
 } from "@reduxjs/toolkit";
-
 import {
     getApiGenericThunkAction,
     makeDispatchActionWhenAuthedObserver,
 } from "../helpers";
 import { RootState } from "../../store";
+import { MANAGER_API_ROUTES } from "../../ApiRoutes";
 
 export interface Schedule {
     id: number;
@@ -70,7 +70,7 @@ export const scheduleReducer = scheduleSlice.reducer;
 export const getSchedules = getApiGenericThunkAction(
     setLoading,
     setSchedules,
-    "/api/schedule/"
+    MANAGER_API_ROUTES.schedule
 );
 
 export const scheduleObserver = makeDispatchActionWhenAuthedObserver(

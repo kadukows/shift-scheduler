@@ -2,18 +2,14 @@ import {
     createSlice,
     createEntityAdapter,
     PayloadAction,
-    ThunkAction,
-    AnyAction,
 } from "@reduxjs/toolkit";
-import axios from "axios";
-
 import {
-    getTokenRequestConfig,
     sortByLastModified,
     makeDispatchActionWhenAuthedObserver,
     getApiGenericThunkAction,
 } from "../helpers";
 import { RootState } from "../../store";
+import { MANAGER_API_ROUTES } from "../../ApiRoutes";
 
 export interface Workplace {
     id: number;
@@ -74,7 +70,7 @@ export const workplaceReducer = workplaceSlice.reducer;
 export const getWorkplaces = getApiGenericThunkAction(
     setLoading,
     setWorkplaces,
-    "/api/workplace/"
+    MANAGER_API_ROUTES.workplace
 );
 
 export const workplaceObserver = makeDispatchActionWhenAuthedObserver(
