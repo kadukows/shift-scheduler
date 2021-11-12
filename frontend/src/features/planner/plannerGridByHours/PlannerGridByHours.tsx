@@ -1,5 +1,6 @@
 import * as React from "react";
 import * as DateFns from "date-fns";
+const sha1 = require("sha1");
 
 import GenericCssGrid, {
     DefaultColumnItemOnGrid,
@@ -161,8 +162,10 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         DateFns.getUnixTime(timeRange.end),
         itemSelector,
         shiftSelector,
-        shifts.length,
-        items.length,
+        //shifts.length,
+        //items.length,
+        sha1(shifts.map((shift) => shift.id)),
+        sha1(items.map((item) => item.id)),
     ]);
 
     return (

@@ -1,6 +1,7 @@
 import * as React from "react";
 import * as DateFns from "date-fns";
-import { Paper, TextField, MenuItem, Stack } from "@mui/material";
+import { Paper, TextField, MenuItem, Stack, Box, styled } from "@mui/material";
+import DateRangePicker, { DateRange } from "@mui/lab/DateRangePicker";
 
 import { RootState } from "../../store";
 import { Schedule } from "../schedules/scheduleSlice";
@@ -51,19 +52,34 @@ const PlannerBoard = ({ schedule }: Props) => {
     const [timeGrouping, setTimeGrouping] = React.useState<TIME_GROUPING>(
         TIME_GROUPING.ByHours
     );
+    const monthYear = DateFns.parse(schedule.month_year, "MM.yyyy", new Date());
+    const [dateRange, setDateRange] = React.useState<DateRange<Date>>([
+        monthYear,
+        DateFns.endOfMonth(monthYear),
+    ]);
+
+    const timeRangeRef = React.useRef(toInterval(dateRange));
 
     //
     // planner grid by hours
     //
 
-    const monthYear = DateFns.parse(schedule.month_year, "MM.yyyy", new Date());
+    //const monthYear = DateFns.parse(schedule.month_year, "MM.yyyy", new Date());
 
+    /*
     const timeRange = {
         start: monthYear.getTime(),
         end: DateFns.endOfDay(
             DateFns.addDays(DateFns.addMonths(monthYear, 1), -2)
         ).getTime(),
     };
+    */
+
+    const timeRange =
+        dateRange[0] !== null && dateRange[1] !== null
+            ? toInterval(dateRange)
+            : timeRangeRef.current;
+    timeRangeRef.current = timeRange;
 
     const secondIndexHandler:
         | SecondIndexHandler<Employee>
@@ -108,7 +124,7 @@ const PlannerBoard = ({ schedule }: Props) => {
 
     return (
         <Paper sx={{ p: 3 }}>
-            <Stack direction="row" spacing={1}>
+            <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
                 <TextField
                     select
                     label="Second index"
@@ -133,6 +149,21 @@ const PlannerBoard = ({ schedule }: Props) => {
                     <MenuItem value={TIME_GROUPING.ByHours}>By Hours</MenuItem>
                     <MenuItem value={TIME_GROUPING.ByDays}>By Days</MenuItem>
                 </TextField>
+                <Spacer />
+                <DateRangePicker
+                    value={dateRange}
+                    onChange={(value: DateRange<Date>) => setDateRange(value)}
+                    minDate={monthYear}
+                    maxDate={DateFns.endOfMonth(monthYear)}
+                    showDaysOutsideCurrentMonth={false}
+                    renderInput={(startProps, endProps) => (
+                        <React.Fragment>
+                            <TextField {...startProps} />
+                            <Box sx={{ mx: 2 }}> to </Box>
+                            <TextField {...endProps} />
+                        </React.Fragment>
+                    )}
+                />
             </Stack>
 
             <PlannerComponent
@@ -234,3 +265,12 @@ const secondIndexDict = {
         }),
     },
 };
+
+const toInterval = (dateRange: DateRange<Date>) => ({
+    start: dateRange[0].getTime(),
+    end: dateRange[1].getTime(),
+});
+
+const Spacer = styled("div")({
+    flex: 1,
+});
