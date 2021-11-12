@@ -161,6 +161,8 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         DateFns.getUnixTime(timeRange.end),
         itemSelector,
         shiftSelector,
+        shifts.length,
+        items.length,
     ]);
 
     return (
