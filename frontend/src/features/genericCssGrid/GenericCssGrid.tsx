@@ -6,12 +6,6 @@ export interface GridDimensionDefinition<Cell> {
     getId: (a: Cell) => string | number;
 }
 
-const unpackGridDimensionDefinition = <Cell extends unknown>(
-    def: GridDimensionDefinition<Cell>
-) => {
-    return def.cells.map(def.getId);
-};
-
 export interface GridDefinition<Tx, Ty> {
     x: GridDimensionDefinition<Tx>;
     y: GridDimensionDefinition<Ty>;

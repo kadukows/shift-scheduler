@@ -19,7 +19,6 @@ export type ItemComponentType =
     | MultipleShiftItemComponent;
 
 export interface SecondIndexHandler<Item> {
-    itemSelector: (state: RootState) => Item[];
     getId: (item: Item) => number;
     secondIndexType: SECOND_INDEX;
     itemToString: (item: Item) => string;

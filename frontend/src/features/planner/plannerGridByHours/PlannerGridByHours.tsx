@@ -27,9 +27,15 @@ import {
 import OverflowHelper from "../OverflowHelper";
 
 export interface Props<Item> {
-    timeRange: DateFns.Interval;
+    //timeRange: DateFns.Interval;
+    timeStart: number;
+    timeEnd: number;
+
     secondIndexHandler: SecondIndexHandler<Item>;
-    shiftSelector: (state: RootState) => Shift[];
+
+    //shiftSelector: (state: RootState) => Shift[];
+    itemIds: number[];
+    shiftIds: number[];
 }
 
 const TIME_FORMAT = "yyyy-MM-dd'T'HH";
@@ -50,7 +56,8 @@ const EmptyItemLogged = (props: React.ComponentProps<typeof EmptyItem>) => (
 EmptyItemLogged.whyDidYouRender = true;
 
 const PlannerGridByHours = <Item extends Role | Employee>({
-    timeRange,
+    timeStart,
+    timeEnd,
     secondIndexHandler: {
         itemSelector,
         getId,
@@ -59,7 +66,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         ItemComponent,
         getShiftComplementaryFromItemId,
     },
-    shiftSelector,
+    shiftIds,
 }: Props<Item>) => {
     const items = useSelector(itemSelector);
     const shifts = useSelector(shiftSelector);
