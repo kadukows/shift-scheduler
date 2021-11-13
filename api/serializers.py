@@ -60,7 +60,7 @@ class ScheduleSerializer(serializers.ModelSerializer):
     month_year = serializers.DateField(format='%m.%Y', input_formats=['%m.%Y'])
     class Meta:
         model = Schedule
-        fields = ['id', 'workplace', 'month_year', 'last_modified']
+        fields = ['id', 'workplace', 'month_year', 'published', 'last_modified']
         read_only_fields = ['id', 'last_modified']
 
     def validate_workplace(self, value: Workplace):

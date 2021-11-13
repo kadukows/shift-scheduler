@@ -13,6 +13,9 @@ class Workplace(LastModifiedBaseModel):
     owner: User = models.ForeignKey(User, on_delete=models.CASCADE, related_name='owned_workplaces', null=False)
 
     def __str__(self):
+        return f'({self.id}) {self.str_wo_id()}'
+
+    def str_wo_id(self):
         return f'{self.name} (owner: {self.owner})'
 
 
@@ -24,15 +27,22 @@ class Employee(LastModifiedBaseModel):
     first_name: str = models.CharField(max_length=128, null=True)
 
     def __str__(self):
+        return f'({self.id}) {self.str_wo_id()}'
+
+    def str_wo_id(self):
         return f'{self.first_name} {self.last_name}'
 
 
 class Schedule(LastModifiedBaseModel):
     workplace: Workplace = models.ForeignKey(Workplace, on_delete=models.CASCADE, related_name='schedules', null=False)
     month_year: date = models.DateField(null=False)  # we only need a month and a year
+    published: bool = models.BooleanField(null=False, default=False)
 
     def __str__(self):
-        return f'{self.workplace} -- {self.month_year.strftime("%m.%Y")}'
+        return f'({self.id}) {self.str_wo_id()}'
+
+    def str_wo_id(self):
+        return f'{self.workplace.str_wo_id()} -- {self.month_year.strftime("%m.%Y")} -- PUBLISHED: {self.published}'
 
 
 class Role(LastModifiedBaseModel):
@@ -40,7 +50,10 @@ class Role(LastModifiedBaseModel):
     workplace: Workplace = models.ForeignKey(Workplace, on_delete=models.CASCADE, related_name='roles', null=False)
 
     def __str__(self):
-        return f'{self.name} -- {self.workplace}'
+        return f'({self.id}) {self.str_wo_id()}'
+
+    def str_wo_id(self):
+        return f'{self.name} -- {self.workplace.str_wo_id()}'
 
 
 class Shift(LastModifiedBaseModel):
@@ -51,4 +64,7 @@ class Shift(LastModifiedBaseModel):
     role: Role = models.ForeignKey(Role, on_delete=models.CASCADE, related_name='shifts', null=False)
 
     def __str__(self):
-        return f'{self.employee} -- {self.role.name} -- {self.schedule}'
+        return f'({self.id}) {self.str_wo_id()}'
+
+    def str_wo_id(self):
+        return f'{self.employee.str_wo_id()} -- {self.role.name} -- {self.schedule.str_wo_id()}'
