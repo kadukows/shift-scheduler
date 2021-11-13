@@ -30,7 +30,6 @@ const App = () => {
     return (
         <Provider store={store}>
             <DndProvider backend={HTML5Backend}>
-                {/* This component tries to authenticate the user upon site loading (with localStorage "token"). */}
                 <TryAuthWithCurrentToken />
                 <DarkThemeProvider>
                     <LocalizationProvider dateAdapter={AdapterDateFns}>
@@ -40,47 +39,33 @@ const App = () => {
                             <Router>
                                 <Navbar />
                                 <Container sx={{ mt: 2 }}>
-                                    <Grid
-                                        container
-                                        spacing={2}
-                                        direction="column"
-                                    >
-                                        <Grid item>
-                                            <Switch>
-                                                <Route exact path="/">
-                                                    <IndexPage />
-                                                </Route>
-                                                <Route exact path="/login">
-                                                    <LoginForm />
-                                                </Route>
-                                                <Route exact path="/logout">
-                                                    <LogoutPage />
-                                                </Route>
-                                                <PrivateRoute
-                                                    exact
-                                                    path="/workplaces"
-                                                >
-                                                    <WorkplaceListPage />
-                                                </PrivateRoute>
-                                                <PrivateRoute path="/planner/:schedule_id">
-                                                    <PlannerLoader />
-                                                </PrivateRoute>
+                                    <Switch>
+                                        <Route exact path="/">
+                                            <IndexPage />
+                                        </Route>
+                                        <Route exact path="/login">
+                                            <LoginForm />
+                                        </Route>
+                                        <Route exact path="/logout">
+                                            <LogoutPage />
+                                        </Route>
+                                        <PrivateRoute exact path="/workplaces">
+                                            <WorkplaceListPage />
+                                        </PrivateRoute>
+                                        <PrivateRoute path="/planner/:schedule_id">
+                                            <PlannerLoader />
+                                        </PrivateRoute>
 
-                                                <PrivateRoute
-                                                    exact
-                                                    path="/draggables"
-                                                >
-                                                    <DraggablePage />
-                                                </PrivateRoute>
-                                                <PrivateRoute
-                                                    exact
-                                                    path="/workplaceDashboard/:workplaceId"
-                                                >
-                                                    <WorkplaceDashboardPage />
-                                                </PrivateRoute>
-                                            </Switch>
-                                        </Grid>
-                                    </Grid>
+                                        <PrivateRoute exact path="/draggables">
+                                            <DraggablePage />
+                                        </PrivateRoute>
+                                        <PrivateRoute
+                                            exact
+                                            path="/workplaceDashboard/:workplaceId"
+                                        >
+                                            <WorkplaceDashboardPage />
+                                        </PrivateRoute>
+                                    </Switch>
                                 </Container>
                             </Router>
                         </SnackbarProvider>

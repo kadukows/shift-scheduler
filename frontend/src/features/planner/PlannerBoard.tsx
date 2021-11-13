@@ -105,6 +105,10 @@ const PlannerBoard = ({ schedule }: Props) => {
                             Date.parse(shift.time_to),
                             timeRange.end
                         ) !== -1
+                )
+                .sort(
+                    (lhs, rhs) =>
+                        Date.parse(lhs.time_from) - Date.parse(rhs.time_from)
                 ),
         [timeRange.start, timeRange.end, schedule.id]
     );

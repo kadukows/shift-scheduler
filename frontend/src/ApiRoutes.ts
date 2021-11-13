@@ -9,3 +9,11 @@ export const MANAGER_API_ROUTES = {
 export const GENERAL_API_ROUTES = {
     user: "/api/user/",
 };
+
+export const EMPLOYEE_API_ROUTES = {
+    workplace: "/api/employee/workplace/",
+    employee: "/api/employee/employee/",
+    schedule: "/api/employee/schedule/",
+    shift: "/api/employee/shift/",
+    role: "/api/employee/role/",
+};
