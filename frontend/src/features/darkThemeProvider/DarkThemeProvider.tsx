@@ -18,6 +18,15 @@ const DarkThemeProvider = ({ children }: React.PropsWithChildren<Props>) => {
                 palette: {
                     mode: darkMode ? "dark" : "light",
                 },
+                components: {
+                    MuiInput: {
+                        styleOverrides: {
+                            root: {
+                                color: "inherit",
+                            },
+                        },
+                    },
+                },
             }),
         [darkMode]
     );

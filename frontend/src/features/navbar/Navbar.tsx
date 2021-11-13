@@ -1,91 +1,154 @@
 import * as React from "react";
-import { Link as RouterLink, NavLink } from "react-router-dom";
+import { NavLink, useHistory } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { AppBar, Toolbar, Button } from "@mui/material";
-import makeStyles from "@mui/styles/makeStyles";
-import { styled } from "@mui/material";
-import { Menu as MenuIcon } from "@mui/icons-material";
-
+import {
+    AppBar,
+    Toolbar,
+    Button,
+    styled,
+    TextField,
+    MenuItem,
+    Typography,
+} from "@mui/material";
+import { Menu as MenuIcon, RestartAlt } from "@mui/icons-material";
 import DarkThemeToggler from "../darkThemeProvider/DarkThemeToggler";
-import { combineClx } from "../helpers";
 import { RootState } from "../../store";
 
-const useStyles = makeStyles((theme) => ({
-    root: {
-        flexGrow: 1,
-    },
-    spacer: {
-        flexGrow: 1,
-    },
-    menuButton: {
-        marginRight: 2,
-    },
-}));
-
-const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
-
-type LinksProps = React.PropsWithChildren<{ ButtonStyled: React.ElementType }>;
-
-const NoAuthLink = ({ ButtonStyled, children }: LinksProps) => (
-    <>
-        {children}
-        <ButtonStyled to="/login">Login</ButtonStyled>
-    </>
-);
-const AuthLink = ({ ButtonStyled, children }: LinksProps) => (
-    <>
-        <ButtonStyled to="/workplaces">Workplaces</ButtonStyled>
-        {/*<ButtonStyled to="/employees">Employees</ButtonStyled>*/}
-        {/*<ButtonStyled to="/schedules">Schedule</ButtonStyled>*}
-        {/*<ButtonStyled to="/planner">Planner</ButtonStyled>*/}
-        {children}
-        <ButtonStyled to="/logout">Logout</ButtonStyled>
-    </>
-);
+//import "./style.css";
 
 const Navbar = () => {
-    const classes = useStyles();
-    const auth = useSelector((state: RootState) => state.authReducer);
-
-    const MyButton = ({
-        className,
-        ...rest
-    }: React.ComponentProps<typeof Button> &
-        React.ComponentProps<typeof NavLink>) => (
-        <Button
-            color="inherit"
-            component={NavLink}
-            className={combineClx(classes.menuButton, className)}
-            activeClassName="Mui-disabled"
-            exact
-            {...rest}
-        />
+    const [mode, setMode] = React.useState<WebsiteMode>(WebsiteMode.Manager);
+    const history = useHistory();
+    const authed = useSelector(
+        (state: RootState) => state.authReducer.authenticated
     );
 
-    const Links = auth.authenticated
-        ? (props: any) => <AuthLink ButtonStyled={MyButton} {...props} />
-        : (props: any) => <NoAuthLink ButtonStyled={MyButton} {...props} />;
+    const onChangeMode = React.useCallback(
+        (value: WebsiteMode) => {
+            if (mode !== value) {
+                history.push("/");
+            }
+
+            setMode(value);
+        },
+        [mode, history, setMode]
+    );
 
     return (
         <>
-            <div className={classes.root}>
+            <GrowingDiv>
                 <AppBar position="absolute">
                     <Toolbar>
-                        <MyButton to="/draggables">
+                        <NavButton to="/draggables">
                             <MenuIcon />
-                        </MyButton>
+                        </NavButton>
 
-                        <MyButton to="/">Index</MyButton>
-                        <Links>
-                            <div className={classes.spacer} />
-                        </Links>
+                        <NavButton to="/">Index</NavButton>
+                        {authed ? (
+                            <AuthLink mode={mode} setMode={onChangeMode} />
+                        ) : (
+                            <NoAuthLink />
+                        )}
                         <DarkThemeToggler />
                     </Toolbar>
                 </AppBar>
-            </div>
+            </GrowingDiv>
             <Offset />
         </>
     );
 };
 
 export default Navbar;
+
+/**
+ *
+ */
+
+const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
+const Spacer = styled("div")({ flex: 1 });
+const ButtonMarginRight = styled(Button)({
+    marginRight: 4,
+});
+const GrowingDiv = styled("div")({
+    flexGrow: 1,
+});
+
+const NoAuthLink = () => (
+    <>
+        <Spacer />
+        <NavButton to="/login">Login</NavButton>
+    </>
+);
+
+interface WebsiteModeSelectProps {
+    mode: WebsiteMode;
+    setMode: (value: WebsiteMode) => void;
+}
+
+const AuthLink = (props: WebsiteModeSelectProps) => (
+    <>
+        <NavButton to="/workplaces">Workplaces</NavButton>
+        <Spacer />
+        <WebsiteModeSelect {...props} />
+        <NavButton to="/logout">Logout</NavButton>
+    </>
+);
+
+const WebsiteModeSelect = ({ mode, setMode }: WebsiteModeSelectProps) => {
+    return (
+        <MyTextField
+            select
+            variant="standard"
+            value={mode}
+            onChange={(e) => {
+                setMode(e.target.value as WebsiteMode);
+            }}
+            inputProps={inputProps}
+            SelectProps={{
+                renderValue: (value) => (
+                    <WhiteTypography variant="button">{value}</WhiteTypography>
+                ),
+            }}
+        >
+            <MenuItem value={WebsiteMode.Manager}>
+                <Typography variant="button">Manager</Typography>
+            </MenuItem>
+            <MenuItem value={WebsiteMode.Employee}>
+                <Typography variant="button">Employee</Typography>
+            </MenuItem>
+        </MyTextField>
+    );
+};
+
+const NavButton = (
+    props: React.ComponentProps<typeof Button> &
+        React.ComponentProps<typeof NavLink>
+) => (
+    <Button
+        color="inherit"
+        component={NavLink}
+        activeClassName="Mui-disabled"
+        exact
+        {...props}
+    />
+);
+
+enum WebsiteMode {
+    Manager = "Manager",
+    Employee = "Employee",
+}
+
+const inputProps = {
+    color: "inherit",
+};
+
+const MyTextField = styled(TextField)(({ theme }) => ({
+    minWidth: 80,
+    marginRight: theme.spacing(2),
+    marginLeft: theme.spacing(2),
+    //color: "white",
+})) as typeof TextField;
+
+const WhiteTypography = styled(Typography)({
+    //color: "white",
+});

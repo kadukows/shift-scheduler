@@ -27,10 +27,12 @@ import {
 import { potentialNewItemReducer } from "./features/planner/plannerGridByHours/potentialNewItemSlice";
 import { addDialogReducer } from "./features/planner/dialogs/addDialogSlice";
 import { updateDialogReducer } from "./features/planner/dialogs/updateDialogSlice";
+//
 import * as EmployeeEmployee from "./features/userAsEmployee/employee/employeeSlice";
 import * as EmployeeRole from "./features/userAsEmployee/role/roleSlice";
 import * as EmployeeSchedule from "./features/userAsEmployee/schedule/scheduleSlice";
 import * as EmployeeShift from "./features/userAsEmployee/shift/shiftSlice";
+import * as EmployeeWorkplace from "./features/userAsEmployee/workplace/workplaceSlice";
 
 export const store = configureStore({
     reducer: {
@@ -50,6 +52,7 @@ export const store = configureStore({
         employee_roleReducer: EmployeeRole.roleReducer,
         employee_scheduleReducer: EmployeeSchedule.scheduleReducer,
         employee_shiftReducer: EmployeeShift.shiftReducer,
+        employee_workplaceReducer: EmployeeWorkplace.workplaceReducer,
     },
 });
 
@@ -68,4 +71,5 @@ observe(store, [
     EmployeeRole.roleObserver,
     EmployeeSchedule.scheduleObserver,
     EmployeeShift.shiftObserver,
+    EmployeeWorkplace.workplaceObserver,
 ]);

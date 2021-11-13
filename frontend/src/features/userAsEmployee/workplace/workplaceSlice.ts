@@ -7,9 +7,9 @@ import {
     sortByLastModified,
     makeDispatchActionWhenAuthedObserver,
     getApiGenericThunkAction,
-} from "../helpers";
-import { RootState } from "../../store";
-import { MANAGER_API_ROUTES } from "../../ApiRoutes";
+} from "../../helpers";
+import { RootState } from "../../../store";
+import { EMPLOYEE_API_ROUTES } from "../../../ApiRoutes";
 
 export interface Workplace {
     id: number;
@@ -35,12 +35,13 @@ const workplaceSlice = createSlice({
     name: "workplace",
     initialState,
     reducers: {
-        setWorkplaces: workplaceAdapter.setAll,
-        resetWorkplaces: workplaceAdapter.removeAll,
-        addWorkplace: workplaceAdapter.addOne,
-        removeWorkplace: workplaceAdapter.removeOne,
-        removeWorkplaces: workplaceAdapter.removeMany,
-        updateWorkplace: workplaceAdapter.updateOne,
+        setAll: workplaceAdapter.setAll,
+        resetAll: workplaceAdapter.removeAll,
+        addOne: workplaceAdapter.addOne,
+        removeOne: workplaceAdapter.removeOne,
+        removeMany: workplaceAdapter.removeMany,
+        updateOne: workplaceAdapter.updateOne,
+        //
         setLoading(state, action: PayloadAction<boolean>) {
             if (state.loading === true && action.payload === false) {
                 state.loaded = true;
@@ -51,27 +52,19 @@ const workplaceSlice = createSlice({
     },
 });
 
-export const workplaceSelectors = workplaceAdapter.getSelectors(
-    (state: RootState) => state.workplaceReducer
-);
-export const {
-    setWorkplaces,
-    resetWorkplaces,
-    addWorkplace,
-    removeWorkplace,
-    updateWorkplace,
-    setLoading,
-    removeWorkplaces,
-} = workplaceSlice.actions;
+export const workplaceActions = workplaceSlice.actions;
 export const workplaceReducer = workplaceSlice.reducer;
+export const workplaceSelectors = workplaceAdapter.getSelectors(
+    (state: RootState) => state.employee_workplaceReducer
+);
 
 const getWorkplaces = getApiGenericThunkAction(
-    setLoading,
-    setWorkplaces,
-    MANAGER_API_ROUTES.workplace
+    workplaceActions.setLoading,
+    workplaceActions.setAll,
+    EMPLOYEE_API_ROUTES.workplace
 );
 
 export const workplaceObserver = makeDispatchActionWhenAuthedObserver(
     getWorkplaces,
-    resetWorkplaces
+    workplaceActions.resetAll
 );
