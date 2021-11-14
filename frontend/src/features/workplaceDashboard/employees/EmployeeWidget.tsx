@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as yup from "yup";
 import axios from "axios";
-import { Typography, Paper, Stack, IconButton } from "@mui/material";
+import { Paper, Stack, IconButton, Box } from "@mui/material";
 import { GridRowParams } from "@mui/x-data-grid";
 import { Work as WorkIcon, Edit as EditIcon } from "@mui/icons-material";
 import EventProvider, { useSignal } from "../../eventProvider/EventProvider";
@@ -14,6 +14,7 @@ import {
     GenericDashboardDataGridProps,
     GenericUpdateDialog,
     GenericUpdateDialogProps,
+    WidgetTitle,
 } from "../generics";
 import {
     addEmployee,
@@ -30,23 +31,29 @@ import { addAlert } from "../../alerts/alertsSlice";
 import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
 
-const EmployeeWidget = () => {
+interface Props {
+    dataGridHeight?: number;
+}
+
+const EmployeeWidget = ({ dataGridHeight }: Props) => {
+    const height = dataGridHeight ?? 350;
+
     return (
         <EventProvider events={Object.values(EventTypes)}>
             <GenericAddDialog {...addEmployeeDialogProps} />
             <GenericUpdateDialog {...updateEmployeeDialogProps} />
-            <></>
             <Paper sx={{ p: 4 }}>
                 <Stack spacing={2}>
-                    <div style={{ display: "flex", flexDirection: "row" }}>
-                        <Typography variant="h4" component="h4">
+                    <Box sx={{ display: "flex", flexDirection: "row" }}>
+                        <WidgetTitle>
                             Employees <WorkIcon />
-                        </Typography>
-                        <div style={{ flex: 1 }} />
+                        </WidgetTitle>
+                        <Box sx={{ flex: 1 }} />
                         <GenericAddButton addEvent={EventTypes.EMPLOYEE_ADD} />
-                    </div>
-
-                    <GenericDashboardDataGrid {...dataGridProps} />
+                    </Box>
+                    <Box sx={{ height }}>
+                        <GenericDashboardDataGrid {...dataGridProps} />
+                    </Box>
                 </Stack>
             </Paper>
         </EventProvider>

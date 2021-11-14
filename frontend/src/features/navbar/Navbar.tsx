@@ -13,8 +13,7 @@ import {
 import { Menu as MenuIcon, RestartAlt } from "@mui/icons-material";
 import DarkThemeToggler from "../darkThemeProvider/DarkThemeToggler";
 import { RootState } from "../../store";
-
-//import "./style.css";
+import UserProfileList from "./UserProfileList";
 
 const Navbar = () => {
     const [mode, setMode] = React.useState<WebsiteMode>(WebsiteMode.Manager);
@@ -66,9 +65,6 @@ export default Navbar;
 
 const Offset = styled("div")(({ theme }) => theme.mixins.toolbar);
 const Spacer = styled("div")({ flex: 1 });
-const ButtonMarginRight = styled(Button)({
-    marginRight: 4,
-});
 const GrowingDiv = styled("div")({
     flexGrow: 1,
 });
@@ -94,7 +90,8 @@ const AuthLink = ({ mode, setMode }: WebsiteModeSelectProps) => (
         )}
         <Spacer />
         <WebsiteModeSelect mode={mode} setMode={setMode} />
-        <NavButton to="/logout">Logout</NavButton>
+        {/*<NavButton to="/logout">Logout</NavButton>*/}
+        <UserProfileList />
     </>
 );
 
@@ -110,7 +107,7 @@ const WebsiteModeSelect = ({ mode, setMode }: WebsiteModeSelectProps) => {
             inputProps={inputProps}
             SelectProps={{
                 renderValue: (value) => (
-                    <WhiteTypography variant="button">{value}</WhiteTypography>
+                    <Typography variant="button">{value}</Typography>
                 ),
             }}
         >
@@ -150,9 +147,4 @@ const MyTextField = styled(TextField)(({ theme }) => ({
     minWidth: 80,
     marginRight: theme.spacing(2),
     marginLeft: theme.spacing(2),
-    //color: "white",
 })) as typeof TextField;
-
-const WhiteTypography = styled(Typography)({
-    //color: "white",
-});

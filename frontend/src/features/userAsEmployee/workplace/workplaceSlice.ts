@@ -26,7 +26,7 @@ const initialState: WorkplaceState = {
 };
 
 const workplaceSlice = createSlice({
-    name: "workplace",
+    name: "employee_workplace",
     initialState,
     reducers: {
         setAll: workplaceAdapter.setAll,

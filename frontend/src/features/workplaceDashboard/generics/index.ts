@@ -11,12 +11,14 @@ import {
     GenericAddDialogProps,
     GenericUpdateDialogProps,
 } from "./GenericDialogs";
+import WidgetTitle from "./WidgetTitle";
 
 export {
     GenericDashboardDataGrid,
     GenericAddButton,
     GenericUpdateDialog,
     GenericAddDialog,
+    WidgetTitle,
 };
 
 export type {

@@ -1,7 +1,14 @@
 import * as React from "react";
 import * as yup from "yup";
 import axios from "axios";
-import { Paper, Stack, Typography, styled, IconButton } from "@mui/material";
+import {
+    Paper,
+    Stack,
+    Typography,
+    styled,
+    IconButton,
+    Box,
+} from "@mui/material";
 import {
     Edit as EditIcon,
     Schedule as ScheduleIcon,
@@ -36,7 +43,13 @@ import { addAlert } from "../../alerts/alertsSlice";
 import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
 
-const ScheduleWidget = () => {
+interface Props {
+    dataGridHeight?: number;
+}
+
+const ScheduleWidget = ({ dataGridHeight }: Props) => {
+    const height = dataGridHeight ?? 350;
+
     return (
         <EventProvider events={Object.values(EventTypes)}>
             <GenericAddDialog {...addScheduleDialogProps} />
@@ -50,7 +63,9 @@ const ScheduleWidget = () => {
                         <Spacer />
                         <GenericAddButton addEvent={EventTypes.SCHEDULE_ADD} />
                     </Stack>
-                    <GenericDashboardDataGrid {...dataGridProps} />
+                    <Box sx={{ height }}>
+                        <GenericDashboardDataGrid {...dataGridProps} />
+                    </Box>
                 </Stack>
             </Paper>
         </EventProvider>

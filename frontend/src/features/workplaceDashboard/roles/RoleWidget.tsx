@@ -4,14 +4,18 @@ import {
     Paper,
     Stack,
     styled,
-    Button,
     IconButton,
+    Box,
 } from "@mui/material";
 import { Person as PersonIcon, Edit as EditIcon } from "@mui/icons-material";
 import EventProvider, { useSignal } from "../../eventProvider/EventProvider";
 import { CallbackTypes, EventTypes } from "./EventTypes";
 import { UpdateRoleDialog, AddRoleDialog } from "./RoleDialog";
-import { GenericDashboardDataGrid, GenericAddButton } from "../generics";
+import {
+    GenericDashboardDataGrid,
+    GenericAddButton,
+    WidgetTitle,
+} from "../generics";
 import { GridActionsCellItem, GridRowParams } from "@mui/x-data-grid";
 import { Role, roleSelectors } from "../../roles/rolesSlice";
 import { createSelector } from "@reduxjs/toolkit";
@@ -19,27 +23,32 @@ import { RootState } from "../../../store";
 import { useEffectWithoutFirst } from "../../helpers";
 import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 
-interface Props {}
+interface Props {
+    dataGridHeight?: number;
+}
 
-const RoleWidget = (props: Props) => {
+const RoleWidget = ({ dataGridHeight }: Props) => {
+    const height = dataGridHeight ?? 350;
+
     return (
         <EventProvider events={Object.values(EventTypes)}>
             <AddRoleDialog />
             <UpdateRoleDialog />
             <Paper sx={{ p: 4 }}>
                 <Stack spacing={2}>
-                    <div style={{ display: "flex", flexDirection: "row" }}>
-                        <Typography variant="h4" component="h4">
+                    <Box sx={{ display: "flex", flexDirection: "row" }}>
+                        <WidgetTitle>
                             Roles <PersonIcon />
-                        </Typography>
-                        <div style={{ flex: 1 }} />
+                        </WidgetTitle>
+                        <Box sx={{ flex: 1 }} />
                         <GenericAddButton addEvent={EventTypes.ROLE_ADD} />
-                    </div>
-
-                    <GenericDashboardDataGrid
-                        useItemSelector={useItemSelector}
-                        useColumnDefs={useColumnDefs}
-                    />
+                    </Box>
+                    <Box sx={{ height }}>
+                        <GenericDashboardDataGrid
+                            useItemSelector={useItemSelector}
+                            useColumnDefs={useColumnDefs}
+                        />
+                    </Box>
                 </Stack>
             </Paper>
         </EventProvider>

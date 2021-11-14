@@ -13,7 +13,7 @@ const WorkplaceBanner = () => {
 
     return (
         <Paper sx={{ p: 4 }}>
-            <Typography variant="h3" component="h3">
+            <Typography variant="h4" component="h4">
                 {workplace.name}
             </Typography>{" "}
         </Paper>

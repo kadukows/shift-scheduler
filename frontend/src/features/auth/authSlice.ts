@@ -9,11 +9,16 @@ import { RootState } from "../../store";
 import { getTokenRequestConfig } from "../helpers";
 import { GENERAL_API_ROUTES } from "../../ApiRoutes";
 
+interface User {
+    username: string;
+}
+
 interface AuthState {
     loading: boolean;
     loaded: boolean;
     authenticated: boolean;
     token: string;
+    user: User;
 }
 
 const initialState: AuthState = {
@@ -24,6 +29,7 @@ const initialState: AuthState = {
     loaded: localStorage.getItem("token") ? false : true,
     authenticated: false,
     token: localStorage.getItem("token"),
+    user: null,
 };
 
 const authSlice = createSlice({
@@ -38,6 +44,7 @@ const authSlice = createSlice({
 
             state.loading = action.payload;
         },
+        /*
         setAuthenticated(state, action: PayloadAction<boolean>) {
             state.authenticated = action.payload;
         },
@@ -45,16 +52,31 @@ const authSlice = createSlice({
             localStorage.setItem("token", action.payload);
             state.token = action.payload;
         },
+        */
+        setUserTokenAuth(state, action) {
+            state.authenticated = true;
+            state.token = action.payload.token;
+            state.user = action.payload.user;
+        },
         resetAuth(state) {
             state.loading = false;
             state.authenticated = false;
             localStorage.removeItem("token");
             state.token = null;
+            state.user = null;
+        },
+        setUser(state, action: PayloadAction<User>) {
+            state.user = action.payload;
         },
     },
 });
 
-export const { setLoading, setAuthenticated, setToken, resetAuth } =
+interface UserTokenAuthPayload {
+    token: string;
+    user: User;
+}
+
+export const { setLoading, setUserTokenAuth, resetAuth, setUser } =
     authSlice.actions;
 export const authReducer = authSlice.reducer;
 
@@ -72,12 +94,15 @@ export const tryAuthWithCurrentToken =
         dispatch(setLoading(true));
 
         try {
-            const user = await axios.get(
+            const token = getState().authReducer.token;
+
+            const res = await axios.get<User>(
                 GENERAL_API_ROUTES.user,
-                getTokenRequestConfig(getState().authReducer.token)
+                getTokenRequestConfig(token)
             );
-            // download workplaces, emplyees, schedules and shifts
-            dispatch(setAuthenticated(true));
+
+            const { username } = res.data;
+            dispatch(setUserTokenAuth({ user: { username }, token }));
         } catch (err) {
             dispatch(resetAuth());
         } finally {
@@ -95,13 +120,13 @@ export const tryAuthWithToken =
         dispatch(setLoading(true));
 
         try {
-            const user = await axios.get(
+            const res = await axios.get(
                 GENERAL_API_ROUTES.user,
                 getTokenRequestConfig(token)
             );
-            dispatch(setToken(token));
-            // download workplaces, emplyees, schedules and shifts
-            dispatch(setAuthenticated(true));
+
+            const { username } = res.data;
+            dispatch(setUserTokenAuth({ user: { username }, token }));
         } catch (err) {
             dispatch(resetAuth());
         } finally {

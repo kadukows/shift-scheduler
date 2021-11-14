@@ -1,7 +1,14 @@
 import * as React from "react";
 import * as yup from "yup";
 import axios from "axios";
-import { Stack, Paper, Typography, styled, IconButton } from "@mui/material";
+import {
+    Stack,
+    Paper,
+    Typography,
+    styled,
+    IconButton,
+    Box,
+} from "@mui/material";
 import {
     Edit as EditIcon,
     List as ListIcon,
@@ -17,6 +24,7 @@ import {
     GenericUpdateDialogProps,
     GenericDashboardDataGrid,
     GenericDashboardDataGridProps,
+    WidgetTitle,
 } from "../generics";
 import {
     addWorkplace,
@@ -33,7 +41,13 @@ import { getTokenRequestConfig } from "../../helpers";
 import { addAlert } from "../../alerts/alertsSlice";
 import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
 
-const WorkplaceWidget = () => {
+interface Props {
+    dataGridHeight?: number;
+}
+
+const WorkplaceWidget = ({ dataGridHeight }: Props) => {
+    const height = dataGridHeight ?? 350;
+
     return (
         <EventProvider events={Object.values(EventTypes)}>
             <GenericAddDialog {...addWorkplaceDialogProps} />
@@ -41,13 +55,15 @@ const WorkplaceWidget = () => {
             <Paper sx={{ p: 4 }}>
                 <Stack spacing={2}>
                     <Stack direction="row">
-                        <Typography variant="h4" component="h4">
-                            Workplaces <BusinessIcon />
-                        </Typography>
+                        <WidgetTitle>
+                            Workplaces <BusinessIcon />+
+                        </WidgetTitle>
                         <Spacer />
                         <GenericAddButton addEvent={EventTypes.ADD_WORKPLACE} />
                     </Stack>
-                    <GenericDashboardDataGrid {...dataGridProps} />
+                    <Box sx={{ height }}>
+                        <GenericDashboardDataGrid {...dataGridProps} />
+                    </Box>
                 </Stack>
             </Paper>
         </EventProvider>
