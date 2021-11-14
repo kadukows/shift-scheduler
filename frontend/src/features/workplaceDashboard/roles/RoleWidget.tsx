@@ -8,7 +8,7 @@ import {
     IconButton,
 } from "@mui/material";
 import { Person as PersonIcon, Edit as EditIcon } from "@mui/icons-material";
-import EventProvider from "../../eventProvider/EventProvider";
+import EventProvider, { useSignal } from "../../eventProvider/EventProvider";
 import { CallbackTypes, EventTypes } from "./EventTypes";
 import { UpdateRoleDialog, AddRoleDialog } from "./RoleDialog";
 import { GenericDashboardDataGrid, GenericAddButton } from "../generics";
@@ -38,7 +38,6 @@ const RoleWidget = (props: Props) => {
 
                     <GenericDashboardDataGrid
                         useItemSelector={useItemSelector}
-                        updateEvent={EventTypes.ROLE_UPDATE}
                         useColumnDefs={useColumnDefs}
                     />
                 </Stack>
@@ -67,7 +66,9 @@ const useItemSelector = () => {
     return (state: RootState) => rolesByWorkplaceSelector(state, workplaceId);
 };
 
-const useColumnDefs = (signal: CallbackTypes.ROLE_UPDATE) => {
+const useColumnDefs = () => {
+    const signal: CallbackTypes.ROLE_UPDATE = useSignal(EventTypes.ROLE_UPDATE);
+
     const memoMapRef = React.useRef<Map<number, () => void>>(new Map());
     // used only to force rerender
     const [bogus, setBogus] = React.useState(5544);

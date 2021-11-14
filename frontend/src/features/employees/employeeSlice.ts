@@ -6,7 +6,6 @@ import {
 import {
     getApiGenericThunkAction,
     makeDispatchActionWhenAuthedObserver,
-    sortByLastModified,
 } from "../helpers";
 import { RootState } from "../../store";
 import { MANAGER_API_ROUTES } from "../../ApiRoutes";

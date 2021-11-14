@@ -4,7 +4,7 @@ import axios from "axios";
 import { Typography, Paper, Stack, IconButton } from "@mui/material";
 import { GridRowParams } from "@mui/x-data-grid";
 import { Work as WorkIcon, Edit as EditIcon } from "@mui/icons-material";
-import EventProvider from "../../eventProvider/EventProvider";
+import EventProvider, { useSignal } from "../../eventProvider/EventProvider";
 import { EventTypes, CallbackTypes } from "./EventTypes";
 import {
     GenericAddButton,
@@ -83,36 +83,40 @@ const dataGridProps: GenericDashboardDataGridProps<Employee> = {
             [workplaceId]
         );
     },
-    updateEvent: EventTypes.EMPLOYEE_UPDATE,
-    useColumnDefs: (signal) => [
-        {
-            field: "id",
-            headerName: "#",
-            type: "number",
-        },
-        {
-            field: "name",
-            headerName: "Name",
-            flex: 1,
-            valueGetter: getFullName,
-            sortComparator: (v1, v2, cellParams1, cellParams2) =>
-                getFullName(cellParams1).localeCompare(
-                    getFullName(cellParams2)
-                ),
-        },
-        {
-            field: "actions",
-            type: "actions",
-            getActions: (params: GridRowParams<Employee>) => [
-                <IconButton
-                    color="primary"
-                    onClick={() => signal({ employeeId: params.row.id })}
-                >
-                    <EditIcon />
-                </IconButton>,
-            ],
-        },
-    ],
+    useColumnDefs: () => {
+        const signal: CallbackTypes.EMPLOYEE_UPDATE = useSignal(
+            EventTypes.EMPLOYEE_UPDATE
+        );
+        return [
+            {
+                field: "id",
+                headerName: "#",
+                type: "number",
+            },
+            {
+                field: "name",
+                headerName: "Name",
+                flex: 1,
+                valueGetter: getFullName,
+                sortComparator: (v1, v2, cellParams1, cellParams2) =>
+                    getFullName(cellParams1).localeCompare(
+                        getFullName(cellParams2)
+                    ),
+            },
+            {
+                field: "actions",
+                type: "actions",
+                getActions: (params: GridRowParams<Employee>) => [
+                    <IconButton
+                        color="primary"
+                        onClick={() => signal({ employeeId: params.row.id })}
+                    >
+                        <EditIcon />
+                    </IconButton>,
+                ],
+            },
+        ];
+    },
 };
 
 /**

@@ -85,11 +85,15 @@ interface WebsiteModeSelectProps {
     setMode: (value: WebsiteMode) => void;
 }
 
-const AuthLink = (props: WebsiteModeSelectProps) => (
+const AuthLink = ({ mode, setMode }: WebsiteModeSelectProps) => (
     <>
-        <NavButton to="/workplaces">Workplaces</NavButton>
+        {mode === WebsiteMode.Manager ? (
+            <NavButton to="/workplaces">Workplaces</NavButton>
+        ) : (
+            <NavButton to="/as_employee/dashboard">Dashboard</NavButton>
+        )}
         <Spacer />
-        <WebsiteModeSelect {...props} />
+        <WebsiteModeSelect mode={mode} setMode={setMode} />
         <NavButton to="/logout">Logout</NavButton>
     </>
 );

@@ -20,11 +20,11 @@ import DraggablePage from "./features/draggableOnMuiTable/DraggablePage";
 import PrivateRoute from "./features/auth/PrivateRote";
 import PlannerLoader from "./features/planner/PlannerLoader";
 import NotifierComponent from "./features/alerts/NotifierComponent";
-
 import {
     WorkplaceDashboardPage,
     WorkplaceListPage,
 } from "./features/workplaceDashboard";
+import AsEmployeeDashboard from "./features/userAsEmployee/dashboard/Dashboard";
 
 const App = () => {
     return (
@@ -55,7 +55,6 @@ const App = () => {
                                         <PrivateRoute path="/planner/:schedule_id">
                                             <PlannerLoader />
                                         </PrivateRoute>
-
                                         <PrivateRoute exact path="/draggables">
                                             <DraggablePage />
                                         </PrivateRoute>
@@ -64,6 +63,12 @@ const App = () => {
                                             path="/workplaceDashboard/:workplaceId"
                                         >
                                             <WorkplaceDashboardPage />
+                                        </PrivateRoute>
+                                        <PrivateRoute
+                                            exact
+                                            path="/as_employee/dashboard"
+                                        >
+                                            <AsEmployeeDashboard />
                                         </PrivateRoute>
                                     </Switch>
                                 </Container>

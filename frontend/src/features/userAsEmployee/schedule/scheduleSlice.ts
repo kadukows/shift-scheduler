@@ -52,6 +52,7 @@ const scheduleSlice = createSlice({
     },
 });
 
+export type { Schedule };
 export const scheduleReducer = scheduleSlice.reducer;
 export const scheduleActions = scheduleSlice.actions;
 export const scheduleSelectors = scheduleAdapter.getSelectors(

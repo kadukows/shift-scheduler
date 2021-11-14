@@ -9,7 +9,7 @@ import {
 } from "@mui/icons-material";
 import { format } from "date-fns";
 import { useHistory } from "react-router-dom";
-import EventProvider from "../../eventProvider/EventProvider";
+import EventProvider, { useSignal } from "../../eventProvider/EventProvider";
 import { EventTypes, CallbackTypes } from "./EventTypes";
 import {
     GenericAddButton,
@@ -85,9 +85,11 @@ const dataGridProps: GenericDashboardDataGridProps<Schedule> = {
         const workplaceId = useWorkplaceId();
         return (state) => scheduleByWorkplaceSelector(state, workplaceId);
     },
-    updateEvent: EventTypes.SCHEDULE_UPDATE,
-    useColumnDefs: (signal: CallbackTypes.SCHEDULE_UPDATE) => {
+    useColumnDefs: () => {
         const history = useHistory();
+        const signal: CallbackTypes.SCHEDULE_UPDATE = useSignal(
+            EventTypes.SCHEDULE_UPDATE
+        );
 
         return [
             {

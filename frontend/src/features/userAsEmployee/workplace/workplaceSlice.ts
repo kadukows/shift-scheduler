@@ -4,18 +4,12 @@ import {
     PayloadAction,
 } from "@reduxjs/toolkit";
 import {
-    sortByLastModified,
     makeDispatchActionWhenAuthedObserver,
     getApiGenericThunkAction,
 } from "../../helpers";
 import { RootState } from "../../../store";
 import { EMPLOYEE_API_ROUTES } from "../../../ApiRoutes";
-
-export interface Workplace {
-    id: number;
-    name: string;
-    last_modified: string;
-}
+import { Workplace } from "../../workplaces/workplaceSlice";
 
 const workplaceAdapter = createEntityAdapter<Workplace>();
 
@@ -52,6 +46,7 @@ const workplaceSlice = createSlice({
     },
 });
 
+export type { Workplace };
 export const workplaceActions = workplaceSlice.actions;
 export const workplaceReducer = workplaceSlice.reducer;
 export const workplaceSelectors = workplaceAdapter.getSelectors(

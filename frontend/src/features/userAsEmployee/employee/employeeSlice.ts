@@ -47,6 +47,7 @@ const employeeSlice = createSlice({
     },
 });
 
+export type { Employee };
 export const employeeReducer = employeeSlice.reducer;
 export const employeeActions = employeeSlice.actions;
 export const employeeSelectors = employeeAdapter.getSelectors(

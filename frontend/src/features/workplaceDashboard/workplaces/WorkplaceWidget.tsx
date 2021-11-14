@@ -7,7 +7,7 @@ import {
     List as ListIcon,
     Business as BusinessIcon,
 } from "@mui/icons-material";
-import EventProvider from "../../eventProvider/EventProvider";
+import EventProvider, { useSignal } from "../../eventProvider/EventProvider";
 import { EventTypes, CallbackTypes } from "./EventTypes";
 import {
     GenericAddButton,
@@ -68,43 +68,52 @@ const dataGridProps: GenericDashboardDataGridProps<Workplace> = {
     useItemSelector: () => {
         return workplaceSelectors.selectAll;
     },
-    updateEvent: EventTypes.UPDATE_WORKPLACE,
-    useColumnDefs: (signal: CallbackTypes.UPDATE_WORKPLACE) => {
+    useColumnDefs: () => {
         const history = useHistory();
+        const signal: CallbackTypes.UPDATE_WORKPLACE = useSignal(
+            EventTypes.UPDATE_WORKPLACE
+        );
 
-        return [
-            {
-                field: "id",
-                headerName: "#",
-                type: "number",
-            },
-            {
-                field: "name",
-                headerName: "Name",
+        return React.useMemo(
+            () => [
+                {
+                    field: "id",
+                    headerName: "#",
+                    type: "number",
+                },
+                {
+                    field: "name",
+                    headerName: "Name",
 
-                flex: 1,
-            },
-            {
-                field: "actions",
-                type: "actions",
-                getActions: (params: GridRowParams<Workplace>) => [
-                    <IconButton
-                        color="primary"
-                        onClick={() => signal({ workplaceId: params.row.id })}
-                    >
-                        <EditIcon />
-                    </IconButton>,
-                    <IconButton
-                        color="primary"
-                        onClick={() =>
-                            history.push(`/workplaceDashboard/${params.row.id}`)
-                        }
-                    >
-                        <ListIcon />
-                    </IconButton>,
-                ],
-            },
-        ];
+                    flex: 1,
+                },
+                {
+                    field: "actions",
+                    type: "actions",
+                    getActions: (params: GridRowParams<Workplace>) => [
+                        <IconButton
+                            color="primary"
+                            onClick={() =>
+                                signal({ workplaceId: params.row.id })
+                            }
+                        >
+                            <EditIcon />
+                        </IconButton>,
+                        <IconButton
+                            color="primary"
+                            onClick={() =>
+                                history.push(
+                                    `/workplaceDashboard/${params.row.id}`
+                                )
+                            }
+                        >
+                            <ListIcon />
+                        </IconButton>,
+                    ],
+                },
+            ],
+            [signal]
+        );
     },
 };
 

@@ -48,13 +48,12 @@ export default EventProvider;
 
 export const useSignal = (event: string) => {
     const { eventToCallbacks } = React.useContext(EventContext);
-    const result = React.useMemo(
-        () =>
-            (...args: any[]) => {
-                for (const callback of eventToCallbacks[event]) {
-                    callback(...args);
-                }
-            },
+    const result = React.useCallback(
+        (...args: any[]) => {
+            for (const callback of eventToCallbacks[event]) {
+                callback(...args);
+            }
+        },
         [eventToCallbacks, event]
     );
 
