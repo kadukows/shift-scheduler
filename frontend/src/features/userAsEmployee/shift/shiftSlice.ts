@@ -60,6 +60,7 @@ const shiftSlice = createSlice({
     },
 });
 
+export type { Shift };
 export const shiftReducer = shiftSlice.reducer;
 export const shiftActions = shiftSlice.actions;
 export const shiftSelectors = shiftAdapter.getSelectors(

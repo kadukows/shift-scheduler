@@ -2,9 +2,6 @@ import * as React from "react";
 import { GridColDef, GridRowParams, DataGrid } from "@mui/x-data-grid";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../store";
-import { useSignal } from "../../eventProvider/EventProvider";
-import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
-import { styled } from "@mui/material";
 
 export interface Props<Item> {
     useItemSelector: () => (state: RootState) => Item[];

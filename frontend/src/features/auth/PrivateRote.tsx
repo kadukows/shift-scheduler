@@ -6,13 +6,14 @@ import { RootState } from "../../store";
 import { BaseAlert } from "../alerts/alertsSlice";
 import Loader from "../loader/Loader";
 import RedirectWithAlert from "../alerts/RedirectWithAlert";
+import { WebsiteMode } from "../navbar/WebsiteMode";
 
 interface Props extends React.ComponentProps<typeof Route> {
     inverse?: boolean;
     previousPage?: string;
     name?: string;
     noAlert?: boolean;
-    path: string;
+    mode?: WebsiteMode;
 }
 
 function PrivateRoute({
@@ -21,6 +22,7 @@ function PrivateRoute({
     previousPage,
     children,
     noAlert,
+    mode,
     ...rest
 }: React.PropsWithChildren<Props>): React.ReactElement {
     const useSlice = () => useSelector((state: RootState) => state.authReducer);
@@ -48,6 +50,11 @@ function PrivateRoute({
     }
 
     const to = previousPage ? previousPage : "/";
+    /*
+    TODO
+
+    useSetMode(mode);
+    */
 
     return (
         <Route {...rest}>

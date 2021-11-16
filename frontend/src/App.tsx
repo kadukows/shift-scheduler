@@ -5,9 +5,7 @@ import { CssBaseline, Container, Grid } from "@mui/material";
 import AdapterDateFns from "@mui/lab/AdapterDateFns";
 import LocalizationProvider from "@mui/lab/LocalizationProvider";
 import { SnackbarProvider } from "notistack";
-
 import { store } from "./store";
-
 import DarkThemeProvider from "./features/darkThemeProvider/DarkThemeProvider";
 import Navbar from "./features/navbar/Navbar";
 import IndexPage from "./features/index/IndexPage";
@@ -25,6 +23,8 @@ import {
     WorkplaceListPage,
 } from "./features/workplaceDashboard";
 import AsEmployeeDashboard from "./features/userAsEmployee/dashboard/Dashboard";
+import { WebsiteMode } from "./features/navbar/WebsiteMode";
+import ShiftPage from "./features/userAsEmployee/shift/ShiftPage";
 
 const App = () => {
     return (
@@ -49,26 +49,46 @@ const App = () => {
                                         <Route exact path="/logout">
                                             <LogoutPage />
                                         </Route>
-                                        <PrivateRoute exact path="/workplaces">
+                                        <PrivateRoute
+                                            exact
+                                            path="/workplaces"
+                                            mode={WebsiteMode.Manager}
+                                        >
                                             <WorkplaceListPage />
                                         </PrivateRoute>
-                                        <PrivateRoute path="/planner/:schedule_id">
+                                        <PrivateRoute
+                                            exact
+                                            path="/planner/:schedule_id"
+                                            mode={WebsiteMode.Manager}
+                                        >
                                             <PlannerLoader />
                                         </PrivateRoute>
-                                        <PrivateRoute exact path="/draggables">
+                                        <PrivateRoute
+                                            exact
+                                            path="/draggables"
+                                            mode={WebsiteMode.Manager}
+                                        >
                                             <DraggablePage />
                                         </PrivateRoute>
                                         <PrivateRoute
                                             exact
                                             path="/workplaceDashboard/:workplaceId"
+                                            mode={WebsiteMode.Manager}
                                         >
                                             <WorkplaceDashboardPage />
                                         </PrivateRoute>
                                         <PrivateRoute
                                             exact
                                             path="/as_employee/dashboard"
+                                            mode={WebsiteMode.Employee}
                                         >
                                             <AsEmployeeDashboard />
+                                        </PrivateRoute>
+                                        <PrivateRoute
+                                            exact
+                                            path="/as_employee/schedule/:schedule_id"
+                                        >
+                                            <ShiftPage />
                                         </PrivateRoute>
                                     </Switch>
                                 </Container>

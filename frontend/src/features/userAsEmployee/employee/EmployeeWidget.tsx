@@ -5,6 +5,7 @@ import { useSelector } from "react-redux";
 import {
     GenericDashboardDataGridProps,
     GenericDashboardDataGrid,
+    WidgetTitle,
 } from "../../workplaceDashboard/generics";
 import { Workplace, workplaceSelectors } from "../workplace/workplaceSlice";
 import { Employee, employeeSelectors } from "./employeeSlice";
@@ -14,9 +15,9 @@ const EmployeeWidget = () => {
     return (
         <Paper sx={{ p: 2 }}>
             <Stack spacing={2}>
-                <Typography variant="h3" component="h3">
+                <WidgetTitle>
                     Employments <BusinessIcon />
-                </Typography>
+                </WidgetTitle>
                 <DataGridDiv>
                     <GenericDashboardDataGrid {...dataGridProps} />
                 </DataGridDiv>
@@ -56,7 +57,7 @@ const dataGridProps: GenericDashboardDataGridProps<Employee> = {
                         field: "workplace",
                         headerName: "Workplace",
                         valueGetter: (params: GridRowParams<Employee>) =>
-                            workplaceById[params.row.workplace].name,
+                            workplaceById[params.row.workplace]?.name,
                         flex: 1,
                     },
                 ] as GridColDef[],

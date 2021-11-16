@@ -53,10 +53,12 @@ const authSlice = createSlice({
             state.token = action.payload;
         },
         */
-        setUserTokenAuth(state, action) {
+        setUserTokenAuth(state, action: PayloadAction<UserTokenAuthPayload>) {
             state.authenticated = true;
             state.token = action.payload.token;
             state.user = action.payload.user;
+
+            localStorage.setItem("token", action.payload.token);
         },
         resetAuth(state) {
             state.loading = false;

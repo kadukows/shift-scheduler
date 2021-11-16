@@ -14,6 +14,7 @@ import { Menu as MenuIcon, RestartAlt } from "@mui/icons-material";
 import DarkThemeToggler from "../darkThemeProvider/DarkThemeToggler";
 import { RootState } from "../../store";
 import UserProfileList from "./UserProfileList";
+import { WebsiteMode } from "./WebsiteMode";
 
 const Navbar = () => {
     const [mode, setMode] = React.useState<WebsiteMode>(WebsiteMode.Manager);
@@ -32,6 +33,17 @@ const Navbar = () => {
         },
         [mode, history, setMode]
     );
+
+    /*
+    TODO
+
+    const locationMode = useMode();
+    React.useEffect(() => {
+        if (locationMode && locationMode !== mode) {
+            setMode(locationMode);
+        }
+    }, [locationMode, setMode, mode]);
+    */
 
     return (
         <>
@@ -90,7 +102,6 @@ const AuthLink = ({ mode, setMode }: WebsiteModeSelectProps) => (
         )}
         <Spacer />
         <WebsiteModeSelect mode={mode} setMode={setMode} />
-        {/*<NavButton to="/logout">Logout</NavButton>*/}
         <UserProfileList />
     </>
 );
@@ -133,11 +144,6 @@ const NavButton = (
         {...props}
     />
 );
-
-enum WebsiteMode {
-    Manager = "Manager",
-    Employee = "Employee",
-}
 
 const inputProps = {
     color: "inherit",
