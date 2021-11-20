@@ -64,17 +64,6 @@ const PlannerBoard = ({ schedule }: Props) => {
     // planner grid by hours
     //
 
-    //const monthYear = DateFns.parse(schedule.month_year, "MM.yyyy", new Date());
-
-    /*
-    const timeRange = {
-        start: monthYear.getTime(),
-        end: DateFns.endOfDay(
-            DateFns.addDays(DateFns.addMonths(monthYear, 1), -2)
-        ).getTime(),
-    };
-    */
-
     const timeRange =
         dateRange[0] !== null && dateRange[1] !== null
             ? toInterval(dateRange)
@@ -156,7 +145,9 @@ const PlannerBoard = ({ schedule }: Props) => {
                 <Spacer />
                 <DateRangePicker
                     value={dateRange}
-                    onChange={(value: DateRange<Date>) => setDateRange(value)}
+                    onChange={(value: DateRange<Date>) =>
+                        setDateRange([value[0], DateFns.endOfDay(value[1])])
+                    }
                     minDate={monthYear}
                     maxDate={DateFns.endOfMonth(monthYear)}
                     showDaysOutsideCurrentMonth={false}

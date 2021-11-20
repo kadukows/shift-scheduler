@@ -29,9 +29,12 @@ const GenericSecondIndexItem = <SecondIndex extends Role | Employee>({
     getSecondIndex,
     getNodeDesc,
 }: Props<SecondIndex>) => {
-    const shifts = useSelector((state: RootState) =>
-        selectByIds(state, shiftsId)
-    );
+    const shiftsById = useSelector(shiftSelectors.selectEntities);
+    const shifts = shiftsId
+        .map((id) => shiftsById[id])
+        .sort((a, b) =>
+            compareAsc(Date.parse(a.time_from), Date.parse(b.time_from))
+        );
 
     const role = useSelector((state: RootState) =>
         roleSelectors.selectById(state, shifts[0].role)
@@ -129,9 +132,10 @@ const GenericSecondIndexItemPartial = <SecondIndex extends Role | Employee>({
     );
 };
 
+/*
 const selectByIds = createSelector(
     [
-        (state: RootState) => state.shiftReducer.entities,
+        (state: RootState, ids: number[]) => state.shiftReducer.entities,
         (state: RootState, ids: number[]) => ids,
     ],
     (shiftsByIds, ids) =>
@@ -141,3 +145,4 @@ const selectByIds = createSelector(
                 compareAsc(Date.parse(lhs.time_from), Date.parse(rhs.time_from))
             )
 );
+*/

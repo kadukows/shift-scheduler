@@ -14,6 +14,7 @@ export interface Schedule {
     id: number;
     workplace: number;
     month_year: string;
+    published: boolean;
     last_modified: string;
 }
 

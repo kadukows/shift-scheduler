@@ -9,8 +9,8 @@ import {
     format,
     roundToNearestMinutes,
     setMinutes,
+    getMinutes,
 } from "date-fns";
-
 import { DndTypes, ItemPassed, getDndTypeForItemId } from "../DndTypes";
 import {
     useGridArea,
@@ -121,9 +121,12 @@ const EmptyItem = <Item extends Role | Employee>({
 
                     start = setMinutes(
                         roundToNearestMinutes(start),
-                        0
+                        getMinutes(shiftTimeFrom)
                     ).getTime();
-                    end = setMinutes(roundToNearestMinutes(end), 0).getTime();
+                    end = setMinutes(
+                        roundToNearestMinutes(end),
+                        getMinutes(shiftTimeTo)
+                    ).getTime();
 
                     return {
                         itemId,

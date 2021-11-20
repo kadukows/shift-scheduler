@@ -66,6 +66,7 @@ export default EmployeeWidget;
  *  DataGrid
  */
 
+/*
 const employeesByWorkplaceSelector = createSelector(
     [
         (state: RootState) => employeeSelectors.selectAll(state),
@@ -74,6 +75,7 @@ const employeesByWorkplaceSelector = createSelector(
     (employees, workplaceId) =>
         employees.filter((employee) => employee.workplace === workplaceId)
 );
+*/
 
 const getFullName = (params: any) =>
     `${params.getValue(params.id, "first_name")} ${params.getValue(
@@ -86,7 +88,10 @@ const dataGridProps: GenericDashboardDataGridProps<Employee> = {
         const workplaceId = useWorkplaceId();
 
         return React.useCallback(
-            (state) => employeesByWorkplaceSelector(state, workplaceId),
+            (state) =>
+                employeeSelectors
+                    .selectAll(state)
+                    .filter((employee) => employee.workplace === workplaceId),
             [workplaceId]
         );
     },

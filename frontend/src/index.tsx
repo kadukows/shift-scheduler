@@ -8,8 +8,6 @@ import { render } from "react-dom";
 
 import App from "./App";
 
-(App as any).whyDidYouRender = true;
-
 render(
     <React.StrictMode>
         <App />

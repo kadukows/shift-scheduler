@@ -98,7 +98,13 @@ const scheduleByWorkplaceSelector = createSelector(
 const dataGridProps: GenericDashboardDataGridProps<Schedule> = {
     useItemSelector: () => {
         const workplaceId = useWorkplaceId();
-        return (state) => scheduleByWorkplaceSelector(state, workplaceId);
+        return React.useCallback(
+            (state: RootState) =>
+                scheduleSelectors
+                    .selectAll(state)
+                    .filter((schedule) => schedule.workplace === workplaceId),
+            [workplaceId]
+        );
     },
     useColumnDefs: () => {
         const history = useHistory();

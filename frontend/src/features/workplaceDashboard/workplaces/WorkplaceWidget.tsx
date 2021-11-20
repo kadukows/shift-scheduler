@@ -56,7 +56,7 @@ const WorkplaceWidget = ({ dataGridHeight }: Props) => {
                 <Stack spacing={2}>
                     <Stack direction="row">
                         <WidgetTitle>
-                            Workplaces <BusinessIcon />+
+                            Workplaces <BusinessIcon />
                         </WidgetTitle>
                         <Spacer />
                         <GenericAddButton addEvent={EventTypes.ADD_WORKPLACE} />

@@ -72,7 +72,13 @@ const rolesByWorkplaceSelector = createSelector(
 
 const useItemSelector = () => {
     const workplaceId = useWorkplaceId();
-    return (state: RootState) => rolesByWorkplaceSelector(state, workplaceId);
+    return React.useCallback(
+        (state: RootState) =>
+            roleSelectors
+                .selectAll(state)
+                .filter((role) => role.workplace === workplaceId),
+        [workplaceId]
+    );
 };
 
 const useColumnDefs = () => {
