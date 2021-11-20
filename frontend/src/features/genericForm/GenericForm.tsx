@@ -27,16 +27,23 @@ function GenericForm<Inputs, Entity extends WithId>({
 
     const schemaBase: any = {};
     for (const field of fields) {
-        schemaBase[field.name] = field.validation;
+        if ("validation" in field) {
+            schemaBase[field.name] = (field as any).validation;
+        }
     }
 
-    const fieldNames: (keyof Inputs)[] = fields.map((field) => field.name);
+    const fieldNames: (keyof Inputs)[] = React.useMemo(
+        () => fields.map((field) => field.name),
+        [fields]
+    );
 
     const methods = useForm<Inputs>({
         resolver: yupResolver(yup.object().shape(schemaBase)),
         // @ts-expect-error
         defaultValues,
     });
+
+    console.log("DefaultValues: ", defaultValues);
 
     const {
         register,
@@ -46,25 +53,26 @@ function GenericForm<Inputs, Entity extends WithId>({
         control,
     } = methods;
 
-    const onSubmit: SubmitHandler<Inputs> = async (data) => {
-        try {
-            await submit(data as any);
-        } catch (err: any | AxiosError<DjangoErrors<Inputs>>) {
-            if (axios.isAxiosError(err)) {
-                const error: AxiosError<DjangoErrors<Inputs>> = err;
-                if (error.response?.data) {
-                    handleErrors(
-                        fieldNames,
-                        error.response,
-                        setError,
-                        setNonFieldErrors
-                    );
+    const onSubmit: SubmitHandler<Inputs> = React.useCallback(
+        async (data) => {
+            try {
+                await submit(data as any);
+            } catch (err: any | AxiosError<DjangoErrors<Inputs>>) {
+                if (axios.isAxiosError(err)) {
+                    const error: AxiosError<DjangoErrors<Inputs>> = err;
+                    if (error.response?.data) {
+                        handleErrors(
+                            fieldNames,
+                            error.response,
+                            setError,
+                            setNonFieldErrors
+                        );
+                    }
                 }
             }
-        }
-    };
-
-    //let i = 0;
+        },
+        [submit, fieldNames, setError, setNonFieldErrors]
+    );
 
     const baseProps: BaseFieldProps<Inputs> = {
         register,

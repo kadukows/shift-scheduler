@@ -14,7 +14,7 @@ import {
     Schedule as ScheduleIcon,
     InsertInvitation as InsertInvitationIcon,
 } from "@mui/icons-material";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { useHistory } from "react-router-dom";
 import EventProvider, { useSignal } from "../../eventProvider/EventProvider";
 import { EventTypes, CallbackTypes } from "./EventTypes";
@@ -86,15 +86,6 @@ const Spacer = styled("div")({
  * Data Grid
  */
 
-const scheduleByWorkplaceSelector = createSelector(
-    [
-        (state: RootState) => scheduleSelectors.selectAll(state),
-        (state: RootState, workplaceId: number) => workplaceId,
-    ],
-    (schedules, workplaceId) =>
-        schedules.filter((schedule) => schedule.workplace === workplaceId)
-);
-
 const dataGridProps: GenericDashboardDataGridProps<Schedule> = {
     useItemSelector: () => {
         const workplaceId = useWorkplaceId();
@@ -121,7 +112,13 @@ const dataGridProps: GenericDashboardDataGridProps<Schedule> = {
             {
                 field: "month_year",
                 headerName: "Month",
+                flex: 5,
+            },
+            {
+                field: "published",
+                headerName: "Published",
                 flex: 1,
+                type: "boolean",
             },
             {
                 field: "actions",
@@ -153,6 +150,7 @@ const dataGridProps: GenericDashboardDataGridProps<Schedule> = {
 
 interface Inputs {
     month_year: Date;
+    published: boolean;
 }
 
 const fields: FieldData<Inputs, any>[] = [
@@ -164,6 +162,11 @@ const fields: FieldData<Inputs, any>[] = [
         //
         views: ["month", "year"],
         format: "",
+    },
+    {
+        type: "check",
+        name: "published",
+        label: "Published",
     },
 ];
 
@@ -213,16 +216,18 @@ const updateScheduleDialogProps: GenericUpdateDialogProps<
     title: "Update Schedule",
     fields,
     getDefaultValues: (schedule: Schedule) => ({
-        month_year: schedule.month_year,
+        month_year: parse(schedule.month_year, TIME_FORMAT, new Date()),
+        published: schedule.published,
     }),
     submit:
         (dispatch, item, token) =>
-        async ({ month_year }) => {
+        async ({ month_year, published }) => {
             const res = await axios.put<Schedule>(
                 `${MANAGER_API_ROUTES.schedule}${item.id}/`,
                 {
-                    month_year,
+                    month_year: format(month_year, TIME_FORMAT),
                     workplace: item.workplace,
+                    published: published,
                 },
                 getTokenRequestConfig(token)
             );

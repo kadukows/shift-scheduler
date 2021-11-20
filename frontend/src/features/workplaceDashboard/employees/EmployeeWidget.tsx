@@ -78,10 +78,7 @@ const employeesByWorkplaceSelector = createSelector(
 */
 
 const getFullName = (params: any) =>
-    `${params.getValue(params.id, "first_name")} ${params.getValue(
-        params.id,
-        "last_name"
-    )}`;
+    `${params.row.first_name} ${params.row.last_name}`;
 
 const dataGridProps: GenericDashboardDataGridProps<Employee> = {
     useItemSelector: () => {

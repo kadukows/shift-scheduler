@@ -8,6 +8,7 @@ import ChooseObjectIdField, {
 } from "./ChooseObjectIdField";
 import DateField, { DateFieldData } from "./DateField";
 import DateTimeField, { DateTimeFieldData } from "./DateTimeField";
+import CheckField, { CheckFieldData } from "./CheckField";
 import { BaseFieldProps } from "./BaseFieldProps";
 
 /**
@@ -18,7 +19,8 @@ export type FieldData<Inputs, Entity extends WithId> =
     | StringFieldData<Inputs>
     | ChooseObjectIdFieldData<Inputs, Entity>
     | DateFieldData<Inputs>
-    | DateTimeFieldData<Inputs>;
+    | DateTimeFieldData<Inputs>
+    | CheckFieldData<Inputs>;
 
 interface FieldInstanceProps<Inputs, Entity extends WithId>
     extends BaseFieldProps<Inputs> {
@@ -78,6 +80,10 @@ const Field = <Inputs, Entity extends WithId>({
                     {...baseProps}
                 />
             );
+
+        case "check":
+            const checkFieldData = field as CheckFieldData<Inputs>;
+            return <CheckField field={checkFieldData} control={control} />;
     }
 
     return <></>;

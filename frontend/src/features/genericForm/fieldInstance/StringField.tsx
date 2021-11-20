@@ -31,17 +31,6 @@ const StringField = <Inputs extends unknown>({
     field,
     control,
 }: StringFieldProps<Inputs>) => {
-    /*
-    return (
-        <MyTextField<Inputs>
-            errors={errors}
-            name={field.name as keyof Inputs & string}
-            isSubmitting={isSubmitting}
-            register={register}
-            label={field.label ? field.label : capitalize(field.name as string)}
-        />
-    );
-    */
     const {
         field: { ref, onBlur, ...inputProps },
         fieldState: { invalid, error },
