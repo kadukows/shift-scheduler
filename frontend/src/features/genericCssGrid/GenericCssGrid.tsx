@@ -1,5 +1,5 @@
 import * as React from "react";
-import { styled } from "@mui/material";
+import { styled, Box } from "@mui/material";
 
 export interface GridDimensionDefinition<Cell> {
     cells: Cell[];
@@ -209,12 +209,28 @@ export const useGridRow = <Ty extends unknown>(args: GridRowArg<Ty>) => {
     return gridAreaImpl({ ...args, inverse, getIdX: (a) => a, getIdY });
 };
 
+interface GridCornerArg {
+    xStart: string;
+    yStart: string;
+    xEnd?: string;
+    yEnd?: string;
+}
+
+export const useGridCorner = (args: GridCornerArg) => {
+    return gridAreaImpl({
+        ...args,
+        inverse: false,
+        getIdX: (a) => a,
+        getIdY: (a) => a,
+    });
+};
+
 /**
  * Helper components
  */
 
 interface DefaultItemOnGridBaseProps<Tx, Ty>
-    extends React.ComponentProps<"div"> {
+    extends React.ComponentProps<typeof Box> {
     xStart: Tx;
     yStart: Ty;
     xEnd?: Tx;
@@ -235,13 +251,14 @@ const DefaultItemOnGridBase = <Tx, Ty>({
     const gridArea = useGridAreaHook({ xStart, yStart, xEnd, yEnd });
 
     return (
-        <div style={{ ...style, gridArea }} {...rest}>
+        <Box style={{ ...style, gridArea }} {...rest}>
             {children}
-        </div>
+        </Box>
     );
 };
 
-interface DefaultItemOnGridProps<Tx, Ty> extends React.ComponentProps<"div"> {
+interface DefaultItemOnGridProps<Tx, Ty>
+    extends React.ComponentProps<typeof Box> {
     xStart: Tx;
     yStart: Ty;
     xEnd?: Tx;

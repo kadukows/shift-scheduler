@@ -10,6 +10,9 @@ import DateField, { DateFieldData } from "./DateField";
 import DateTimeField, { DateTimeFieldData } from "./DateTimeField";
 import CheckField, { CheckFieldData } from "./CheckField";
 import { BaseFieldProps } from "./BaseFieldProps";
+import DateTimeRangeField, {
+    DateTimeRangeFieldData,
+} from "./DateTimeRangeField";
 
 /**
  * Types definitions
@@ -20,7 +23,8 @@ export type FieldData<Inputs, Entity extends WithId> =
     | ChooseObjectIdFieldData<Inputs, Entity>
     | DateFieldData<Inputs>
     | DateTimeFieldData<Inputs>
-    | CheckFieldData<Inputs>;
+    | CheckFieldData<Inputs>
+    | DateTimeRangeFieldData<Inputs>;
 
 interface FieldInstanceProps<Inputs, Entity extends WithId>
     extends BaseFieldProps<Inputs> {
@@ -84,9 +88,19 @@ const Field = <Inputs, Entity extends WithId>({
         case "check":
             const checkFieldData = field as CheckFieldData<Inputs>;
             return <CheckField field={checkFieldData} control={control} />;
+
+        case "datetime_range":
+            const dateTimeRangeFieldData =
+                field as DateTimeRangeFieldData<Inputs>;
+            return (
+                <DateTimeRangeField
+                    field={dateTimeRangeFieldData}
+                    control={control}
+                />
+            );
     }
 
-    return <></>;
+    return <React.Fragment />;
 };
 
 export default Field;

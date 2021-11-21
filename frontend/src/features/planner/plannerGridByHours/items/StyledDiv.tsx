@@ -1,6 +1,6 @@
-import { styled, Typography } from "@mui/material";
+import { styled, Typography, Box } from "@mui/material";
 
-export const BorderedDiv = styled("div")({
+export const BorderedDiv = styled(Box)({
     width: "100%",
     height: "100%",
     outline: "1px solid rgba(128, 128, 128, 0.4)",

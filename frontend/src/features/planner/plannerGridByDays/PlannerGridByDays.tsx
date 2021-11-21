@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as DateFns from "date-fns";
-import { Typography, styled } from "@mui/material";
+import { Typography, styled, Box } from "@mui/material";
 import {
     MultipleShiftItemComponent,
     SecondIndexHandler,
@@ -91,27 +91,29 @@ const PlannerGridByDays = <Item extends Role | Employee>({
 
     return (
         <OverflowHelper>
-            <GenericCssGrid {...genericCssGridProps} gap="3px">
-                {days.map((day) => (
-                    <DayItem
-                        day={day}
-                        row={ADDITIONAL_FIELDS.DateAnnotation}
-                        key={day.getTime()}
-                    />
-                ))}
-                {items.map((item) => (
-                    <DefaultRowItemOnGrid<Item>
-                        xStart={ADDITIONAL_FIELDS.ItemAnnotation}
-                        yStart={item}
-                        key={item.id}
-                    >
-                        <Typography align="center" sx={{ p: 2 }}>
-                            {itemToString(item)}
-                        </Typography>
-                    </DefaultRowItemOnGrid>
-                ))}
-                {gridItems}
-            </GenericCssGrid>
+            <Box sx={{ m: 2, p: 2 }}>
+                <GenericCssGrid {...genericCssGridProps} gap="3px">
+                    {days.map((day) => (
+                        <DayItem
+                            day={day}
+                            row={ADDITIONAL_FIELDS.DateAnnotation}
+                            key={day.getTime()}
+                        />
+                    ))}
+                    {items.map((item) => (
+                        <DefaultRowItemOnGrid<Item>
+                            xStart={ADDITIONAL_FIELDS.ItemAnnotation}
+                            yStart={item}
+                            key={item.id}
+                        >
+                            <Typography align="center" sx={{ p: 2 }}>
+                                {itemToString(item)}
+                            </Typography>
+                        </DefaultRowItemOnGrid>
+                    ))}
+                    {gridItems}
+                </GenericCssGrid>
+            </Box>
         </OverflowHelper>
     );
 };

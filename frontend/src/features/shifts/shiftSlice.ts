@@ -42,7 +42,6 @@ const shiftSlice = createSlice({
     name: "shift",
     initialState,
     reducers: {
-        /*setShifts: shiftAdapter.setAll,*/
         setShifts(state, action: PayloadAction<Shift[]>) {
             // add default 'blocked' property
             for (const shift of action.payload) {
@@ -53,7 +52,6 @@ const shiftSlice = createSlice({
         },
         resetShifts: shiftAdapter.removeAll,
         //
-        /*addShift: shiftAdapter.addOne,*/
         addShift(state, action: PayloadAction<Shift>) {
             if (!("blocked" in action.payload)) {
                 action.payload.blocked = false;
@@ -61,6 +59,16 @@ const shiftSlice = createSlice({
 
             return shiftAdapter.addOne(state, action);
         },
+        addShifts(state, action: PayloadAction<Shift[]>) {
+            for (const shift of action.payload) {
+                if (!("blocked" in shift)) {
+                    shift.blocked = false;
+                }
+            }
+
+            return shiftAdapter.addMany(state, action);
+        },
+        //
         removeShift: shiftAdapter.removeOne,
         removeManyShift: shiftAdapter.removeMany,
         updateShift: shiftAdapter.updateOne,
@@ -83,6 +91,7 @@ export const {
     setShifts,
     resetShifts,
     addShift,
+    addShifts,
     removeShift,
     removeManyShift,
     updateShift,

@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 
 from django.contrib.auth.models import User
@@ -113,6 +114,7 @@ class ShiftSerializer(serializers.ModelSerializer):
 
         return data
 
+
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
@@ -124,3 +126,7 @@ class RoleSerializer(serializers.ModelSerializer):
             raise serializers.ValidationError("Workplace not found")
 
         return value
+
+
+class ShiftBatchCopySerializer(serializers.Serializer):
+    date = serializers.DateField()

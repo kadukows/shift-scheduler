@@ -4,6 +4,8 @@ export const MANAGER_API_ROUTES = {
     schedule: "/api/manager/schedule/",
     shift: "/api/manager/shift/",
     role: "/api/manager/role/",
+    shiftBatchCopy: (shiftId: number) =>
+        `/api/manager/shift/${shiftId}/batch_copy/`,
 };
 
 export const GENERAL_API_ROUTES = {

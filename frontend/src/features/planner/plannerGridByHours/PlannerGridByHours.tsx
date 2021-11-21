@@ -26,6 +26,7 @@ import {
     SingleShiftItemComponent,
 } from "../SecondIndexHandler";
 import OverflowHelper from "../OverflowHelper";
+import LeftColumnItem from "./items/LeftColumnItem";
 
 export interface Props<Item> {
     timeRange: DateFns.Interval;
@@ -66,8 +67,6 @@ const PlannerGridByHours = <Item extends Role | Employee>({
     const shifts = useSelector(shiftSelector);
 
     const [jsxElements, genericCssGridProps] = React.useMemo(() => {
-        console.log("Calculating jsxElements");
-
         const result: JSX.Element[] = [];
 
         result.push(<PotentialNewItem key="PotentialNewItem" />);
@@ -114,20 +113,33 @@ const PlannerGridByHours = <Item extends Role | Employee>({
 
         for (const item of items) {
             result.push(
-                <DefaultRowItemOnGrid<Item>
+                <LeftColumnItem
                     xStart={ADDITIONAL_FIELDS.ItemAnnotation}
                     yStart={item}
                     key={`item-${item.id}`}
-                    style={{
-                        alignContent: "center",
-                    }}
                 >
-                    <Typography noWrap sx={{ mr: 0.7 }}>
-                        {itemToString(item)}
-                    </Typography>
-                </DefaultRowItemOnGrid>
+                    {itemToString(item)}
+                </LeftColumnItem>
             );
         }
+
+        result.push(
+            <LeftColumnItem
+                xStart={ADDITIONAL_FIELDS.ItemAnnotation}
+                yStart={ADDITIONAL_FIELDS.HourAnnotation}
+                corner
+                key="item-hour"
+            />
+        );
+
+        result.push(
+            <LeftColumnItem
+                xStart={ADDITIONAL_FIELDS.ItemAnnotation}
+                yStart={ADDITIONAL_FIELDS.DateAnnotation}
+                corner
+                key="item-date"
+            />
+        );
 
         const CastedComponent = ItemComponent as SingleShiftItemComponent;
 
@@ -162,16 +174,14 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         DateFns.getUnixTime(timeRange.end),
         itemSelector,
         shiftSelector,
-        //shifts.length,
-        //items.length,
         sha1(shifts.map((shift) => shift.id)),
         sha1(items.map((item) => item.id)),
     ]);
 
     return (
-        <OverflowHelper>
-            <DispatchBatcherProvider timeout={30}>
-                <Box sx={{ m: 2, p: 2 }}>
+        <DispatchBatcherProvider timeout={30}>
+            <OverflowHelper>
+                <Box sx={{ m: 2, p: 2, display: "inline-block" }}>
                     <GenericCssGrid<Date, Item>
                         {...genericCssGridProps}
                         gap="1px"
@@ -179,17 +189,8 @@ const PlannerGridByHours = <Item extends Role | Employee>({
                         {jsxElements}
                     </GenericCssGrid>
                 </Box>
-            </DispatchBatcherProvider>
-        </OverflowHelper>
-    );
-};
-
-const arePropsEqual = (prev: Props<any>, curr: Props<any>) => {
-    return (
-        DateFns.isEqual(prev.timeRange.start, curr.timeRange.start) &&
-        DateFns.isEqual(prev.timeRange.end, curr.timeRange.end) &&
-        Object.is(prev.secondIndexHandler, curr.secondIndexHandler) &&
-        Object.is(prev.shiftSelector, curr.shiftSelector)
+            </OverflowHelper>
+        </DispatchBatcherProvider>
     );
 };
 
