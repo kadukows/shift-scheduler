@@ -6,6 +6,8 @@ export const MANAGER_API_ROUTES = {
     role: "/api/manager/role/",
     shiftBatchCopy: (shiftId: number) =>
         `/api/manager/shift/${shiftId}/batch_copy/`,
+    employeeGetBindingKey: (employeeId: number) =>
+        `/api/manager/employee/${employeeId}/get_binding_key/`,
 };
 
 export const GENERAL_API_ROUTES = {
@@ -18,4 +20,7 @@ export const EMPLOYEE_API_ROUTES = {
     schedule: "/api/employee/schedule/",
     shift: "/api/employee/shift/",
     role: "/api/employee/role/",
+    employeeBindNewEmployee: "/api/employee/employee/bind_new_employee/",
+    employeeDeleteBinding: (employeeId: number) =>
+        `/api/employee/employee/${employeeId}/delete_bound_employee/`,
 };

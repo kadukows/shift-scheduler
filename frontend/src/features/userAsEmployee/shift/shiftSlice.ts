@@ -67,7 +67,7 @@ export const shiftSelectors = shiftAdapter.getSelectors(
     (state: RootState) => state.employee_shiftReducer
 );
 
-const getShifts = getApiGenericThunkAction(
+export const getShifts = getApiGenericThunkAction(
     shiftActions.setLoading,
     shiftActions.setAll,
     EMPLOYEE_API_ROUTES.shift

@@ -65,7 +65,7 @@ export const useSignal = (event: string) => {
     }
 };
 
-export const useSlot = (
+export const useSlot = <CallbackType extends (...a: any[]) => void>(
     event: string,
     callback: (...a: any) => void,
     depends: React.DependencyList = []

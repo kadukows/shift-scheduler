@@ -59,7 +59,7 @@ export const scheduleSelectors = scheduleAdapter.getSelectors(
     (state: RootState) => state.employee_scheduleReducer
 );
 
-const getSchedules = getApiGenericThunkAction(
+export const getSchedules = getApiGenericThunkAction(
     scheduleActions.setLoading,
     scheduleActions.setAll,
     EMPLOYEE_API_ROUTES.schedule

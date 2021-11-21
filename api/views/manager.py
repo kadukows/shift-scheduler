@@ -1,14 +1,16 @@
+from django.utils.crypto import get_random_string
 from rest_framework import serializers, viewsets, permissions, status
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
 from rest_framework.decorators import action
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from ..serializers import (
+    EmptySerializerHelper,
     RoleSerializer,
     ScheduleSerializer,
     ShiftSerializer,
     WorkplaceSerializer,
-    EmployeeSerializer,
+    EmployeeSerializerManager,
     ShiftBatchCopySerializer)
 from ..models import Employee, Schedule, Workplace, Shift, Role
 from ..helpers import LastModifiedHeaderMixin
@@ -25,13 +27,28 @@ class WorkplaceViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
 
 
 class EmployeeViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
-    serializer_class  = EmployeeSerializer
+    serializer_class  = EmployeeSerializerManager
     queryset = Employee.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
         return Employee.objects.filter(workplace__owner=self.request.user).all()
+
+    @action(detail=True, methods=["post"], serializer_class=EmptySerializerHelper)
+    def get_binding_key(self, request, pk=None):
+        employee: Employee = Employee.objects.get(pk=pk)
+        if employee.workplace.owner != self.request.user:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        potential_new_key = get_random_string(length=24)
+        while Employee.objects.filter(bounding_key=potential_new_key).first() != None:
+            potential_new_key = get_random_string(length=24)
+
+        employee.bounding_key = potential_new_key
+        employee.save()
+
+        return Response(EmployeeSerializerManager(employee).data, status=status.HTTP_200_OK);
 
 
 class ScheduleViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):

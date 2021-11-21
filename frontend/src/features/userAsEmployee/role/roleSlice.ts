@@ -50,7 +50,7 @@ export const roleSelectors = roleAdapter.getSelectors(
     (state: RootState) => state.employee_roleReducer
 );
 
-const getRoles = getApiGenericThunkAction(
+export const getRoles = getApiGenericThunkAction(
     roleActions.setLoading,
     roleActions.setAll,
     EMPLOYEE_API_ROUTES.role

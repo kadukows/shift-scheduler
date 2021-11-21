@@ -162,6 +162,7 @@ export interface GenericAddDialogProps<Inputs> {
     formId?: string;
     title: string;
     fields: FieldData<Inputs, any>[];
+    submitButtonText?: string;
 }
 
 export const GenericAddDialog = <Inputs, Item>({
@@ -170,13 +171,14 @@ export const GenericAddDialog = <Inputs, Item>({
     formId,
     title,
     fields,
+    submitButtonText,
 }: GenericAddDialogProps<Inputs>) => {
     const [open, setOpen] = React.useState(false);
     const submit = useSubmit();
     const token = useSelector((state: RootState) => state.authReducer.token);
     const dispatch = useDispatch();
 
-    useSlot(addEvent, () => setOpen(true), []);
+    useSlot(addEvent, () => setOpen(true), [setOpen]);
 
     const nanoIdRef = React.useRef<string>(nanoid());
     const formIdProcessed = formId ?? nanoIdRef.current;
@@ -203,7 +205,7 @@ export const GenericAddDialog = <Inputs, Item>({
             <DialogActions>
                 <Button onClick={() => setOpen(false)}>Close</Button>
                 <Button type="submit" form={formIdProcessed}>
-                    Create
+                    {submitButtonText ?? "Create"}
                 </Button>
             </DialogActions>
         </Dialog>

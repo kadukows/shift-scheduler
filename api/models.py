@@ -22,7 +22,7 @@ class Workplace(LastModifiedBaseModel):
 class Employee(LastModifiedBaseModel):
     workplace: Workplace = models.ForeignKey(Workplace, on_delete=models.CASCADE, related_name='employees', null=False)
     bound_to: User = models.ForeignKey(User, on_delete=models.SET_NULL, related_name='employments', null=True, blank=True)
-    bounding_key: str = models.CharField(max_length=16, null=True, blank=True)
+    bounding_key: str = models.CharField(max_length=16, null=True, blank=True, unique=True)
     last_name: str = models.CharField(max_length=128, null=True)
     first_name: str = models.CharField(max_length=128, null=True)
 
@@ -31,6 +31,9 @@ class Employee(LastModifiedBaseModel):
 
     def str_wo_id(self):
         return f'{self.first_name} {self.last_name}'
+
+    def get_is_bound_to(self):
+        return self.bound_to != None
 
 
 class Schedule(LastModifiedBaseModel):

@@ -43,18 +43,29 @@ class WorkplaceSerializer(serializers.ModelSerializer):
         return Workplace.objects.create(owner=self.context['request'].user, **validated_data)
 
 
-class EmployeeSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Employee
-        fields = ['id', 'last_name', 'workplace', 'first_name', 'last_modified']
-        read_only_fields = ['id', 'last_modified']
-
+class EmployeeSerializerBase(serializers.ModelSerializer):
     def validate_workplace(self, value):
         user: User = self.context['request'].user
         if value.owner != user:
             raise serializers.ValidationError("Workplace not found")
 
         return value
+
+
+class EmployeeSerializerManager(EmployeeSerializerBase):
+    bound_to = serializers.BooleanField(source="get_is_bound_to")
+
+    class Meta:
+        model = Employee
+        fields = ['id', 'last_name', 'workplace', 'first_name', 'last_modified', 'bound_to', 'bounding_key']
+        read_only_fields = ['id', 'last_modified', 'bound_to', 'bounding_key']
+
+
+class EmployeeSerializerEmployee(EmployeeSerializerBase):
+    class Meta:
+        model = Employee
+        fields = ['id', 'last_name', 'workplace', 'first_name', 'last_modified']
+        read_only_fields = ['id', 'last_modified']
 
 
 class ScheduleSerializer(serializers.ModelSerializer):
@@ -130,3 +141,19 @@ class RoleSerializer(serializers.ModelSerializer):
 
 class ShiftBatchCopySerializer(serializers.Serializer):
     date = serializers.DateField()
+
+
+class EmptySerializerHelper(serializers.Serializer):
+    pass
+
+
+class EmployeeBindSerializer(serializers.Serializer):
+    bind_key = serializers.CharField()
+
+    def validate_bind_key(self, value):
+        employee = Employee.objects.filter(bounding_key=value).first()
+
+        if employee is None:
+            raise serializers.ValidationError("Binding key not found")
+
+        return value

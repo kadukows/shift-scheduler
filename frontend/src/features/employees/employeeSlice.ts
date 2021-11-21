@@ -15,6 +15,8 @@ export interface Employee {
     last_name: string;
     first_name: string;
     workplace: number;
+    bound_to?: number;
+    bounding_key?: string;
     last_modified: string;
 }
 

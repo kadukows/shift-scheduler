@@ -1,14 +1,16 @@
 from django.db.models.query import QuerySet
-from rest_framework import serializers, viewsets, permissions
-from rest_framework import authentication
+from rest_framework import viewsets, permissions, status
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.decorators import permission_classes
+from rest_framework.decorators import permission_classes, action
+from rest_framework.response import Response
 from ..serializers import (
+    EmployeeBindSerializer,
+    EmptySerializerHelper,
     RoleSerializer,
     ScheduleSerializer,
     ShiftSerializer,
     WorkplaceSerializer,
-    EmployeeSerializer)
+    EmployeeSerializerEmployee)
 from ..models import Employee, Schedule, Workplace, Shift, Role
 from ..helpers import LastModifiedHeaderMixin
 
@@ -25,13 +27,39 @@ class WorkplaceViewSet(LastModifiedHeaderMixin, viewsets.ReadOnlyModelViewSet):
 
 
 class EmployeeViewSet(LastModifiedHeaderMixin, viewsets.ReadOnlyModelViewSet):
-    serializer_class  = EmployeeSerializer
+    serializer_class  = EmployeeSerializerEmployee
     queryset = Employee.objects.all()
     permission_classes = [permissions.IsAuthenticated]
     authentication_classes = [TokenAuthentication, SessionAuthentication]
 
     def get_queryset(self):
         return Employee.objects.filter(bound_to=self.request.user).all()
+
+    @action(detail=False, methods=['post'], serializer_class=EmployeeBindSerializer)
+    def bind_new_employee(self, request):
+        serializer = self.get_serializer(data=request.data)
+
+        if serializer.is_valid():
+            employee = Employee.objects.filter(bounding_key=serializer.validated_data["bind_key"]).first()
+            employee.bound_to = self.request.user
+            employee.save()
+            return Response(EmployeeSerializerEmployee(employee).data, status=status.HTTP_200_OK)
+        else:
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(detail=True, methods=['delete'], serializer_class=EmptySerializerHelper)
+    def delete_bound_employee(self, request, pk=None):
+        employee: Employee = Employee.objects.get(pk=pk)
+
+        if employee is None:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        if employee.bound_to != request.user:
+            return Response(status=status.HTTP_400_BAD_REQUEST)
+
+        employee.bound_to = None
+        employee.save()
+        return Response(status=status.HTTP_200_OK)
 
 
 class ScheduleViewSet(LastModifiedHeaderMixin, viewsets.ReadOnlyModelViewSet):

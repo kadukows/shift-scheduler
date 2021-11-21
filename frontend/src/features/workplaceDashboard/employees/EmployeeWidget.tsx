@@ -3,7 +3,11 @@ import * as yup from "yup";
 import axios from "axios";
 import { Paper, Stack, IconButton, Box } from "@mui/material";
 import { GridRowParams } from "@mui/x-data-grid";
-import { Work as WorkIcon, Edit as EditIcon } from "@mui/icons-material";
+import {
+    Work as WorkIcon,
+    Edit as EditIcon,
+    VpnKey as VpnKeyIcon,
+} from "@mui/icons-material";
 import EventProvider, { useSignal } from "../../eventProvider/EventProvider";
 import { EventTypes, CallbackTypes } from "./EventTypes";
 import {
@@ -30,6 +34,7 @@ import { getTokenRequestConfig } from "../../helpers";
 import { addAlert } from "../../alerts/alertsSlice";
 import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
+import KeyDialog from "./KeyDialog";
 
 interface Props {
     dataGridHeight?: number;
@@ -42,6 +47,7 @@ const EmployeeWidget = ({ dataGridHeight }: Props) => {
         <EventProvider events={Object.values(EventTypes)}>
             <GenericAddDialog {...addEmployeeDialogProps} />
             <GenericUpdateDialog {...updateEmployeeDialogProps} />
+            <KeyDialog />
             <Paper sx={{ p: 4 }}>
                 <Stack spacing={2}>
                     <Box sx={{ display: "flex", flexDirection: "row" }}>
@@ -66,17 +72,6 @@ export default EmployeeWidget;
  *  DataGrid
  */
 
-/*
-const employeesByWorkplaceSelector = createSelector(
-    [
-        (state: RootState) => employeeSelectors.selectAll(state),
-        (state: RootState, workplaceId: number) => workplaceId,
-    ],
-    (employees, workplaceId) =>
-        employees.filter((employee) => employee.workplace === workplaceId)
-);
-*/
-
 const getFullName = (params: any) =>
     `${params.row.first_name} ${params.row.last_name}`;
 
@@ -93,9 +88,14 @@ const dataGridProps: GenericDashboardDataGridProps<Employee> = {
         );
     },
     useColumnDefs: () => {
-        const signal: CallbackTypes.EMPLOYEE_UPDATE = useSignal(
+        const signalUpdate: CallbackTypes.EMPLOYEE_UPDATE = useSignal(
             EventTypes.EMPLOYEE_UPDATE
         );
+
+        const signalKey: CallbackTypes.EMPLOYEE_KEY_DIALOG_OPEN = useSignal(
+            EventTypes.EMPLOYEE_KEY_DIALOG_OPEN
+        );
+
         return [
             {
                 field: "id",
@@ -105,7 +105,7 @@ const dataGridProps: GenericDashboardDataGridProps<Employee> = {
             {
                 field: "name",
                 headerName: "Name",
-                flex: 1,
+                flex: 5,
                 valueGetter: getFullName,
                 sortComparator: (v1, v2, cellParams1, cellParams2) =>
                     getFullName(cellParams1).localeCompare(
@@ -113,14 +113,28 @@ const dataGridProps: GenericDashboardDataGridProps<Employee> = {
                     ),
             },
             {
+                field: "bound_to",
+                headerName: "Bound",
+                flex: 1,
+                type: "boolean",
+            },
+            {
                 field: "actions",
                 type: "actions",
                 getActions: (params: GridRowParams<Employee>) => [
                     <IconButton
                         color="primary"
-                        onClick={() => signal({ employeeId: params.row.id })}
+                        onClick={() =>
+                            signalUpdate({ employeeId: params.row.id })
+                        }
                     >
                         <EditIcon />
+                    </IconButton>,
+                    <IconButton
+                        color="primary"
+                        onClick={() => signalKey({ employeeId: params.row.id })}
+                    >
+                        <VpnKeyIcon />
                     </IconButton>,
                 ],
             },

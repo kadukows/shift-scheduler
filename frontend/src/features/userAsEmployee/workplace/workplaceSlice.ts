@@ -53,7 +53,7 @@ export const workplaceSelectors = workplaceAdapter.getSelectors(
     (state: RootState) => state.employee_workplaceReducer
 );
 
-const getWorkplaces = getApiGenericThunkAction(
+export const getWorkplaces = getApiGenericThunkAction(
     workplaceActions.setLoading,
     workplaceActions.setAll,
     EMPLOYEE_API_ROUTES.workplace
