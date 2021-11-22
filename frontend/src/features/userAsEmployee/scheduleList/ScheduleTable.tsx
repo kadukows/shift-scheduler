@@ -76,13 +76,7 @@ const ScheduleTable = ({ start, end, useGetShifts }: Props) => {
             : [],
     }));
 
-    return (
-        <Paper sx={{ p: 2 }}>
-            <DataGridDiv>
-                <DataGrid columns={gridColDef} rows={rows} />
-            </DataGridDiv>
-        </Paper>
-    );
+    return <DataGrid columns={gridColDef} rows={rows} />;
 };
 
 export default ScheduleTable;
@@ -95,8 +89,3 @@ interface Data {
     date: Date;
     shifts: Shift[];
 }
-
-const DataGridDiv = styled("div")({
-    width: "100%",
-    height: 650,
-});

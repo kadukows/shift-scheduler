@@ -156,6 +156,9 @@ const loginFields: FieldData<LoginInputs, any>[] = [
         name: "username",
         label: "Username",
         validation: yup.string().required().label("Username"),
+        textFieldProps: {
+            autoFocus: true,
+        },
     },
     {
         type: "string",

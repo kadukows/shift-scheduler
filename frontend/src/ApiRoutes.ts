@@ -24,4 +24,6 @@ export const EMPLOYEE_API_ROUTES = {
     employeeBindNewEmployee: "/api/employee/employee/bind_new_employee/",
     employeeDeleteBinding: (employeeId: number) =>
         `/api/employee/employee/${employeeId}/delete_bound_employee/`,
+    employeeScheduleGetICal: (scheduleId: number) =>
+        `/api/employee/schedule/${scheduleId}/get_ical/`,
 };

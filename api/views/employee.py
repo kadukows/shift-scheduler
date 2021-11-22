@@ -1,8 +1,12 @@
+import os
+from typing import List
+from django.http import FileResponse
 from django.db.models.query import QuerySet
-from rest_framework import viewsets, permissions, status
+from rest_framework import viewsets, permissions, status, renderers
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.decorators import permission_classes, action
+from rest_framework.decorators import permission_classes, action, renderer_classes
 from rest_framework.response import Response
+from icalendar import Calendar, Event
 from ..serializers import (
     EmployeeBindSerializer,
     EmptySerializerHelper,
@@ -62,6 +66,16 @@ class EmployeeViewSet(LastModifiedHeaderMixin, viewsets.ReadOnlyModelViewSet):
         return Response(status=status.HTTP_200_OK)
 
 
+class PassthroughRenderer(renderers.BaseRenderer):
+    """
+        Return data as-is. View should supply a Response.
+    """
+    media_type = ''
+    format = ''
+    def render(self, data, accepted_media_type=None, renderer_context=None):
+        return data
+
+
 class ScheduleViewSet(LastModifiedHeaderMixin, viewsets.ReadOnlyModelViewSet):
     serializer_class = ScheduleSerializer
     queryset = Schedule.objects.all()
@@ -71,6 +85,29 @@ class ScheduleViewSet(LastModifiedHeaderMixin, viewsets.ReadOnlyModelViewSet):
     def get_queryset(self):
         schedule_ids_from_shifts = get_bound_shifts(self.request.user).values('schedule')
         return Schedule.objects.filter(id__in=schedule_ids_from_shifts).filter(published=True).all()
+
+    @action(detail=True, methods=["get"], renderer_classes=(PassthroughRenderer,))
+    def get_ical(self, request, pk=None):
+        schedule: Schedule = self.get_object()
+        shifts: List[Shift] = Shift.objects.filter(schedule=schedule, employee__bound_to=request.user).all()
+
+        cal = Calendar()
+        for shift in shifts:
+            event = Event()
+            event.add('dtstart', shift.time_from)
+            event.add('dtend', shift.time_to)
+            event.add('summary', shift.role.name)
+            event.add('location', shift.schedule.workplace.name)
+
+            cal.add_component(event)
+
+        ical_bytes = cal.to_ical().decode('utf-8')
+
+        response = FileResponse(ical_bytes)
+        response["Content-Length"] = len(ical_bytes)
+        response["Content-Disposition"] = f'attachment; filename="schedule-{schedule.id}.ical"'
+
+        return response
 
 
 class RoleViewSet(LastModifiedHeaderMixin, viewsets.ReadOnlyModelViewSet):
