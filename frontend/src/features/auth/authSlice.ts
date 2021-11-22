@@ -9,7 +9,7 @@ import { RootState } from "../../store";
 import { getTokenRequestConfig } from "../helpers";
 import { GENERAL_API_ROUTES } from "../../ApiRoutes";
 
-interface User {
+export interface User {
     username: string;
 }
 

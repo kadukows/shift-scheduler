@@ -15,6 +15,7 @@ import DarkThemeToggler from "../darkThemeProvider/DarkThemeToggler";
 import { RootState } from "../../store";
 import UserProfileList from "./UserProfileList";
 import { WebsiteMode } from "./WebsiteMode";
+import LoginRegisterDialog from "../login/LoginRegisterDialog";
 
 const Navbar = () => {
     const [mode, setMode] = React.useState<WebsiteMode>(
@@ -41,27 +42,16 @@ const Navbar = () => {
         [mode, history, setMode]
     );
 
-    /*
-    TODO
-
-    const locationMode = useMode();
-    React.useEffect(() => {
-        if (locationMode && locationMode !== mode) {
-            setMode(locationMode);
-        }
-    }, [locationMode, setMode, mode]);
-    */
-
     return (
         <>
             <GrowingDiv>
                 <AppBar position="absolute">
                     <Toolbar>
-                        <NavButton to="/draggables">
+                        <Button color="inherit">
                             <MenuIcon />
-                        </NavButton>
+                        </Button>
 
-                        <NavButton to="/">Index</NavButton>
+                        <NavButton to="/">Home</NavButton>
                         {authed ? (
                             <AuthLink mode={mode} setMode={onChangeMode} />
                         ) : (
@@ -88,12 +78,21 @@ const GrowingDiv = styled("div")({
     flexGrow: 1,
 });
 
-const NoAuthLink = () => (
-    <>
-        <Spacer />
-        <NavButton to="/login">Login</NavButton>
-    </>
-);
+const NoAuthLink = () => {
+    const [open, setOpen] = React.useState(false);
+    const handleLogin = React.useCallback(() => setOpen(true), [setOpen]);
+
+    return (
+        <>
+            <Spacer />
+            {/*<NavButton to="/login">Login</NavButton>*/}
+            <Button color="inherit" onClick={handleLogin}>
+                Login
+            </Button>
+            <LoginRegisterDialog open={open} setOpen={setOpen} />
+        </>
+    );
+};
 
 interface WebsiteModeSelectProps {
     mode: WebsiteMode;
@@ -103,9 +102,11 @@ interface WebsiteModeSelectProps {
 const AuthLink = ({ mode, setMode }: WebsiteModeSelectProps) => (
     <>
         {mode === WebsiteMode.Manager ? (
-            <NavButton to="/workplaces">Workplaces</NavButton>
+            <NavButton to="/workplaces">Manager's dashboard</NavButton>
         ) : (
-            <NavButton to="/as_employee/dashboard">Dashboard</NavButton>
+            <NavButton to="/as_employee/dashboard">
+                Employee's dashboard
+            </NavButton>
         )}
         <Spacer />
         <WebsiteModeSelect mode={mode} setMode={setMode} />

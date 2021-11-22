@@ -12,6 +12,7 @@ export const MANAGER_API_ROUTES = {
 
 export const GENERAL_API_ROUTES = {
     user: "/api/user/",
+    getToken: "/api/get_token/",
 };
 
 export const EMPLOYEE_API_ROUTES = {

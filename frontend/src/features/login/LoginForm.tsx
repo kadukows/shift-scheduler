@@ -22,6 +22,7 @@ import { yupResolver } from "@hookform/resolvers/yup";
 import { DjangoErrors, handleErrors, MyTextField } from "../helpers";
 import { addAlert } from "../alerts/alertsSlice";
 import { tryAuthWithToken } from "../auth/authSlice";
+import { GENERAL_API_ROUTES } from "../../ApiRoutes";
 
 interface Props {}
 
@@ -56,7 +57,7 @@ const LoginForm = (props: Props) => {
     const onSubmit: SubmitHandler<Inputs> = async (data) => {
         try {
             const res = await axios.post<{ token: string }>(
-                "/api/get_token/",
+                GENERAL_API_ROUTES.getToken,
                 data
             );
             dispatch(

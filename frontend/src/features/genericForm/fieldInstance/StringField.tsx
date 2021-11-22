@@ -16,6 +16,7 @@ export interface StringFieldData<Inputs> {
     name: keyof Inputs;
     label?: string;
     validation: StringYupValidationBuilderObject;
+    textFieldProps?: React.ComponentProps<typeof TextField>;
 }
 
 interface StringFieldProps<Inputs> {
@@ -42,6 +43,7 @@ const StringField = <Inputs extends unknown>({
     return (
         <TextField
             {...inputProps}
+            {...field.textFieldProps}
             inputRef={ref}
             label={field.label ?? capitalize(field.name as any)}
             error={invalid}
