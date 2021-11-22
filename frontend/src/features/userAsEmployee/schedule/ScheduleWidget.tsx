@@ -1,7 +1,11 @@
 import * as React from "react";
-import { Paper, Stack, Typography, styled } from "@mui/material";
-import { Business as BusinessIcon } from "@mui/icons-material";
+import { Paper, Stack, Typography, styled, IconButton } from "@mui/material";
+import {
+    Business as BusinessIcon,
+    MoreHoriz as MoreHorizIcon,
+} from "@mui/icons-material";
 import { useSelector } from "react-redux";
+import { useHistory } from "react-router-dom";
 import {
     GenericDashboardDataGridProps,
     GenericDashboardDataGrid,
@@ -36,6 +40,7 @@ const dataGridProps: GenericDashboardDataGridProps<Schedule> = {
     },
     useColumnDefs: () => {
         const workplaceById = useSelector(workplaceSelectors.selectEntities);
+        const history = useHistory();
 
         return React.useMemo(
             () =>
@@ -57,6 +62,22 @@ const dataGridProps: GenericDashboardDataGridProps<Schedule> = {
                         valueGetter: (params: GridRowParams<Schedule>) =>
                             workplaceById[params.row.workplace]?.name,
                         flex: 2,
+                    },
+                    {
+                        field: "actions",
+                        type: "actions",
+                        getActions: (params: GridRowParams<Schedule>) => [
+                            <IconButton
+                                color="primary"
+                                onClick={() =>
+                                    history.push(
+                                        `/as_employee/schedule/${params.row.id}`
+                                    )
+                                }
+                            >
+                                <MoreHorizIcon />
+                            </IconButton>,
+                        ],
                     },
                 ] as GridColDef[],
             [workplaceById]

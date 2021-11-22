@@ -50,20 +50,18 @@ const EmployeeWidget = () => {
             <DeleteEmploymentDialog />
             <Paper sx={{ p: 2 }}>
                 <Stack spacing={2}>
-                    <WidgetTitle>
-                        <Box sx={{ display: "flex", flexDirection: "row" }}>
-                            <Box>
-                                <Typography component="h6" variant="h6" noWrap>
-                                    Employments <BusinessIcon />
-                                </Typography>
-                            </Box>
-                            <Box sx={{ flex: 1 }} />
+                    <Box sx={{ display: "flex", flexDirection: "row" }}>
+                        <WidgetTitle>
+                            Employments <BusinessIcon />
+                        </WidgetTitle>
+                        <Box sx={{ flex: 1 }} />
+                        <Box>
                             <GenericAddButton
                                 addEvent={EventTypes.ADD_NEW_EMPLOYMENT}
                                 text="Bind"
                             />
                         </Box>
-                    </WidgetTitle>
+                    </Box>
                     <DataGridDiv>
                         <GenericDashboardDataGrid {...dataGridProps} />
                     </DataGridDiv>

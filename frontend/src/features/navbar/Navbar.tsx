@@ -17,11 +17,18 @@ import UserProfileList from "./UserProfileList";
 import { WebsiteMode } from "./WebsiteMode";
 
 const Navbar = () => {
-    const [mode, setMode] = React.useState<WebsiteMode>(WebsiteMode.Manager);
+    const [mode, setMode] = React.useState<WebsiteMode>(
+        (localStorage.getItem("website-mode") as WebsiteMode) ??
+            WebsiteMode.Manager
+    );
     const history = useHistory();
     const authed = useSelector(
         (state: RootState) => state.authReducer.authenticated
     );
+
+    React.useEffect(() => {
+        localStorage.setItem("website-mode", mode);
+    }, [mode]);
 
     const onChangeMode = React.useCallback(
         (value: WebsiteMode) => {

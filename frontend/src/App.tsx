@@ -25,6 +25,7 @@ import {
 import AsEmployeeDashboard from "./features/userAsEmployee/dashboard/Dashboard";
 import { WebsiteMode } from "./features/navbar/WebsiteMode";
 import ShiftPage from "./features/userAsEmployee/shift/ShiftPage";
+import ScheduleListPage from "./features/userAsEmployee/scheduleList/ScheduleListPage";
 
 const App = () => {
     return (
@@ -84,11 +85,19 @@ const App = () => {
                                         >
                                             <AsEmployeeDashboard />
                                         </PrivateRoute>
+                                        {/*
                                         <PrivateRoute
                                             exact
                                             path="/as_employee/schedule/:schedule_id"
                                         >
                                             <ShiftPage />
+                                        </PrivateRoute>
+                                        */}
+                                        <PrivateRoute
+                                            exact
+                                            path="/as_employee/schedule/:scheduleId"
+                                        >
+                                            <ScheduleListPage />
                                         </PrivateRoute>
                                     </Switch>
                                 </Container>

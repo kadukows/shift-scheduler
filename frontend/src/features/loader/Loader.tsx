@@ -45,3 +45,17 @@ function Loader<SliceStateType>({
 }
 
 export default Loader;
+
+/**
+ *
+ */
+
+export const connectWithLoader =
+    <Props extends unknown>(useSlice: () => boolean) =>
+    (Comp: React.ComponentType<Props>) =>
+    (props: Props) =>
+        (
+            <Loader useSlice={useSlice} precondition={(a) => a}>
+                <Comp {...props} />
+            </Loader>
+        );
