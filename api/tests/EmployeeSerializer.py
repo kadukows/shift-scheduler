@@ -2,7 +2,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from ..serializers import EmployeeSerializer
+from ..serializers import EmployeeSerializerManager as EmployeeSerializer
 from ..models import Workplace, Employee
 
 from .helpers import RequestMock
@@ -12,7 +12,8 @@ class EmployeeSerializerTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user('foo', 'a@a.com', 'foo')
         self.other_user = User.objects.create_user('bar', 'b@b.com', 'bar')
-        self.workplace = Workplace.objects.create(name='TEST_WORKPLACE', owner=self.user)
+        self.workplace = Workplace.objects.create(
+            name='TEST_WORKPLACE', owner=self.user)
 
     def makeSut(self, *args, other_user=False, **kwargs):
         context = {

@@ -1,10 +1,16 @@
+absl-py==1.0.0
 asgiref==3.4.1
+autopep8==1.6.0
 coverage==6.0.1
 Django==3.2.7
 django-rest-framework==0.1.0
 djangorestframework==3.12.4
 icalendar==4.0.9
+ortools==9.1.9490
+protobuf==3.19.1
+pycodestyle==2.8.0
 python-dateutil==2.8.2
 pytz==2021.1
 six==1.16.0
 sqlparse==0.4.1
+toml==0.10.2

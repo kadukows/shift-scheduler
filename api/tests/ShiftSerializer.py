@@ -5,7 +5,7 @@ from typing import Literal, Tuple
 from django.test import TestCase
 from django.contrib.auth.models import User
 
-from ..serializers import EmployeeSerializer, ShiftSerializer, WorkplaceSerializer
+from ..serializers import ShiftSerializer, EmployeeSerializerManager as EmployeeSerializer
 from ..models import Role, Schedule, Workplace, Employee, Shift
 
 from .helpers import RequestMock
@@ -21,13 +21,17 @@ class ShiftSerializerTests(TestCase):
     def setUp(self):
         self.user = User.objects.create_user('foo', 'a@a.com', 'foo')
         self.other_user = User.objects.create_user('bar', 'b@b.com', 'bar')
-        self.workplace = Workplace.objects.create(name='WORKPLACE_NAME', owner=self.user)
-        self.other_workplace = Workplace.objects.create(name='OTHER_WORKPLACE_NAME', owner=self.user)
+        self.workplace = Workplace.objects.create(
+            name='WORKPLACE_NAME', owner=self.user)
+        self.other_workplace = Workplace.objects.create(
+            name='OTHER_WORKPLACE_NAME', owner=self.user)
 
     def createValidData(self) -> Tuple[Schedule, Employee, Role]:
         return (
-            Schedule.objects.create(workplace=self.workplace, month_year=date(2000, 1, 1)),
-            Employee.objects.create(first_name='F', last_name='B', workplace=self.workplace),
+            Schedule.objects.create(
+                workplace=self.workplace, month_year=date(2000, 1, 1)),
+            Employee.objects.create(
+                first_name='F', last_name='B', workplace=self.workplace),
             Role.objects.create(workplace=self.workplace, name='BASIC_ROLE')
         )
 
@@ -47,17 +51,17 @@ class ShiftSerializerTests(TestCase):
         return (schedule, employee, role)
 
     def createValidShift(
-        self,
-        time_from: DateTime = DateTime(1999, 1, 1, 0, 0),
-        time_to: DateTime = DateTime(1999, 1, 1, 8, 0)):
-            schedule, employee, role = self.createValidData()
-            return Shift.objects.create(
-                schedule=schedule,
-                employee=employee,
-                role=role,
-                time_from=time_from,
-                time_to=time_to
-            )
+            self,
+            time_from: DateTime = DateTime(1999, 1, 1, 0, 0),
+            time_to: DateTime = DateTime(1999, 1, 1, 8, 0)):
+        schedule, employee, role = self.createValidData()
+        return Shift.objects.create(
+            schedule=schedule,
+            employee=employee,
+            role=role,
+            time_from=time_from,
+            time_to=time_to
+        )
 
     def makeSut(self, *args, other_user=False, **kwargs):
         context = {
@@ -68,7 +72,8 @@ class ShiftSerializerTests(TestCase):
 
     def test_shift_serializer_serializes(self):
         schedule, employee, role = self.createValidData()
-        time_from = DateTime(1999, 1, 1, 0, tzinfo=timezone(timedelta(hours=0)))
+        time_from = DateTime(
+            1999, 1, 1, 0, tzinfo=timezone(timedelta(hours=0)))
         time_to = DateTime(1999, 1, 1, 8, tzinfo=timezone(timedelta(hours=0)))
         shift = Shift.objects.create(
             schedule=schedule,
@@ -92,7 +97,8 @@ class ShiftSerializerTests(TestCase):
 
     def test_shift_serializer_deserializes(self):
         schedule, employee, role = self.createValidData()
-        time_from = DateTime(1999, 1, 1, 0, tzinfo=timezone(timedelta(hours=0)))
+        time_from = DateTime(
+            1999, 1, 1, 0, tzinfo=timezone(timedelta(hours=0)))
         time_to = DateTime(1999, 1, 1, 8, tzinfo=timezone(timedelta(hours=0)))
 
         sut = self.makeSut(data={
@@ -114,13 +120,17 @@ class ShiftSerializerTests(TestCase):
         self.assertEqual(shift.time_to, time_to)
 
     def test_shift_serializer_validates_workplaces_are_congruent(self):
-        invalidParts = [ShiftModelPart.SCHEDULE, ShiftModelPart.EMPLOYEE, ShiftModelPart.ROLE]
+        invalidParts = [ShiftModelPart.SCHEDULE,
+                        ShiftModelPart.EMPLOYEE, ShiftModelPart.ROLE]
 
         for invalidPart in invalidParts:
             with self.subTest():
-                schedule, employee, role = self.createDataWithDifferentWorkplaces(invalidPart)
-                time_from = DateTime(1999, 1, 1, 0, tzinfo=timezone(timedelta(hours=0)))
-                time_to = DateTime(1999, 1, 1, 8, tzinfo=timezone(timedelta(hours=0)))
+                schedule, employee, role = self.createDataWithDifferentWorkplaces(
+                    invalidPart)
+                time_from = DateTime(
+                    1999, 1, 1, 0, tzinfo=timezone(timedelta(hours=0)))
+                time_to = DateTime(
+                    1999, 1, 1, 8, tzinfo=timezone(timedelta(hours=0)))
 
                 sut = self.makeSut(data={
                     'schedule': schedule.id,
@@ -139,7 +149,8 @@ class ShiftSerializerTests(TestCase):
 
     def test_shift_serializer_validates_ownership_of_parts(self):
         schedule, employee, role = self.createValidData()
-        time_from = DateTime(1999, 1, 1, 0, tzinfo=timezone(timedelta(hours=0)))
+        time_from = DateTime(
+            1999, 1, 1, 0, tzinfo=timezone(timedelta(hours=0)))
         time_to = DateTime(1999, 1, 1, 8, tzinfo=timezone(timedelta(hours=0)))
 
         sut = self.makeSut(data={
@@ -165,7 +176,8 @@ class ShiftSerializerTests(TestCase):
 
     def test_shift_serializer_validates_time_range(self):
         schedule, employee, role = self.createValidData()
-        time_from = DateTime(1999, 1, 1, 8, tzinfo=timezone(timedelta(hours=0)))
+        time_from = DateTime(
+            1999, 1, 1, 8, tzinfo=timezone(timedelta(hours=0)))
         time_to = DateTime(1999, 1, 1, 0, tzinfo=timezone(timedelta(hours=0)))
 
         sut = self.makeSut(data={
