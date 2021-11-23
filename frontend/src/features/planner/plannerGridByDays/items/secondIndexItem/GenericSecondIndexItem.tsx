@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Typography, Stack } from "@mui/material";
+import { Typography, Stack, Box } from "@mui/material";
 import { useDispatch, useSelector } from "react-redux";
 import { format, compareAsc } from "date-fns";
 import { RootState } from "../../../../../store";
@@ -55,16 +55,33 @@ const GenericSecondIndexItem = <SecondIndex extends Role | Employee>({
     );
 
     return (
-        <Stack style={{ gridArea }} spacing="3px" direction="row">
-            {shifts.map((shift) => (
-                <GenericSecondIndexItemPartial
-                    key={shift.id}
-                    shiftId={shift.id}
-                    getSecondIndex={getSecondIndex}
-                    getNodeDesc={getNodeDesc}
-                />
-            ))}
-        </Stack>
+        <Box
+            style={{
+                gridArea,
+                width: "100%",
+                height: "100%",
+                //display: "inline-block",
+            }}
+        >
+            <Box
+                style={{
+                    display: "grid",
+                    gridTemplateColumns: `repeat(${shifts.length}, 1fr)`,
+                    gap: "3px",
+                    width: "100%",
+                    height: "100%",
+                }}
+            >
+                {shifts.map((shift) => (
+                    <GenericSecondIndexItemPartial
+                        key={shift.id}
+                        shiftId={shift.id}
+                        getSecondIndex={getSecondIndex}
+                        getNodeDesc={getNodeDesc}
+                    />
+                ))}
+            </Box>
+        </Box>
     );
 };
 
@@ -131,18 +148,3 @@ const GenericSecondIndexItemPartial = <SecondIndex extends Role | Employee>({
         </SecondIndexItemDiv>
     );
 };
-
-/*
-const selectByIds = createSelector(
-    [
-        (state: RootState, ids: number[]) => state.shiftReducer.entities,
-        (state: RootState, ids: number[]) => ids,
-    ],
-    (shiftsByIds, ids) =>
-        ids
-            .map((id) => shiftsByIds[id])
-            .sort((lhs, rhs) =>
-                compareAsc(Date.parse(lhs.time_from), Date.parse(rhs.time_from))
-            )
-);
-*/

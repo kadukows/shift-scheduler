@@ -1,4 +1,5 @@
-import datetime
+import datetime, calendar
+from dateutil.relativedelta import relativedelta
 from typing import List
 
 from django.contrib.auth.models import User
@@ -118,7 +119,13 @@ class ShiftSerializer(serializers.ModelSerializer):
                 raise serializers.ValidationError("Mixing of schedule and/or employee and/or role from different workplaces is not permitted")
 
         if data['time_from'] > data['time_to']:
-            raise serializers.ValidationError("time_from could not be greater than time_to")
+            raise serializers.ValidationError("'Time from' field is greater than 'time to'")
+
+        schedule: Schedule = data['schedule']
+        first_of_next_month = schedule.month_year + relativedelta(months=1)
+
+        if data['time_from'] < schedule.month_year or data['time_from'] > first_of_next_month:
+            raise serializers.ValidationError(f"Shift must be in schedule months")
 
         #from time import sleep
         #sleep(5.5)
