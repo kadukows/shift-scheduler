@@ -103,18 +103,6 @@ class Shift(LastModifiedBaseModel):
         return f"{self.employee.str_wo_id()} -- {self.role.name} -- {self.schedule.str_wo_id()}"
 
 
-"""
-class FreeDays(LastModifiedBaseModel):
-    employee: Employee = models.ForeignKey(
-        Employee, on_delete=models.CASCADE, related_name='free_days', null=False)
-    days_from: datetime = models.DateField(null=False)
-    days_to: datetime = models.DateField(null=False)
-
-    def __str__(self):
-        return f'{self.employee} -- {self.day}'
-"""
-
-
 class ShiftTemplate(LastModifiedBaseModel):
     workplace: Workplace = models.ForeignKey(
         Workplace, on_delete=models.CASCADE, related_name="shift_templates", null=False
@@ -139,7 +127,9 @@ class LimitedAvailabilityDescriptor(LastModifiedBaseModel):
     #
     # 2 modes of this object working:
     # LA_Type.FREEDAY = whole day is free for given employee (shift_templates is ignored)
-    # LA_Type.PREFERENCE = shift_templates mentioned here will be at disadvantege when selecting shifts
+    # LA_Type.PREFERENCE = shift_templates mentioned here will be forbidden when selecting shifts
     #
     la_type: LA_Type = models.CharField(max_length=4, choices=LA_Type.choices)
-    shift_templates: List[ShiftTemplate] = models.ManyToManyField(ShiftTemplate)
+    shift_templates: List[ShiftTemplate] = models.ManyToManyField(
+        ShiftTemplate, blank=True
+    )

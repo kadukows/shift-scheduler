@@ -8,7 +8,15 @@ from ortools.init import pywrapinit
 from ortools.sat.python import cp_model
 
 
-from ..models import Workplace, Shift, Employee, Role, ShiftTemplate, Schedule
+from ..models import (
+    LimitedAvailabilityDescriptor,
+    Workplace,
+    Shift,
+    Employee,
+    Role,
+    ShiftTemplate,
+    Schedule,
+)
 
 
 class TranslatedModel:
@@ -74,6 +82,23 @@ class TranslatedModel:
                     )
                     <= 1
                 )
+
+        #
+        # Account for limited availability per employee
+        #
+        #
+
+        for e in employees:
+            for la in e.limited_availabilities.all():
+                la: LimitedAvailabilityDescriptor
+                if la.la_type == LimitedAvailabilityDescriptor.LA_Type.FREEDAY:
+                    for r in roles:
+                        for st in shift_templates:
+                            self.model.Add(self.shifts[(e, la.date, r, st)] == 0)
+                elif la.la_type == LimitedAvailabilityDescriptor.LA_Type.PREFERENCE:
+                    for r in roles:
+                        for st in la.shift_templates.all():
+                            self.model.Add(self.shifts[(e, la.date, r, st)] == 0)
 
         #
         # Employee should have stable shift_template in given week

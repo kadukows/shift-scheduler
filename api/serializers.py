@@ -147,8 +147,8 @@ class ShiftSerializer(serializers.ModelSerializer):
         first_of_next_month = schedule.month_year + relativedelta(months=1)
 
         if (
-            data["time_from"] < schedule.month_year
-            or data["time_from"] > first_of_next_month
+            data["time_from"].date() < schedule.month_year
+            or data["time_from"].date() > first_of_next_month
         ):
             raise serializers.ValidationError(f"Shift must be in schedule months")
 
