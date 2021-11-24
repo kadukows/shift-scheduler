@@ -47,11 +47,23 @@ interface Props {
 
 const PlannerBoard = ({ schedule }: Props) => {
     const [secondIdx, setSecondIdx] = React.useState<SECOND_INDEX>(
-        SECOND_INDEX.Employee
+        (localStorage.getItem("PlannerBoard-SECOND_INDEX") as SECOND_INDEX) ??
+            SECOND_INDEX.Employee
     );
     const [timeGrouping, setTimeGrouping] = React.useState<TIME_GROUPING>(
-        TIME_GROUPING.ByHours
+        (localStorage.getItem("PlannerBoard-TIME_GROUPING") as TIME_GROUPING) ??
+            TIME_GROUPING.ByHours
     );
+
+    React.useEffect(
+        () => localStorage.setItem("PlannerBoard-SECOND_INDEX", secondIdx),
+        [secondIdx]
+    );
+    React.useEffect(
+        () => localStorage.setItem("PlannerBoard-TIME_GROUPING", timeGrouping),
+        [timeGrouping]
+    );
+
     const monthYear = DateFns.parse(schedule.month_year, "MM.yyyy", new Date());
     const [dateRange, setDateRange] = React.useState<DateRange<Date>>([
         monthYear,

@@ -8,11 +8,17 @@ from ortools.init import pywrapinit
 from ortools.sat.python import cp_model
 
 
-from ..models import Workplace, FreeDays, Shift, Employee, Role, ShiftTemplate, Schedule
+from ..models import Workplace, Shift, Employee, Role, ShiftTemplate, Schedule
 
 
 class TranslatedModel:
-    def __init__(self, workplace: Workplace, employees: List[Employee], roles: List[Role], days: List[datetime.date]):
+    def __init__(
+        self,
+        workplace: Workplace,
+        employees: List[Employee],
+        roles: List[Role],
+        days: List[datetime.date],
+    ):
         self.workplace = workplace
         self.employees = employees
         self.roles = roles
@@ -21,16 +27,20 @@ class TranslatedModel:
         shift_templates: List[ShiftTemplate] = workplace.shift_templates.all()
 
         self.model = cp_model.CpModel()
-        self.shifts: Mapping[Tuple[Employee, datetime.date,
-                                   Role, ShiftTemplate], cp_model.IntVar] = {}
+        self.shifts: Mapping[
+            Tuple[Employee, datetime.date, Role, ShiftTemplate], cp_model.IntVar
+        ] = {}
 
         for employee in employees:
             for day in days:
                 for role in roles:
                     for shift_template in shift_templates:
                         shift_template: ShiftTemplate
-                        self.shifts[(employee, day, role, shift_template)] = self.model.NewBoolVar(
-                            f'shift_e{employee.id}d{day.isoformat()}r{role.id}st{shift_template.id}')
+                        self.shifts[
+                            (employee, day, role, shift_template)
+                        ] = self.model.NewBoolVar(
+                            f"shift_e{employee.id}d{day.isoformat()}r{role.id}st{shift_template.id}"
+                        )
 
         #
         # Each role__shift_template can be assigned to single employee
@@ -41,7 +51,12 @@ class TranslatedModel:
                 for shift_template in shift_templates:
                     shift_template: ShiftTemplate
                     self.model.Add(
-                        sum(self.shifts[(e, day, role, shift_template)] for e in employees) <= 1)
+                        sum(
+                            self.shifts[(e, day, role, shift_template)]
+                            for e in employees
+                        )
+                        <= 1
+                    )
 
         #
         # Each employee works at most one role__shift_template per day
@@ -51,16 +66,95 @@ class TranslatedModel:
             for day in days:
 
                 self.model.Add(
-                    sum(self.shifts[(employee, day, role, st)]
-                        for role, st in shiftGenerator(roles, workplace.shift_templates.all())) <= 1)
+                    sum(
+                        self.shifts[(employee, day, role, st)]
+                        for role, st in shiftGenerator(
+                            roles, workplace.shift_templates.all()
+                        )
+                    )
+                    <= 1
+                )
+
+        #
+        # Employee should have stable shift_template in given week
+        #
+        #
+        days_grouped_by_weeks: Mapping[int, List[datetime.date]] = {}
+        for day in days:
+            y, week, _ = day.isocalendar()
+            if week not in days_grouped_by_weeks:
+                days_grouped_by_weeks[week] = []
+
+            days_grouped_by_weeks[week].append(day)
+
+        weeks = [tuple(v) for v in days_grouped_by_weeks.values()]
+
+        week_employee_st_exists = {}
+        for week_idx, week in enumerate(weeks):
+            for e in employees:
+                for st in shift_templates:
+                    week_employee_st_exists[(week, e, st)] = self.model.NewBoolVar(
+                        f"week{week_idx}_employee{e.id}_st{st.id}_choice"
+                    )
+
+        for week in weeks:
+            for e in employees:
+                self.model.AddBoolXOr(
+                    week_employee_st_exists[(week, e, st)] for st in shift_templates
+                )
+
+        for week in weeks:
+            for d in week:
+                for e in employees:
+                    for r in roles:
+                        for st in shift_templates:
+                            self.model.Add(
+                                self.shifts[(e, d, r, st)]
+                                <= week_employee_st_exists[(week, e, st)]
+                            )
 
         #
         # Maximize assignments to roles with higher priority
+        # and minimize changes in role by week basis
         #
-        #
+        week_employee_role_exists = {}
+        for week_idx, week in enumerate(weeks):
+            for e in employees:
+                for r in roles:
+                    week_employee_role_exists[week, e, r] = self.model.NewBoolVar(
+                        f"week{week_idx}_employee{e.id}_role{role.id}_exists"
+                    )
+
+        for week in weeks:
+            for e in employees:
+                for r in roles:
+                    self.model.AddMaxEquality(
+                        week_employee_role_exists[week, e, r],
+                        (
+                            self.shifts[e, d, r, st]
+                            for st in shift_templates
+                            for d in week
+                        ),
+                    )
+
         self.model.Maximize(
-            sum(
-                (self.shifts[(e, d, r, st)] * r.priority) for e in employees for d in days for r in roles for st in shift_templates
+            (
+                sum(
+                    (self.shifts[(e, d, r, st)] * r.priority)
+                    for e in employees
+                    for d in days
+                    for r in roles
+                    for st in shift_templates
+                )
+                * 1000
+                - sum(
+                    sum(
+                        week_employee_role_exists[week, e, r]
+                        for e in employees
+                        for r in roles
+                    )
+                    for week in weeks
+                )
             )
         )
 
@@ -73,7 +167,8 @@ class TranslatedModel:
     def get_shifts(self, schedule: Schedule) -> List[Shift]:
         if self.status != cp_model.OPTIMAL:
             raise RuntimeError(
-                "TranslatedModel.get_shifts(): non optimal solution found")
+                "TranslatedModel.get_shifts(): non optimal solution found"
+            )
 
         result: List[Shift] = []
 
@@ -83,14 +178,17 @@ class TranslatedModel:
                     for st in self.workplace.shift_templates.all():
                         st: ShiftTemplate
                         if self.solver.Value(self.shifts[e, d, r, st]) == 1:
-                            result.append(Shift(
-                                schedule=schedule,
-                                time_from=datetime.datetime.combine(
-                                    d, st.time_from),
-                                time_to=datetime.datetime.combine(
-                                    d, st.time_to),
-                                employee=e,
-                                role=r))
+                            result.append(
+                                Shift(
+                                    schedule=schedule,
+                                    time_from=datetime.datetime.combine(
+                                        d, st.time_from
+                                    ),
+                                    time_to=datetime.datetime.combine(d, st.time_to),
+                                    employee=e,
+                                    role=r,
+                                )
+                            )
 
         return result
 
