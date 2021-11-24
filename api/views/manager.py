@@ -1,7 +1,7 @@
 from django.utils.crypto import get_random_string
 from rest_framework import serializers, viewsets, permissions, status
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
-from rest_framework.decorators import action
+from rest_framework.decorators import action, authentication_classes, permission_classes
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from ..serializers import (
@@ -9,12 +9,13 @@ from ..serializers import (
     RoleSerializer,
     ScheduleSerializer,
     ShiftSerializer,
+    ShiftTemplateSerializer,
     WorkplaceSerializer,
     EmployeeSerializerManager,
     ShiftBatchCopySerializer,
     SolverModelInputSerializer,
 )
-from ..models import Employee, Schedule, Workplace, Shift, Role
+from ..models import Employee, Schedule, ShiftTemplate, Workplace, Shift, Role
 from ..helpers import LastModifiedHeaderMixin
 from ..solver import TranslatedModel
 
@@ -152,3 +153,13 @@ class ShiftViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
             )
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ShiftTemplateViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
+    serializer_class = ShiftTemplateSerializer
+    queryset = ShiftTemplate.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get_queryset(self):
+        return ShiftTemplate.objects.filter(workplace__owner=self.request.user).all()

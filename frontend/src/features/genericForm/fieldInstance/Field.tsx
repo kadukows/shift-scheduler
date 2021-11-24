@@ -13,6 +13,7 @@ import { BaseFieldProps } from "./BaseFieldProps";
 import DateTimeRangeField, {
     DateTimeRangeFieldData,
 } from "./DateTimeRangeField";
+import TimeField, { TimeFieldData } from "./TimeField";
 
 /**
  * Types definitions
@@ -24,7 +25,8 @@ export type FieldData<Inputs, Entity extends WithId> =
     | DateFieldData<Inputs>
     | DateTimeFieldData<Inputs>
     | CheckFieldData<Inputs>
-    | DateTimeRangeFieldData<Inputs>;
+    | DateTimeRangeFieldData<Inputs>
+    | TimeFieldData<Inputs>;
 
 interface FieldInstanceProps<Inputs, Entity extends WithId>
     extends BaseFieldProps<Inputs> {
@@ -96,6 +98,16 @@ const Field = <Inputs, Entity extends WithId>({
                 <DateTimeRangeField
                     field={dateTimeRangeFieldData}
                     control={control}
+                />
+            );
+
+        case "time":
+            const timeFieldData = field as TimeFieldData<Inputs>;
+            return (
+                <TimeField
+                    field={timeFieldData}
+                    control={control}
+                    {...baseProps}
                 />
             );
     }

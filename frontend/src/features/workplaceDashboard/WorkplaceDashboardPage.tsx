@@ -10,6 +10,7 @@ import { workplaceSelectors } from "../workplaces/workplaceSlice";
 import RoleWidget from "./roles";
 import EmployeeWidget from "./employees";
 import ScheduleWidget from "./schedules";
+import ShiftTemplateWidget from "./shiftTemplates";
 import WorkplaceBanner from "./workplaceBanner";
 
 const WorkplaceDashboardPage = () => (
@@ -58,8 +59,11 @@ const WorkplaceDashboardPageImpl = () => {
                 <Grid item md={7} sm={12}>
                     <EmployeeWidget />
                 </Grid>
-                <Grid item sm={12}>
+                <Grid item md={6} sm={12}>
                     <ScheduleWidget />
+                </Grid>
+                <Grid item md={6} sm={12}>
+                    <ShiftTemplateWidget />
                 </Grid>
             </Grid>
         </WorkplaceProvider>

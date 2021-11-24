@@ -62,7 +62,7 @@ export default GenericDatePickerField;
 type DateYupValidationBuilderType = ReturnType<typeof yup.date>;
 
 export interface DatePickerFieldData<Inputs> {
-    type: "date" | "datetime";
+    type: "date" | "datetime" | "time";
     name: keyof Inputs;
     label?: string;
     validation: DateYupValidationBuilderType;

@@ -6,7 +6,7 @@ from typing import List
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Employee, Workplace, Schedule, Shift, Role
+from .models import Employee, ShiftTemplate, Workplace, Schedule, Shift, Role
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -235,3 +235,16 @@ class SolverModelInputSerializer(serializers.Serializer):
             raise serializers.ValidationError("Role(s) not found")
 
         return data
+
+
+class ShiftTemplateSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShiftTemplate
+        fields = ["id", "workplace", "time_from", "time_to", "last_modified"]
+        read_only_fields = ["id", "last_modified"]
+
+    def validate_workplace(self, value: Workplace):
+        if value.owner != self.context["request"].user:
+            raise serializers.ValidationError("Workplace not found")
+
+        return value
