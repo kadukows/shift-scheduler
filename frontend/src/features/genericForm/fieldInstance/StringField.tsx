@@ -15,7 +15,7 @@ export interface StringFieldData<Inputs> {
     type: "string";
     name: keyof Inputs;
     label?: string;
-    validation: StringYupValidationBuilderObject;
+    validation: any; //StringYupValidationBuilderObject;
     textFieldProps?: React.ComponentProps<typeof TextField>;
 }
 

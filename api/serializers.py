@@ -169,7 +169,7 @@ class ShiftSerializer(serializers.ModelSerializer):
 class RoleSerializer(serializers.ModelSerializer):
     class Meta:
         model = Role
-        fields = ["id", "workplace", "name", "last_modified"]
+        fields = ["id", "workplace", "name", "last_modified", "priority"]
         read_only_fields = ["id", "last_modified"]
 
     def validate_workplace(self, value: Workplace):

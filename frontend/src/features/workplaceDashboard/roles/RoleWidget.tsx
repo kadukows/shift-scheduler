@@ -116,7 +116,13 @@ const useColumnDefs = () => {
             {
                 field: "name",
                 headerName: "Name",
+                flex: 3,
+            },
+            {
+                field: "priority",
+                headerName: "Priority",
                 flex: 1,
+                type: "number",
             },
             {
                 field: "actions",

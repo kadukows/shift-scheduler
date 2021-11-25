@@ -35,6 +35,7 @@ export const AddRoleDialog = () => {
 
 interface Inputs {
     name: string;
+    priority: number;
 }
 
 const fields: FieldData<Inputs, any>[] = [
@@ -43,6 +44,15 @@ const fields: FieldData<Inputs, any>[] = [
         name: "name",
         label: "Name",
         validation: yup.string().required(),
+    },
+    {
+        type: "string",
+        name: "priority",
+        label: "Priority",
+        validation: yup.number().required(),
+        textFieldProps: {
+            type: "number",
+        },
     },
 ];
 
@@ -56,12 +66,13 @@ const ADD_ROLE_PROPS: GenericAddDialogProps<Inputs> = {
 
         return React.useCallback(
             (dispatch, token) =>
-                async ({ name }) => {
+                async ({ name, priority }) => {
                     const res = await axios.post<Role>(
                         MANAGER_API_ROUTES.role,
                         {
                             name,
                             workplace: workplaceId,
+                            priority,
                         },
                         getTokenRequestConfig(token)
                     );
@@ -91,15 +102,19 @@ const UPDATE_ROLE_PROPS: GenericUpdateDialogProps<
     title: "Update Role",
     formId: "UPDATE_ROLE_WORKPLACE_DASHBOARD_FORM",
     fields,
-    getDefaultValues: (role: Role) => ({ name: role.name }),
+    getDefaultValues: (role: Role) => ({
+        name: role.name,
+        priority: role.priority,
+    }),
     submit:
         (dispatch, item, token) =>
-        async ({ name }: Inputs) => {
+        async ({ name, priority }: Inputs) => {
             const res = await axios.put<Role>(
                 `${MANAGER_API_ROUTES.role}${item.id}/`,
                 {
                     name,
                     workplace: item.workplace,
+                    priority,
                 },
                 getTokenRequestConfig(token)
             );

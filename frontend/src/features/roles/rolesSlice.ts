@@ -14,6 +14,7 @@ export interface Role {
     id: number;
     name: string;
     workplace: number;
+    priority: number;
 }
 
 const roleAdapter = createEntityAdapter<Role>();
