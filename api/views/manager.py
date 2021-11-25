@@ -1,3 +1,4 @@
+import datetime
 from django.utils.crypto import get_random_string
 from rest_framework import serializers, viewsets, permissions, status
 from rest_framework.authentication import SessionAuthentication, TokenAuthentication
@@ -97,7 +98,12 @@ class ScheduleViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
             serializer.validated_data["days"],
         )
 
-        shifts = model.get_shifts(schedule)
+        # tz_info_date: datetime.datetime = serializer.validated_data["tz_info"]
+        tz_info = serializer.validated_data["tz_info"]
+        print(tz_info)
+        # print(tz_info_date)
+        # print(tz_info_date.tzinfo)
+        shifts = model.get_shifts(schedule, tz_info)
         for shift in shifts:
             shift.save()
 

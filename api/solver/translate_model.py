@@ -189,7 +189,7 @@ class TranslatedModel:
     def status(self):
         return self.solver.Solve(self.model)
 
-    def get_shifts(self, schedule: Schedule) -> List[Shift]:
+    def get_shifts(self, schedule: Schedule, tz_info: datetime.tzinfo) -> List[Shift]:
         if self.status != cp_model.OPTIMAL:
             raise RuntimeError(
                 "TranslatedModel.get_shifts(): non optimal solution found"
@@ -207,9 +207,11 @@ class TranslatedModel:
                                 Shift(
                                     schedule=schedule,
                                     time_from=datetime.datetime.combine(
-                                        d, st.time_from
+                                        date=d, time=st.time_from, tzinfo=tz_info
                                     ),
-                                    time_to=datetime.datetime.combine(d, st.time_to),
+                                    time_to=datetime.datetime.combine(
+                                        d, st.time_to, tzinfo=tz_info
+                                    ),
                                     employee=e,
                                     role=r,
                                 )

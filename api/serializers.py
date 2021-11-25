@@ -1,5 +1,5 @@
-import datetime
-import calendar
+import datetime, calendar
+from backports.zoneinfo import ZoneInfo
 from dateutil.relativedelta import relativedelta
 from typing import List
 
@@ -209,6 +209,7 @@ class SolverModelInputSerializer(serializers.Serializer):
         allow_empty=False,
     )
     days = serializers.ListField(child=serializers.DateField(), allow_empty=False)
+    tz_info = serializers.CharField()
 
     def validate_employees(self, value: List[int]):
         employees: List[Employee] = [Employee.objects.get(pk=id) for id in value]
@@ -225,6 +226,14 @@ class SolverModelInputSerializer(serializers.Serializer):
             raise serializers.ValidationError("Role(s) not found")
 
         return roles
+
+    def validate_tz_info(self, value):
+        try:
+            zoneInfo = ZoneInfo(value)
+        except:
+            raise serializers.ValidationError("unknown tz info")
+
+        return zoneInfo
 
     def validate(self, data):
         employees: List[Employee] = data["employees"]

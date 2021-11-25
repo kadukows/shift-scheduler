@@ -19,7 +19,7 @@ import {
     resetShifts,
     Shift,
 } from "../shifts/shiftSlice";
-import { format } from "date-fns";
+import { format, parse } from "date-fns";
 import { addAlert } from "../alerts/alertsSlice";
 
 export interface Schedule {
@@ -114,6 +114,7 @@ export const runSolverDefault =
                     employees: employees.map((e) => e.id),
                     roles: roles.map((r) => r.id),
                     days: days.map((d) => format(d, "yyyy-MM-dd")),
+                    tz_info: Intl.DateTimeFormat().resolvedOptions().timeZone,
                 },
                 getTokenRequestConfig(state.authReducer.token)
             );
