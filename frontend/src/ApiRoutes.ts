@@ -10,6 +10,10 @@ export const MANAGER_API_ROUTES = {
         `/api/manager/employee/${employeeId}/get_binding_key/`,
     shiftTemplate: "/api/manager/shift_template/",
     limitedAvailability: "/api/manager/limited_availability/",
+    scheduleRunSolver: (scheduleId: number) =>
+        `/api/manager/schedule/${scheduleId}/run_solver_model/`,
+    scheduleClear: (scheduleId: number) =>
+        `/api/manager/schedule/${scheduleId}/clear/`,
 };
 
 export const GENERAL_API_ROUTES = {

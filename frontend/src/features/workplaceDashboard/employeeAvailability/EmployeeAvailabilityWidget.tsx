@@ -210,57 +210,6 @@ interface DateAndLA {
     date: Date;
     la: LimitedAvailability;
 }
-/*
-const getDataGridProps: (
-    a: number
-) => GenericDashboardDataGridProps<DateAndLA> = (employeeId: number) => ({
-    useItemSelector: () => (state: RootState) =>
-        limitedAvailabilitySelectors
-            .selectAll(state)
-            .filter((la) => la.employee === employeeId),
-    useColumnDefs: () => {
-        const signalUpdate: CallbackTypes.EMPLOYEE_AVAILABILITY_UPDATE =
-            useSignal(EventTypes.EMPLOYEE_AVAILABILITY_UPDATE);
-
-        return React.useMemo(
-            () => [
-                {
-                    field: "id",
-                    headerName: "#",
-                    type: "number",
-                },
-                {
-                    field: "la_type",
-                    headerName: "Type",
-                    flex: 2,
-                },
-                {
-                    field: "shift_templates",
-                    headerName: "Shift templates",
-                    flex: 2,
-                },
-                {
-                    field: "actions",
-                    type: "actions",
-                    getActions: (params: GridRowParams<DateAndLA>) => [
-                        <IconButton
-                            color="primary"
-                            onClick={() =>
-                                signalUpdate({
-                                    employeeAvailabilityId: params.row.la.id,
-                                })
-                            }
-                        >
-                            <EditIcon />
-                        </IconButton>,
-                    ],
-                },
-            ],
-            [signalUpdate]
-        );
-    },
-});
-*/
 
 /**
  * Dialogs
@@ -304,39 +253,6 @@ const fields: FieldData<Inputs, any>[] = [
         multiple: true,
     } as ChooseObjectIdFieldData<Inputs, ShiftTemplate>,
 ];
-/*
-const addEmployeeDialogProps: GenericAddDialogProps<Inputs> = {
-    addEvent: EventTypes.EMPLOYEE_AVAILABILITY_ADD,
-    title: "Availability",
-    fields,
-    formId: "ADD_EMPLOYEE_AVAILABILITY_FORM",
-    useSubmit: () => {
-        return React.useCallback(
-            (dispatch, token) =>
-                async ({ la_type, shift_templates }) => {
-                    const res = await axios.post<ShiftTemplate>(
-                        MANAGER_API_ROUTES.shiftTemplate,
-                        {
-                            time_from: format(time_from, "HH:mm"),
-                            time_to: format(time_to, "HH:mm"),
-                            workplace: workplaceId,
-                        },
-                        getTokenRequestConfig(token)
-                    );
-
-                    dispatch(shiftTemplateActions.addOne(res.data));
-                    dispatch(
-                        addAlert({
-                            type: "info",
-                            message: "Added a Shift Template",
-                        })
-                    );
-                },
-            [workplaceId]
-        );
-    },
-};
-*/
 
 const updateEmployeeDialogProps: GenericUpdateDialogProps<
     CallbackTypes.EMPLOYEE_AVAILABILITY_UPDATE_ARG_TYPE,

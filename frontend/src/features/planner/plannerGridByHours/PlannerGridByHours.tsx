@@ -27,6 +27,7 @@ import {
 } from "../SecondIndexHandler";
 import OverflowHelper from "../OverflowHelper";
 import LeftColumnItem from "./items/LeftColumnItem";
+import LaItem from "./items/LaItem";
 
 export interface Props<Item> {
     timeRange: DateFns.Interval;
@@ -60,11 +61,13 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         itemToString,
         ItemComponent,
         getShiftComplementaryFromItemId,
+        limitedAvailabilitySelector,
     },
     shiftSelector,
 }: Props<Item>) => {
     const items = useSelector(itemSelector);
     const shifts = useSelector(shiftSelector);
+    const las = useSelector(limitedAvailabilitySelector ?? (() => []));
 
     const [jsxElements, genericCssGridProps] = React.useMemo(() => {
         const result: JSX.Element[] = [];
@@ -152,6 +155,10 @@ const PlannerGridByHours = <Item extends Role | Employee>({
             );
         }
 
+        for (const la of las) {
+            result.push(<LaItem laId={la.id} key={la.id} />);
+        }
+
         const genericCssGridProps = {
             x: {
                 cells: hours,
@@ -176,6 +183,7 @@ const PlannerGridByHours = <Item extends Role | Employee>({
         shiftSelector,
         sha1(shifts.map((shift) => shift.id)),
         sha1(items.map((item) => item.id)),
+        sha1(las.map((la) => la.id)),
     ]);
 
     return (

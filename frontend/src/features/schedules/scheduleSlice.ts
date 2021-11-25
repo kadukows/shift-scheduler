@@ -2,13 +2,25 @@ import {
     createSlice,
     createEntityAdapter,
     PayloadAction,
+    ThunkAction,
+    AnyAction,
 } from "@reduxjs/toolkit";
+import axios from "axios";
 import {
     getApiGenericThunkAction,
+    getTokenRequestConfig,
     makeDispatchActionWhenAuthedObserver,
 } from "../helpers";
 import { RootState } from "../../store";
 import { MANAGER_API_ROUTES } from "../../ApiRoutes";
+import {
+    addShifts,
+    removeManyShift,
+    resetShifts,
+    Shift,
+} from "../shifts/shiftSlice";
+import { format } from "date-fns";
+import { addAlert } from "../alerts/alertsSlice";
 
 export interface Schedule {
     id: number;
@@ -78,3 +90,78 @@ export const scheduleObserver = makeDispatchActionWhenAuthedObserver(
     getSchedules,
     resetSchedules
 );
+
+export const runSolverDefault =
+    (
+        scheduleId: number,
+        days: Date[]
+    ): ThunkAction<void, RootState, unknown, AnyAction> =>
+    async (dispatch, getState) => {
+        const state = getState();
+
+        const schedule = state.scheduleReducer.entities[scheduleId];
+        const employees = state.employeeReducer.ids
+            .map((id) => state.employeeReducer.entities[id])
+            .filter((e) => e.workplace === schedule.workplace);
+        const roles = state.roleReducer.ids
+            .map((id) => state.roleReducer.entities[id])
+            .filter((r) => r.workplace === schedule.workplace);
+
+        try {
+            const res = await axios.post<Shift[]>(
+                MANAGER_API_ROUTES.scheduleRunSolver(schedule.id),
+                {
+                    employees: employees.map((e) => e.id),
+                    roles: roles.map((r) => r.id),
+                    days: days.map((d) => format(d, "yyyy-MM-dd")),
+                },
+                getTokenRequestConfig(state.authReducer.token)
+            );
+
+            dispatch(addShifts(res.data));
+            dispatch(
+                addAlert({
+                    type: "success",
+                    message: "Sucessfully ran solver!",
+                })
+            );
+        } catch (e) {
+            dispatch(
+                addAlert({
+                    type: "warning",
+                    message: "Something went wrong",
+                })
+            );
+        }
+    };
+
+export const clearShiftsForSchedule =
+    (scheduleId: number): ThunkAction<void, RootState, unknown, AnyAction> =>
+    async (dispatch, getState) => {
+        try {
+            await axios.delete(
+                MANAGER_API_ROUTES.scheduleClear(scheduleId),
+                getTokenRequestConfig(getState().authReducer.token)
+            );
+
+            const shiftR = getState().shiftReducer;
+            const shiftsToDelete = shiftR.ids
+                .map((id) => shiftR.entities[id])
+                .filter((s) => s.schedule === scheduleId);
+
+            dispatch(removeManyShift(shiftsToDelete.map((s) => s.id)));
+            dispatch(
+                addAlert({
+                    type: "info",
+                    message: `Cleared shifts`,
+                })
+            );
+        } catch (e) {
+            dispatch(
+                addAlert({
+                    type: "warning",
+                    message: "Something went wrong",
+                })
+            );
+        }
+    };

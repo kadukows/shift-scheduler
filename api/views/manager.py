@@ -91,13 +91,15 @@ class ScheduleViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
         model = TranslatedModel(
-            serializer.validated_data["workplace"],
+            schedule.workplace,
             serializer.validated_data["employees"],
             serializer.validated_data["roles"],
             serializer.validated_data["days"],
         )
 
-        shifts = Shift.objects.bulk_create(model.get_shifts(schedule))
+        shifts = model.get_shifts(schedule)
+        for shift in shifts:
+            shift.save()
 
         return Response(
             ShiftSerializer(shifts, many=True).data, status=status.HTTP_200_OK

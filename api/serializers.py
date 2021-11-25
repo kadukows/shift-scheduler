@@ -200,20 +200,15 @@ class EmployeeBindSerializer(serializers.Serializer):
 
 
 class SolverModelInputSerializer(serializers.Serializer):
-    workplace = serializers.IntegerField()
     employees = serializers.ListField(
-        child=serializers.IntegerField(), allow_empty=False
+        child=serializers.ModelField(model_field=Employee()._meta.get_field("id")),
+        allow_empty=False,
     )
-    roles = serializers.ListField(child=serializers.IntegerField(), allow_empty=False)
+    roles = serializers.ListField(
+        child=serializers.ModelField(model_field=Role()._meta.get_field("id")),
+        allow_empty=False,
+    )
     days = serializers.ListField(child=serializers.DateField(), allow_empty=False)
-
-    def validate_workplace(self, value: int):
-        workplace: Workplace = Workplace.objects.get(pk=value)
-
-        if workplace is None or workplace.owner != self.context["request"].user:
-            raise serializers.ValidationError("Workplace not found")
-
-        return workplace
 
     def validate_employees(self, value: List[int]):
         employees: List[Employee] = [Employee.objects.get(pk=id) for id in value]
@@ -232,9 +227,13 @@ class SolverModelInputSerializer(serializers.Serializer):
         return roles
 
     def validate(self, data):
-        workplace: Workplace = data["workplace"]
         employees: List[Employee] = data["employees"]
         roles: List[Role] = data["roles"]
+
+        if len(employees) == 0 and len(roles == 0):
+            return data
+
+        workplace = len(employees) != 0 and employees[0].workplace or roles[0].workplace
 
         if any(e.workplace != workplace for e in employees):
             raise serializers.ValidationError("Employee(s) not found")

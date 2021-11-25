@@ -66,6 +66,8 @@ const shiftSlice = createSlice({
                 }
             }
 
+            console.log(action.payload);
+
             return shiftAdapter.addMany(state, action);
         },
         //

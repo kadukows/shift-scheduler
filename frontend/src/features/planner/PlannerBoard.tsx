@@ -1,10 +1,28 @@
 import * as React from "react";
 import * as DateFns from "date-fns";
-import { Paper, TextField, MenuItem, Stack, Box, styled } from "@mui/material";
+import {
+    Paper,
+    TextField,
+    MenuItem,
+    Stack,
+    Box,
+    styled,
+    Button,
+    ButtonGroup,
+    Dialog,
+    DialogTitle,
+    DialogActions,
+    DialogContent,
+    DialogContentText,
+} from "@mui/material";
 import DateRangePicker, { DateRange } from "@mui/lab/DateRangePicker";
 
 import { RootState } from "../../store";
-import { Schedule } from "../schedules/scheduleSlice";
+import {
+    clearShiftsForSchedule,
+    runSolverDefault,
+    Schedule,
+} from "../schedules/scheduleSlice";
 import { Shift, shiftSelectors } from "../shifts/shiftSlice";
 import { employeeSelectors } from "../employees/employeeSlice";
 import { Employee } from "../employees/employeeSlice";
@@ -40,6 +58,9 @@ import AddRoleDialog from "./dialogs/AddRoleDialog";
 import UpdateEmployeeDialog from "./dialogs/UpdateEmployeeDialog";
 import UpdateRoleDialog from "./dialogs/UpdateRoleDialog";
 import PlannerGridByHours from "./plannerGridByHours/PlannerGridByHours";
+import { limitedAvailabilitySelectors } from "../limitedAvailability/limitedAvailablitySlice";
+import { compareAsc, parse } from "date-fns";
+import { useDispatch, useSelector } from "react-redux";
 
 interface Props {
     schedule: Schedule;
@@ -82,10 +103,22 @@ const PlannerBoard = ({ schedule }: Props) => {
             : timeRangeRef.current;
     timeRangeRef.current = timeRange;
 
+    const employeesInWorkplace = new Set<number>(
+        useSelector((state: RootState) =>
+            employeeSelectors
+                .selectAll(state)
+                .filter((e) => e.workplace === schedule.workplace)
+                .map((e) => e.id)
+        )
+    );
+
     const secondIndexHandler:
         | SecondIndexHandler<Employee>
         | SecondIndexHandler<Role> = React.useMemo(() => {
-        return secondIndexDict[timeGrouping][secondIdx](schedule);
+        return secondIndexDict[timeGrouping][secondIdx](
+            schedule,
+            employeesInWorkplace
+        );
     }, [schedule.workplace, secondIdx, timeGrouping]);
 
     const shiftSelector = React.useCallback(
@@ -127,8 +160,22 @@ const PlannerBoard = ({ schedule }: Props) => {
             ? PlannerGridByHours
             : PlannerGridByDays;
 
+    const [runSolverOpen, setRunSolverOpen] = React.useState(false);
+    const [clearOpen, setClearOpen] = React.useState(false);
+
     return (
         <Paper sx={{ p: 3 }}>
+            <RunSolverDialog
+                open={runSolverOpen}
+                setOpen={setRunSolverOpen}
+                schedule={schedule}
+                days={dateRange}
+            />
+            <ClearDialog
+                open={clearOpen}
+                setOpen={setClearOpen}
+                schedule={schedule}
+            />
             <Stack direction="row" spacing={1} sx={{ mb: 1 }}>
                 <TextField
                     select
@@ -154,6 +201,18 @@ const PlannerBoard = ({ schedule }: Props) => {
                     <MenuItem value={TIME_GROUPING.ByHours}>By Hours</MenuItem>
                     <MenuItem value={TIME_GROUPING.ByDays}>By Days</MenuItem>
                 </TextField>
+                <Spacer />
+                <ButtonGroup variant="contained">
+                    <Button onClick={() => setRunSolverOpen(true)}>
+                        Run solver
+                    </Button>
+                    <Button
+                        color="secondary"
+                        onClick={() => setClearOpen(true)}
+                    >
+                        Clear
+                    </Button>
+                </ButtonGroup>
                 <Spacer />
                 <DateRangePicker
                     value={dateRange}
@@ -245,13 +304,38 @@ enum TIME_GROUPING {
 const secondIndexDict = {
     [TIME_GROUPING.ByHours]: {
         [SECOND_INDEX.Employee]: (
-            schedule: Schedule
-        ): SecondIndexHandler<Employee> => ({
-            ...getEmployeeSecondIndexHandlerBase(schedule),
-            ItemComponent: EmployeeItemByHours,
-        }),
+            schedule: Schedule,
+            employeeInWorkplace: Set<number>
+        ): SecondIndexHandler<Employee> => {
+            const month = parse(schedule.month_year, "MM.yyyy", new Date());
+            const interval = {
+                start: DateFns.startOfMonth(month),
+                end: DateFns.endOfMonth(month),
+            };
+
+            return {
+                ...getEmployeeSecondIndexHandlerBase(schedule),
+                ItemComponent: EmployeeItemByHours,
+                limitedAvailabilitySelector: (state: RootState) =>
+                    limitedAvailabilitySelectors
+                        .selectAll(state)
+                        .filter((la) => {
+                            const parsed = parse(
+                                la.date,
+                                "yyyy-MM-dd",
+                                new Date()
+                            );
+
+                            return (
+                                DateFns.isWithinInterval(parsed, interval) &&
+                                employeeInWorkplace.has(la.employee)
+                            );
+                        }),
+            };
+        },
         [SECOND_INDEX.Role]: (
-            schedule: Schedule
+            schedule: Schedule,
+            employeeInWorkplace: Set<number>
         ): SecondIndexHandler<Role> => ({
             ...getRoleSecondIndexHandlerBase(schedule),
             ItemComponent: RoleItemByHours,
@@ -259,13 +343,15 @@ const secondIndexDict = {
     },
     [TIME_GROUPING.ByDays]: {
         [SECOND_INDEX.Employee]: (
-            schedule: Schedule
+            schedule: Schedule,
+            employeeInWorkplace: Set<number>
         ): SecondIndexHandler<Employee> => ({
             ...getEmployeeSecondIndexHandlerBase(schedule),
             ItemComponent: EmployeeItemByDays,
         }),
         [SECOND_INDEX.Role]: (
-            schedule: Schedule
+            schedule: Schedule,
+            employeeInWorkplace: Set<number>
         ): SecondIndexHandler<Role> => ({
             ...getRoleSecondIndexHandlerBase(schedule),
             ItemComponent: RoleItemByDays,
@@ -281,3 +367,82 @@ const toInterval = (dateRange: DateRange<Date>) => ({
 const Spacer = styled("div")({
     flex: 1,
 });
+
+interface ClearDialogProps {
+    schedule: Schedule;
+    setOpen: (b: boolean) => void;
+    open: boolean;
+}
+
+const ClearDialog = ({ schedule, open, setOpen }: ClearDialogProps) => {
+    const closeCallback = React.useCallback(() => setOpen(false), [setOpen]);
+    const dispatch = useDispatch();
+    const agreeCallback = React.useCallback(() => {
+        dispatch(clearShiftsForSchedule(schedule.id));
+        setOpen(false);
+    }, [schedule.id]);
+
+    return (
+        <Dialog open={open} onClose={closeCallback}>
+            <DialogTitle>{"Clearing shifts"}</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    {
+                        "Are you sure you want to clear all shifts from this schedule?"
+                    }
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={closeCallback}>Close</Button>
+                <Button onClick={agreeCallback} autoFocus color="secondary">
+                    Clear
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+};
+
+interface RunSolverDialogProps {
+    schedule: Schedule;
+    days: Date[];
+    setOpen: (b: boolean) => void;
+    open: boolean;
+}
+
+const RunSolverDialog = ({
+    schedule,
+    days,
+    open,
+    setOpen,
+}: RunSolverDialogProps) => {
+    const closeCallback = React.useCallback(() => setOpen(false), [setOpen]);
+    const dispatch = useDispatch();
+    const agreeCallback = React.useCallback(() => {
+        const days_ = DateFns.eachDayOfInterval({
+            start: days[0],
+            end: days[1],
+        }).filter((d) => !DateFns.isWeekend(d));
+
+        dispatch(runSolverDefault(schedule.id, days_));
+        setOpen(false);
+    }, [dispatch, days[0]?.getTime(), days[1]?.getTime(), schedule.id]);
+
+    return (
+        <Dialog open={open} onClose={closeCallback}>
+            <DialogTitle>{"Running solver"}</DialogTitle>
+            <DialogContent>
+                <DialogContentText>
+                    {
+                        "Are you sure you want to run solver? This will not take into account existing shifts!"
+                    }
+                </DialogContentText>
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={closeCallback}>Close</Button>
+                <Button onClick={agreeCallback} autoFocus>
+                    Run
+                </Button>
+            </DialogActions>
+        </Dialog>
+    );
+};

@@ -1,4 +1,5 @@
 import { RootState } from "../../store";
+import { LimitedAvailability } from "../limitedAvailability/limitedAvailablitySlice";
 import { Shift } from "../shifts/shiftSlice";
 
 export enum SECOND_INDEX {
@@ -26,4 +27,5 @@ export interface SecondIndexHandler<Item> {
     ItemComponent: ItemComponentType;
     getShiftComplementaryFromItemId: (itemId: number) => Partial<Shift>;
     getItemIdFromShift: (shift: Shift) => number;
+    limitedAvailabilitySelector?: (state: RootState) => LimitedAvailability[];
 }
