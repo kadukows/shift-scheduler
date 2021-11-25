@@ -6,7 +6,15 @@ from typing import List
 from django.contrib.auth.models import User
 from rest_framework import serializers
 
-from .models import Employee, ShiftTemplate, Workplace, Schedule, Shift, Role
+from .models import (
+    Employee,
+    LimitedAvailabilityDescriptor,
+    ShiftTemplate,
+    Workplace,
+    Schedule,
+    Shift,
+    Role,
+)
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -246,5 +254,24 @@ class ShiftTemplateSerializer(serializers.ModelSerializer):
     def validate_workplace(self, value: Workplace):
         if value.owner != self.context["request"].user:
             raise serializers.ValidationError("Workplace not found")
+
+        return value
+
+
+class LimitedAvailabilityDescriptorSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = LimitedAvailabilityDescriptor
+        fields = ["id", "date", "employee", "la_type", "shift_templates"]
+        read_only_fields = ["id"]
+
+    def validate_employee(self, value: Employee):
+        if value.workplace.owner != self.context["request"].user:
+            raise serializers.ValidationError("Employee not found")
+
+        return value
+
+    def validate_shift_templates(self, value: List[ShiftTemplate]):
+        if any(st.workplace.owner != self.context["request"].user for st in value):
+            raise serializers.ValidationError("Shift template not found")
 
         return value

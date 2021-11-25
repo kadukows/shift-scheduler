@@ -9,6 +9,7 @@ export const MANAGER_API_ROUTES = {
     employeeGetBindingKey: (employeeId: number) =>
         `/api/manager/employee/${employeeId}/get_binding_key/`,
     shiftTemplate: "/api/manager/shift_template/",
+    limitedAvailability: "/api/manager/limited_availability/",
 };
 
 export const GENERAL_API_ROUTES = {

@@ -2,10 +2,7 @@ import {
     createSlice,
     createEntityAdapter,
     PayloadAction,
-    ThunkAction,
-    AnyAction,
 } from "@reduxjs/toolkit";
-import { observer } from "redux-observers";
 import {
     getApiGenericThunkAction,
     makeDispatchActionWhenAuthedObserver,

@@ -31,6 +31,10 @@ import {
     shiftTemplateReducer,
     shiftTemplateObserver,
 } from "./features/shiftTemplates/shiftTemplates";
+import {
+    limitedAvailabilityReducer,
+    limitedAvailabilityObserver,
+} from "./features/limitedAvailability/limitedAvailablitySlice";
 //
 import * as EmployeeEmployee from "./features/userAsEmployee/employee/employeeSlice";
 import * as EmployeeRole from "./features/userAsEmployee/role/roleSlice";
@@ -53,6 +57,7 @@ export const store = configureStore({
         addDialogReducer,
         updateDialogReducer,
         shiftTemplateReducer,
+        limitedAvailabilityReducer,
         employee_employeeReducer: EmployeeEmployee.employeeReducer,
         employee_roleReducer: EmployeeRole.roleReducer,
         employee_scheduleReducer: EmployeeSchedule.scheduleReducer,
@@ -73,6 +78,7 @@ observe(store, [
     deleteShiftWhenEmployeeDeletedObserver,
     deleteShiftWhenScheduleDeletedObserver,
     shiftTemplateObserver,
+    limitedAvailabilityObserver,
     EmployeeEmployee.employeeObserver,
     EmployeeRole.roleObserver,
     EmployeeSchedule.scheduleObserver,

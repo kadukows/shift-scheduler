@@ -7,6 +7,7 @@ import {
     Work as WorkIcon,
     Edit as EditIcon,
     VpnKey as VpnKeyIcon,
+    CalendarViewMonth as CalendarViewMonthIcon,
 } from "@mui/icons-material";
 import EventProvider, { useSignal } from "../../eventProvider/EventProvider";
 import { EventTypes, CallbackTypes } from "./EventTypes";
@@ -35,6 +36,7 @@ import { addAlert } from "../../alerts/alertsSlice";
 import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
 import KeyDialog from "./KeyDialog";
+import { useHistory } from "react-router-dom";
 
 interface Props {
     dataGridHeight?: number;
@@ -96,6 +98,8 @@ const dataGridProps: GenericDashboardDataGridProps<Employee> = {
             EventTypes.EMPLOYEE_KEY_DIALOG_OPEN
         );
 
+        const history = useHistory();
+
         return [
             {
                 field: "id",
@@ -121,6 +125,7 @@ const dataGridProps: GenericDashboardDataGridProps<Employee> = {
             {
                 field: "actions",
                 type: "actions",
+                width: 150,
                 getActions: (params: GridRowParams<Employee>) => [
                     <IconButton
                         color="primary"
@@ -135,6 +140,16 @@ const dataGridProps: GenericDashboardDataGridProps<Employee> = {
                         onClick={() => signalKey({ employeeId: params.row.id })}
                     >
                         <VpnKeyIcon />
+                    </IconButton>,
+                    <IconButton
+                        color="primary"
+                        onClick={() =>
+                            history.push(
+                                `/employeeAvailability/${params.row.id}`
+                            )
+                        }
+                    >
+                        <CalendarViewMonthIcon />
                     </IconButton>,
                 ],
             },

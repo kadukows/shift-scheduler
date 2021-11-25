@@ -30,6 +30,11 @@ router.register(
     manager_views.ShiftTemplateViewSet,
     basename="manager/shift_template",
 )
+router.register(
+    r"manager/limited_availability",
+    manager_views.LimitedAvailabilityDescriptorViewSet,
+    basename="manager/limited_availability",
+)
 
 #
 #   Employee API endpoints

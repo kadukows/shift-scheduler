@@ -190,7 +190,7 @@ const addEmployeeDialogProps: GenericAddDialogProps<Inputs> = {
 };
 
 const updateEmployeeDialogProps: GenericUpdateDialogProps<
-    CallbackTypes.EMPLOYEE_UPDATE_ARG_TYPE,
+    CallbackTypes.SHIFT_TEMPLATE_UPDATE_ARG_TYPE,
     ShiftTemplate,
     Inputs
 > = {

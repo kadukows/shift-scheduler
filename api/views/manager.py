@@ -6,6 +6,7 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from ..serializers import (
     EmptySerializerHelper,
+    LimitedAvailabilityDescriptorSerializer,
     RoleSerializer,
     ScheduleSerializer,
     ShiftSerializer,
@@ -15,7 +16,15 @@ from ..serializers import (
     ShiftBatchCopySerializer,
     SolverModelInputSerializer,
 )
-from ..models import Employee, Schedule, ShiftTemplate, Workplace, Shift, Role
+from ..models import (
+    Employee,
+    LimitedAvailabilityDescriptor,
+    Schedule,
+    ShiftTemplate,
+    Workplace,
+    Shift,
+    Role,
+)
 from ..helpers import LastModifiedHeaderMixin
 from ..solver import TranslatedModel
 
@@ -163,3 +172,17 @@ class ShiftTemplateViewSet(LastModifiedHeaderMixin, viewsets.ModelViewSet):
 
     def get_queryset(self):
         return ShiftTemplate.objects.filter(workplace__owner=self.request.user).all()
+
+
+class LimitedAvailabilityDescriptorViewSet(
+    LastModifiedHeaderMixin, viewsets.ModelViewSet
+):
+    serializer_class = LimitedAvailabilityDescriptorSerializer
+    queryset = LimitedAvailabilityDescriptor.objects.all()
+    permission_classes = [permissions.IsAuthenticated]
+    authentication_classes = [TokenAuthentication, SessionAuthentication]
+
+    def get_queryset(self):
+        return LimitedAvailabilityDescriptor.objects.filter(
+            employee__workplace__owner=self.request.user
+        ).all()

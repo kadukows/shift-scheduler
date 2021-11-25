@@ -14,17 +14,19 @@ import {
  * Types definitions
  */
 
-export interface ChooseObjectIdFieldData<Inputs, Entity extends WithId> {
+export interface ChooseObjectIdFieldData<Inputs, Entity> {
     type: "choose_object";
     name: keyof Inputs;
     label?: string;
-    validation: NumberYupValidationBuilderObject;
+    validation: any;
 
     entitySelector: (state: RootState, getValues: any) => Entity[];
     entityToString: (a: Entity) => string;
+    multiple?: boolean;
+    entityGetId?: (e: Entity) => number | string;
 }
 
-interface ChooseObjectIdFieldProps<Inputs, Entity extends WithId>
+interface ChooseObjectIdFieldProps<Inputs, Entity>
     extends BaseFieldProps<Inputs> {
     field: ChooseObjectIdFieldData<Inputs, Entity>;
     control: Control<Inputs>;
@@ -34,7 +36,7 @@ interface ChooseObjectIdFieldProps<Inputs, Entity extends WithId>
  *  Component definition
  */
 
-const ChooseObjectIdField = <Inputs, Entity extends WithId>({
+const ChooseObjectIdField = <Inputs, Entity>({
     field,
     control,
 }: ChooseObjectIdFieldProps<Inputs, Entity>) => {
@@ -42,6 +44,8 @@ const ChooseObjectIdField = <Inputs, Entity extends WithId>({
     const entities = useSelector((state: RootState) =>
         field.entitySelector(state, getValues)
     );
+
+    const getId = field.entityGetId ?? ((e: Entity) => (e as any).id);
 
     return (
         <Controller
@@ -64,9 +68,12 @@ const ChooseObjectIdField = <Inputs, Entity extends WithId>({
                     onChange={onChange}
                     value={value}
                     select
+                    SelectProps={{
+                        multiple: !!field.multiple,
+                    }}
                 >
                     {entities.map((entity) => (
-                        <MenuItem key={entity.id} value={entity.id}>
+                        <MenuItem key={getId(entity)} value={getId(entity)}>
                             {field.entityToString(entity)}
                         </MenuItem>
                     ))}

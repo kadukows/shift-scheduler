@@ -19,7 +19,7 @@ import TimeField, { TimeFieldData } from "./TimeField";
  * Types definitions
  */
 
-export type FieldData<Inputs, Entity extends WithId> =
+export type FieldData<Inputs, Entity> =
     | StringFieldData<Inputs>
     | ChooseObjectIdFieldData<Inputs, Entity>
     | DateFieldData<Inputs>
@@ -28,8 +28,7 @@ export type FieldData<Inputs, Entity extends WithId> =
     | DateTimeRangeFieldData<Inputs>
     | TimeFieldData<Inputs>;
 
-interface FieldInstanceProps<Inputs, Entity extends WithId>
-    extends BaseFieldProps<Inputs> {
+interface FieldInstanceProps<Inputs, Entity> extends BaseFieldProps<Inputs> {
     field: FieldData<Inputs, Entity>;
     control: Control<Inputs>;
 }
@@ -38,7 +37,7 @@ interface FieldInstanceProps<Inputs, Entity extends WithId>
  *  Component definition
  */
 
-const Field = <Inputs, Entity extends WithId>({
+const Field = <Inputs, Entity>({
     field,
     errors,
     isSubmitting,

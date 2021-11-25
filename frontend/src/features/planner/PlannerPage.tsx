@@ -22,18 +22,17 @@ const PlannerPage = (props: Props) => {
         scheduleSelectors.selectById(state, schedule_id)
     );
 
-    if (schedule)
-        return schedule ? (
-            <PlannerBoard schedule={schedule} />
-        ) : (
-            <RedirectWithAlert
-                alert={{
-                    type: "warning",
-                    message: "Schedule not found",
-                }}
-                to="/"
-            />
-        );
+    return schedule ? (
+        <PlannerBoard schedule={schedule} />
+    ) : (
+        <RedirectWithAlert
+            alert={{
+                type: "warning",
+                message: "Schedule not found",
+            }}
+            to="/"
+        />
+    );
 };
 
 export default PlannerPage;

@@ -26,6 +26,7 @@ import AsEmployeeDashboard from "./features/userAsEmployee/dashboard/Dashboard";
 import { WebsiteMode } from "./features/navbar/WebsiteMode";
 import ShiftPage from "./features/userAsEmployee/shift/ShiftPage";
 import ScheduleListPage from "./features/userAsEmployee/scheduleList/ScheduleListPage";
+import EmployeeAvailabilityPage from "./features/workplaceDashboard/employeeAvailability/EmployeeAvailabilityPage";
 
 const App = () => {
     return (
@@ -80,19 +81,18 @@ const App = () => {
                                         </PrivateRoute>
                                         <PrivateRoute
                                             exact
+                                            path="/employeeAvailability/:employeeId"
+                                            mode={WebsiteMode.Manager}
+                                        >
+                                            <EmployeeAvailabilityPage />
+                                        </PrivateRoute>
+                                        <PrivateRoute
+                                            exact
                                             path="/as_employee/dashboard"
                                             mode={WebsiteMode.Employee}
                                         >
                                             <AsEmployeeDashboard />
                                         </PrivateRoute>
-                                        {/*
-                                        <PrivateRoute
-                                            exact
-                                            path="/as_employee/schedule/:schedule_id"
-                                        >
-                                            <ShiftPage />
-                                        </PrivateRoute>
-                                        */}
                                         <PrivateRoute
                                             exact
                                             path="/as_employee/schedule/:scheduleId"

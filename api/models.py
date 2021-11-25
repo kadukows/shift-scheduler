@@ -113,8 +113,11 @@ class ShiftTemplate(LastModifiedBaseModel):
 
 class LimitedAvailabilityDescriptor(LastModifiedBaseModel):
     class LA_Type(models.TextChoices):
-        FREEDAY = "FREE", gettext_lazy("Free")
-        PREFERENCE = "PREF", gettext_lazy("Preference")
+        FREEDAY = "FREE", gettext_lazy("Free day")
+        PREFERENCE = "PREF", gettext_lazy("Preference for free shift")
+
+    class Meta:
+        unique_together = [["date", "employee"]]
 
     date: date = models.DateField(null=False)
     employee: Employee = models.ForeignKey(
