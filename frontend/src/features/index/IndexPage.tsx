@@ -25,9 +25,10 @@ const IndexPage = () => {
                     >
                         <Grid item>
                             <Typography variant="h5" component="h5">
-                                This is as Index Page!
+                                Home Page
                             </Typography>
                         </Grid>
+                        {/*
                         <Grid item>
                             <Grid item container direction="row" spacing={2}>
                                 <Grid item>
@@ -73,6 +74,8 @@ const IndexPage = () => {
                                 Dashboard
                             </Button>
                         </Grid>
+
+                            */}
                     </Grid>
                 </Paper>
             </Grid>

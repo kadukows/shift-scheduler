@@ -86,7 +86,8 @@ const EmployeeAvailabilityWidget = ({
                     .filter(
                         (la) =>
                             compareAsc(start, parseLa(la.date)) !== 1 &&
-                            compareAsc(parseLa(la.date), end) !== 1
+                            compareAsc(parseLa(la.date), end) !== 1 &&
+                            la.employee === employeeId
                     );
 
                 const daysToLas = new Map<number, LimitedAvailability>();
@@ -179,22 +180,12 @@ const EmployeeAvailabilityWidget = ({
             {/*<GenericAddDialog {...addEmployeeDialogProps} />*/}
             <CreateEmployeeAvailabilityDialog />
             <GenericUpdateDialog {...updateEmployeeDialogProps} />
-            <Paper sx={{ p: 4 }}>
-                <Stack spacing={2}>
-                    <Box sx={{ display: "flex", flexDirection: "row" }}>
-                        <WidgetTitle>
-                            Employee availability templates
-                        </WidgetTitle>
-                        <Box sx={{ flex: 1 }} />
-                    </Box>
-                    <Box sx={{ height }}>
-                        <GenericDashboardDataGrid
-                            useItemSelector={useItemSelector}
-                            useColumnDefs={useColumnDefs}
-                        />
-                    </Box>
-                </Stack>
-            </Paper>
+            <Box sx={{ height }}>
+                <GenericDashboardDataGrid
+                    useItemSelector={useItemSelector}
+                    useColumnDefs={useColumnDefs}
+                />
+            </Box>
         </EventProvider>
     );
 };

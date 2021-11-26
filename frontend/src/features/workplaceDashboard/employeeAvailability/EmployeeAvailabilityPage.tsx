@@ -75,13 +75,16 @@ const EmployeeAvailabilityPageImpl = React.memo(({ employeeId }: ImplProps) => {
     return (
         <Stack spacing={2}>
             <Paper sx={{ p: 2 }}>
-                <Typography component="h2" variant="h2">
-                    Availability: {employeeToString(employee)}
-                </Typography>
-            </Paper>
-            <Paper sx={{ p: 2 }}>
-                <Stack spacing={2}>
+                <Stack>
                     <Box sx={{ display: "flex", flexDirection: "row" }}>
+                        <Typography
+                            noWrap
+                            component="h4"
+                            variant="h4"
+                            sx={{ mb: 1 }}
+                        >
+                            Availability: {employeeToString(employee)}
+                        </Typography>
                         <Box sx={{ flex: 1 }} />
                         <DatePicker
                             label="Month"

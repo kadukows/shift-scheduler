@@ -165,7 +165,10 @@ class TranslatedModel:
         self.model.Maximize(
             (
                 sum(
-                    (self.shifts[(e, d, r, st)] * r.priority)
+                    (
+                        self.shifts[(e, d, r, st)]
+                        * (r.priority + (r in e.preffered_roles.all() and 1 or 0))
+                    )
                     for e in employees
                     for d in days
                     for r in roles

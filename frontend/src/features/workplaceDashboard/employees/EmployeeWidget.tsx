@@ -37,6 +37,8 @@ import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
 import KeyDialog from "./KeyDialog";
 import { useHistory } from "react-router-dom";
+import { ChooseObjectIdFieldData } from "../../genericForm/fieldInstance/ChooseObjectIdField";
+import { roleSelectors, Role } from "../../roles/rolesSlice";
 
 interface Props {
     dataGridHeight?: number;
@@ -44,10 +46,136 @@ interface Props {
 
 const EmployeeWidget = ({ dataGridHeight }: Props) => {
     const height = dataGridHeight ?? 350;
+    const workplaceId = useWorkplaceId();
+
+    const fields: FieldData<Inputs, any>[] = [
+        {
+            type: "string",
+            name: "first_name",
+            label: "First Name",
+            validation: yup.string().required(),
+        },
+        {
+            type: "string",
+            name: "last_name",
+            label: "Last Name",
+            validation: yup.string().required(),
+        },
+        {
+            type: "choose_object",
+            name: "preffered_roles",
+            label: "Preffered roles",
+            validation: yup.array().of(yup.number().required()),
+            entitySelector: (state: RootState) =>
+                roleSelectors
+                    .selectAll(state)
+                    .filter((r) => r.workplace === workplaceId),
+            entityToString: (role) => role.name,
+            multiple: true,
+        } as ChooseObjectIdFieldData<Inputs, Role>,
+    ];
+
+    const addEmployeeDialogProps: GenericAddDialogProps<Inputs> = {
+        addEvent: EventTypes.EMPLOYEE_ADD,
+        title: "Add Employee",
+        fields,
+        formId: "ADD_EMPLOYEE_WORKPLACE_DASHBOARD_FORM",
+        useSubmit: () => {
+            const workplaceId = useWorkplaceId();
+
+            return React.useCallback(
+                (dispatch, token) =>
+                    async ({ first_name, last_name, preffered_roles }) => {
+                        const res = await axios.post<Employee>(
+                            MANAGER_API_ROUTES.employee,
+                            {
+                                first_name,
+                                last_name,
+                                workplace: workplaceId,
+                                preffered_roles,
+                            },
+                            getTokenRequestConfig(token)
+                        );
+
+                        dispatch(addEmployee(res.data));
+                        dispatch(
+                            addAlert({
+                                type: "info",
+                                message: "Added an Employee",
+                            })
+                        );
+                    },
+                [workplaceId]
+            );
+        },
+    };
+
+    const updateEmployeeDialogProps: GenericUpdateDialogProps<
+        CallbackTypes.EMPLOYEE_UPDATE_ARG_TYPE,
+        Employee,
+        Inputs
+    > = {
+        getItemId: (arg) => arg.employeeId,
+        itemSelector: (itemId) => (state) =>
+            employeeSelectors.selectById(state, itemId),
+        eventType: EventTypes.EMPLOYEE_UPDATE,
+        title: "Update Employee",
+        formId: "UPDATE_EMPLOYEE_WORKPLACE_DASHBOARD_FORM",
+        fields,
+        getDefaultValues: ({
+            first_name,
+            last_name,
+            preffered_roles,
+        }: Employee) => ({
+            first_name,
+            last_name,
+            preffered_roles,
+        }),
+        submit:
+            (dispatch, item, token) =>
+            async ({ first_name, last_name, preffered_roles }) => {
+                const res = await axios.put<Employee>(
+                    `${MANAGER_API_ROUTES.employee}${item.id}/`,
+                    {
+                        first_name,
+                        last_name,
+                        workplace: item.workplace,
+                        preffered_roles,
+                    },
+                    getTokenRequestConfig(token)
+                );
+
+                const { id, ...rest } = res.data;
+                dispatch(updateEmployee({ id, changes: rest }));
+                dispatch(
+                    addAlert({
+                        type: "info",
+                        message: `Successfully updated an employee: ${id}`,
+                    })
+                );
+            },
+        onDelete: async (dispatch, employeeId, token) => {
+            await axios.delete(
+                `${MANAGER_API_ROUTES.employee}${employeeId}/`,
+                getTokenRequestConfig(token)
+            );
+
+            dispatch(removeEmployee(employeeId));
+            dispatch(
+                addAlert({
+                    type: "info",
+                    message: `Removed an employee: ${employeeId}`,
+                })
+            );
+        },
+    };
 
     return (
         <EventProvider events={Object.values(EventTypes)}>
-            <GenericAddDialog {...addEmployeeDialogProps} />
+            <GenericAddDialog
+                {...addEmployeeDialogProps}
+                defaultValues={{ preffered_roles: [] }}
+            />
             <GenericUpdateDialog {...updateEmployeeDialogProps} />
             <KeyDialog />
             <Paper sx={{ p: 4 }}>
@@ -164,107 +292,5 @@ const dataGridProps: GenericDashboardDataGridProps<Employee> = {
 interface Inputs {
     first_name: string;
     last_name: string;
+    preffered_roles: number[];
 }
-
-const fields: FieldData<Inputs, any>[] = [
-    {
-        type: "string",
-        name: "first_name",
-        label: "First Name",
-        validation: yup.string().required(),
-    },
-    {
-        type: "string",
-        name: "last_name",
-        label: "Last Name",
-        validation: yup.string().required(),
-    },
-];
-
-const addEmployeeDialogProps: GenericAddDialogProps<Inputs> = {
-    addEvent: EventTypes.EMPLOYEE_ADD,
-    title: "Add Employee",
-    fields,
-    formId: "ADD_EMPLOYEE_WORKPLACE_DASHBOARD_FORM",
-    useSubmit: () => {
-        const workplaceId = useWorkplaceId();
-
-        return React.useCallback(
-            (dispatch, token) =>
-                async ({ first_name, last_name }) => {
-                    const res = await axios.post<Employee>(
-                        MANAGER_API_ROUTES.employee,
-                        {
-                            first_name,
-                            last_name,
-                            workplace: workplaceId,
-                        },
-                        getTokenRequestConfig(token)
-                    );
-
-                    dispatch(addEmployee(res.data));
-                    dispatch(
-                        addAlert({
-                            type: "info",
-                            message: "Added an Employee",
-                        })
-                    );
-                },
-            [workplaceId]
-        );
-    },
-};
-
-const updateEmployeeDialogProps: GenericUpdateDialogProps<
-    CallbackTypes.EMPLOYEE_UPDATE_ARG_TYPE,
-    Employee,
-    Inputs
-> = {
-    getItemId: (arg) => arg.employeeId,
-    itemSelector: (itemId) => (state) =>
-        employeeSelectors.selectById(state, itemId),
-    eventType: EventTypes.EMPLOYEE_UPDATE,
-    title: "Update Employee",
-    formId: "UPDATE_EMPLOYEE_WORKPLACE_DASHBOARD_FORM",
-    fields,
-    getDefaultValues: ({ first_name, last_name }: Employee) => ({
-        first_name,
-        last_name,
-    }),
-    submit:
-        (dispatch, item, token) =>
-        async ({ first_name, last_name }) => {
-            const res = await axios.put<Employee>(
-                `${MANAGER_API_ROUTES.employee}${item.id}/`,
-                {
-                    first_name,
-                    last_name,
-                    workplace: item.workplace,
-                },
-                getTokenRequestConfig(token)
-            );
-
-            const { id, ...rest } = res.data;
-            dispatch(updateEmployee({ id, changes: rest }));
-            dispatch(
-                addAlert({
-                    type: "info",
-                    message: `Successfully updated an employee: ${id}`,
-                })
-            );
-        },
-    onDelete: async (dispatch, employeeId, token) => {
-        await axios.delete(
-            `${MANAGER_API_ROUTES.employee}${employeeId}/`,
-            getTokenRequestConfig(token)
-        );
-
-        dispatch(removeEmployee(employeeId));
-        dispatch(
-            addAlert({
-                type: "info",
-                message: `Removed an employee: ${employeeId}`,
-            })
-        );
-    },
-};

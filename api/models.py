@@ -14,8 +14,6 @@ class Workplace(LastModifiedBaseModel):
     owner: User = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="owned_workplaces", null=False
     )
-    # time_opens: time = models.TimeField(null=False, default=time(hour=9))
-    # time_closes: time = models.TimeField(null=False, default=time(hour=17))
 
     def __str__(self):
         return f"({self.id}) {self.str_wo_id()}"
@@ -40,7 +38,7 @@ class Employee(LastModifiedBaseModel):
     )
     last_name: str = models.CharField(max_length=128, null=True)
     first_name: str = models.CharField(max_length=128, null=True)
-    # time_job: int = models.IntegerField(null=False, default=8, validators=[validators.MinValueValidator(1), validators.MaxValueValidator(8)])
+    preffered_roles = models.ManyToManyField("Role", blank=True)
 
     def __str__(self):
         return f"({self.id}) {self.str_wo_id()}"

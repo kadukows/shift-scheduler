@@ -85,11 +85,34 @@ const PlannerBoard = ({ schedule }: Props) => {
         [timeGrouping]
     );
 
+    const d_start = localStorage.getItem(
+        `PlannerBoard-DATE_START-${schedule.id}`
+    );
+    const d_end = localStorage.getItem(`PlannerBoard-DATE_END-${schedule.id}`);
+
     const monthYear = DateFns.parse(schedule.month_year, "MM.yyyy", new Date());
     const [dateRange, setDateRange] = React.useState<DateRange<Date>>([
-        monthYear,
-        DateFns.endOfMonth(monthYear),
+        d_start ? new Date(d_start) : monthYear,
+        d_end ? new Date(d_end) : DateFns.endOfMonth(monthYear),
     ]);
+
+    React.useEffect(
+        () =>
+            localStorage.setItem(
+                `PlannerBoard-DATE_START-${schedule.id}`,
+                dateRange[0].toISOString()
+            ),
+        [dateRange[0].toISOString(), schedule.id]
+    );
+
+    React.useEffect(
+        () =>
+            localStorage.setItem(
+                `PlannerBoard-DATE_END-${schedule.id}`,
+                dateRange[1].toISOString()
+            ),
+        [dateRange[1].toISOString(), schedule.id]
+    );
 
     const timeRangeRef = React.useRef(toInterval(dateRange));
 

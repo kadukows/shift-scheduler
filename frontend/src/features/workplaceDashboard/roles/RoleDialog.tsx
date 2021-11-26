@@ -61,6 +61,9 @@ const ADD_ROLE_PROPS: GenericAddDialogProps<Inputs> = {
     title: "Add Role",
     fields: fields,
     formId: "ADD_ROLE_WORKPLACE_DASHBOARD_FORM",
+    defaultValues: {
+        priority: 1,
+    },
     useSubmit: () => {
         const workplaceId = useWorkplaceId();
 

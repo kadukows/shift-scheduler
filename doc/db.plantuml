@@ -1,7 +1,8 @@
 @startuml
+
 skinparam linetype ortho
 left to right direction
-!theme spacelab
+
 
 together {
 
@@ -26,21 +27,32 @@ entity Employee {
     bounding_key: string
     last_name: string
     first_name: string
+    preffered_roles: role_id[]
 }
 
 entity Schedule {
     id: number
     workplace: workplace_id
     month_year: Date
+    published: bool
 }
 
 entity Role {
     id: number
     name: string
     workplace: workplace_id
+    priority: number
+}
+
+entity ShiftTemplate {
+    workplace: workplace_id
+    time_from: Time
+    time_to: Time
 }
 
 }
+
+together {
 
 entity Shift {
     id: number
@@ -51,13 +63,26 @@ entity Shift {
     role: role_id
 }
 
+entity LimitedAvailability {
+    date: Date
+    employee: employee_id
+    la_type: enum
+    shift_templates: shift_template_id[]
+}
+
+}
+
 User ||--o{ Workplace
 User ||--o{ Employee
 Workplace ||--o{ Employee
 Workplace ||--o{ Schedule
 Workplace ||--o{ Role
+Workplace ||--o{ ShiftTemplate
 Schedule ||--o{ Shift
 Employee ||--o{ Shift
+Employee }o--o{ Role
 Role ||--o{ Shift
+LimitedAvailability ||--o{ Employee
+LimitedAvailability }o--o{ ShiftTemplate
 
 @enduml

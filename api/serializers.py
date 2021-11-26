@@ -73,6 +73,7 @@ class EmployeeSerializerManager(EmployeeSerializerBase):
             "last_modified",
             "bound_to",
             "bounding_key",
+            "preffered_roles",
         ]
         read_only_fields = ["id", "last_modified", "bound_to", "bounding_key"]
 

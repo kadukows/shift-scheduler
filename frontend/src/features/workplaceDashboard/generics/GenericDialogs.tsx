@@ -163,6 +163,7 @@ export interface GenericAddDialogProps<Inputs> {
     title: string;
     fields: FieldData<Inputs, any>[];
     submitButtonText?: string;
+    defaultValues?: Partial<Inputs>;
 }
 
 export const GenericAddDialog = <Inputs, Item>({
@@ -172,6 +173,7 @@ export const GenericAddDialog = <Inputs, Item>({
     title,
     fields,
     submitButtonText,
+    defaultValues,
 }: GenericAddDialogProps<Inputs>) => {
     const [open, setOpen] = React.useState(false);
     const submit = useSubmit();
@@ -200,6 +202,7 @@ export const GenericAddDialog = <Inputs, Item>({
                     submit={memoSubmit}
                     fields={fields}
                     formId={formIdProcessed}
+                    defaultValues={defaultValues}
                 />
             </DialogContent>
             <DialogActions>

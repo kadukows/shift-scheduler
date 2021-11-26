@@ -18,6 +18,7 @@ export interface Employee {
     bound_to?: number;
     bounding_key?: string;
     last_modified: string;
+    preffered_roles: number[];
 }
 
 const employeeAdapter = createEntityAdapter<Employee>();
