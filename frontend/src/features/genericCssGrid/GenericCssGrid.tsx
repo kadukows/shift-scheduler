@@ -73,7 +73,7 @@ const GenericCssGrid = <Tx, Ty>({
                 inverse: false,
             }}
         >
-            <div style={gridArea}>{children}</div>
+            <Box style={gridArea}>{children}</Box>
         </GenericCssGridContext.Provider>
     );
 };
