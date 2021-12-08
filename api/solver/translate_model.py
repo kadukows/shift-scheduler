@@ -89,7 +89,7 @@ class TranslatedModel:
         #
 
         for e in employees:
-            for la in e.limited_availabilities.all():
+            for la in e.limited_availabilities.filter(date__in=days).all():
                 la: LimitedAvailabilityDescriptor
                 if la.la_type == LimitedAvailabilityDescriptor.LA_Type.FREEDAY:
                     for r in roles:
@@ -124,8 +124,11 @@ class TranslatedModel:
 
         for week in weeks:
             for e in employees:
-                self.model.AddBoolXOr(
-                    week_employee_st_exists[(week, e, st)] for st in shift_templates
+                self.model.Add(
+                    sum(
+                        week_employee_st_exists[(week, e, st)] for st in shift_templates
+                    )
+                    <= 1
                 )
 
         for week in weeks:

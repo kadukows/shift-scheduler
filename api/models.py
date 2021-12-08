@@ -34,7 +34,7 @@ class Employee(LastModifiedBaseModel):
         blank=True,
     )
     bounding_key: str = models.CharField(
-        max_length=24, null=True, blank=True, unique=True
+        max_length=24, null=True, blank=True, unique=True, db_index=True
     )
     last_name: str = models.CharField(max_length=128, null=True)
     first_name: str = models.CharField(max_length=128, null=True)
@@ -93,6 +93,14 @@ class Shift(LastModifiedBaseModel):
     role: Role = models.ForeignKey(
         Role, on_delete=models.CASCADE, related_name="shifts", null=False
     )
+
+    class Meta:
+        constraints = [
+            models.CheckConstraint(
+                name="%(app_label)s_%(class)s_time_from_lte_time_to",
+                check=models.Q(time_from__lte=models.F("time_to")),
+            )
+        ]
 
     def __str__(self):
         return f"({self.id}) {self.str_wo_id()}"
