@@ -49,8 +49,8 @@ const StickyBox = styled(Box)(({ theme }) => ({
     left: 0,
     padding: theme.spacing(2),
     whiteSpace: "nowrap",
-    backgroundColor: "rgb(128, 128, 128)",
-    outline: "1px solid rgb(128, 128, 128)",
+    backgroundColor: theme.status.plannerByHoursItemColor,
+    outline: `1px solid ${theme.status.plannerByHoursItemColor}`,
     zIndex: 10,
     textAlign: "center",
 }));

@@ -76,7 +76,7 @@ const EmployeeAvailabilityPageImpl = React.memo(({ employeeId }: ImplProps) => {
         <Stack spacing={2}>
             <Paper sx={{ p: 2 }}>
                 <Stack>
-                    <Box sx={{ display: "flex", flexDirection: "row" }}>
+                    <Box sx={{ display: "flex", flexDirection: "row", mb: 2 }}>
                         <Typography
                             noWrap
                             component="h4"

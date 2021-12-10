@@ -40,6 +40,7 @@ import { useWorkplaceId } from "../../workplaces/WorkplaceProvider";
 import { getTokenRequestConfig } from "../../helpers";
 import { addAlert } from "../../alerts/alertsSlice";
 import { MANAGER_API_ROUTES } from "../../../ApiRoutes";
+import { store } from "../../../store";
 
 interface Props {
     dataGridHeight?: number;
@@ -168,7 +169,7 @@ const addWorkplaceDialogProps: GenericAddDialogProps<Inputs> = {
                     dispatch(
                         addAlert({
                             type: "info",
-                            message: `Added a schedule: ${res.data.name}`,
+                            message: `Added a workplace: ${res.data.name}`,
                         })
                     );
                 },
@@ -211,7 +212,7 @@ const updateWorkplaceDialogProps: GenericUpdateDialogProps<
             dispatch(
                 addAlert({
                     type: "info",
-                    message: `Updated a workplace: ${id}`,
+                    message: `Updated a workplace: ${rest.name}`,
                 })
             );
         },
@@ -221,11 +222,14 @@ const updateWorkplaceDialogProps: GenericUpdateDialogProps<
             getTokenRequestConfig(token)
         );
 
+        const workplaceToDelete =
+            store.getState().workplaceReducer.entities[workplaceId];
+
         dispatch(removeWorkplace(workplaceId));
         dispatch(
             addAlert({
                 type: "info",
-                message: `Removed a workplace: ${workplaceId}`,
+                message: `Removed a workplace: ${workplaceToDelete.name}`,
             })
         );
     },

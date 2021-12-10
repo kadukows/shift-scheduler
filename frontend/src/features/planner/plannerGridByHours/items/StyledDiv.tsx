@@ -6,17 +6,17 @@ export const BorderedDiv = styled(Box)({
     outline: "1px solid rgba(128, 128, 128, 0.4)",
 });
 
-export const StyledDiv = styled("div")({
+export const PlannerByHoursSecondItemDiv = styled(Box)(({ theme }) => ({
     width: "100%",
     height: "100%",
-    backgroundColor: "rgb(128, 128, 128)",
+    backgroundColor: theme.status.plannerByHoursItemColor,
     textAlign: "center",
     borderRadius: "3px",
-    border: "1px solid white",
+    border: theme.status.plannerByHoursItemBorder,
     ":hover": {
-        backgroundColor: "rgb(148, 148, 148)",
+        backgroundColor: theme.status.plannerByHoursItemHover,
     },
-});
+}));
 
 export const BorderTypography = styled(Typography)({
     width: "100%",

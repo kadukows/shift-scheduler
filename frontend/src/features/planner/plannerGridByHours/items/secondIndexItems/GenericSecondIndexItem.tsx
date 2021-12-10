@@ -13,7 +13,7 @@ import { Role, roleSelectors } from "../../../../roles/rolesSlice";
 import { Shift, shiftSelectors } from "../../../../shifts/shiftSlice";
 import { set as updateDialogSet } from "../../../dialogs/updateDialogSlice";
 import { reset as potentialNewItemReset } from "../../potentialNewItemSlice";
-import { HoverableDiv, StyledDiv } from "../StyledDiv";
+import { HoverableDiv, PlannerByHoursSecondItemDiv } from "../StyledDiv";
 import { DndTypes, ItemPassed } from "../../DndTypes";
 import {
     startBatching,
@@ -141,7 +141,7 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
 
     return (
         <HoverableDiv sx={{ p: 0.7 }} style={{ gridArea }}>
-            <StyledDiv
+            <PlannerByHoursSecondItemDiv
                 onClick={() => {
                     if (!shift.blocked) {
                         dispatch(updateDialogSet({ shiftId, open: true }));
@@ -158,7 +158,7 @@ const GenericSecondIndexItem = <SecondIndex extends { id: number }>({
                     --
                     {format(Date.parse(shift.time_to), "HH:mm")}
                 </Typography>
-            </StyledDiv>
+            </PlannerByHoursSecondItemDiv>
         </HoverableDiv>
     );
 };
