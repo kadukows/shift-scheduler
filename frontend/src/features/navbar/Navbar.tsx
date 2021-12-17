@@ -9,6 +9,7 @@ import {
     TextField,
     MenuItem,
     Typography,
+    Container,
 } from "@mui/material";
 import { Menu as MenuIcon, RestartAlt } from "@mui/icons-material";
 import DarkThemeToggler from "../darkThemeProvider/DarkThemeToggler";
@@ -42,23 +43,36 @@ const Navbar = () => {
         [mode, history, setMode]
     );
 
+    // responsive
+    const [anchorElNav, setAnchorElNav] = React.useState<null | HTMLElement>(
+        null
+    );
+    const handleOpenNavMenu = (event: React.MouseEvent<HTMLElement>) => {
+        setAnchorElNav(event.currentTarget);
+    };
+    const handleCloseNavMenu = () => {
+        setAnchorElNav(null);
+    };
+
     return (
         <>
             <GrowingDiv>
                 <AppBar position="absolute">
-                    <Toolbar>
-                        <Button color="inherit">
-                            <MenuIcon />
-                        </Button>
+                    <Container maxWidth="xl">
+                        <Toolbar disableGutters>
+                            <Button color="inherit">
+                                <MenuIcon />
+                            </Button>
 
-                        <NavButton to="/">Home</NavButton>
-                        {authed ? (
-                            <AuthLink mode={mode} setMode={onChangeMode} />
-                        ) : (
-                            <NoAuthLink />
-                        )}
-                        <DarkThemeToggler />
-                    </Toolbar>
+                            <NavButton to="/">Home</NavButton>
+                            {authed ? (
+                                <AuthLink mode={mode} setMode={onChangeMode} />
+                            ) : (
+                                <NoAuthLink />
+                            )}
+                            <DarkThemeToggler />
+                        </Toolbar>
+                    </Container>
                 </AppBar>
             </GrowingDiv>
             <Offset />

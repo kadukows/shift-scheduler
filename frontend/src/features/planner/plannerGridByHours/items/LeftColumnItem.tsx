@@ -32,17 +32,6 @@ export default LeftColumnItem;
  *
  */
 
-const StickyTypography = styled(Typography)(({ theme }) => ({
-    position: "sticky",
-    left: 0,
-    marginRight: theme.spacing(2),
-}));
-
-const FullTypograhy = styled(Typography)({
-    width: "100%",
-    height: "100%",
-});
-
 const StickyBox = styled(Box)(({ theme }) => ({
     ...theme.typography.body1,
     position: "sticky",
@@ -53,4 +42,5 @@ const StickyBox = styled(Box)(({ theme }) => ({
     outline: `1px solid ${theme.status.plannerByHoursItemColor}`,
     zIndex: 10,
     textAlign: "center",
+    boxShadow: `3px 0 0 ${theme.palette.mode === "dark" ? "#777" : "#000"}`,
 }));

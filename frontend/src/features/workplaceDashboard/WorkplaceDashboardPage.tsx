@@ -54,10 +54,10 @@ const WorkplaceDashboardPageImpl = () => {
                     <WorkplaceBanner />
                 </Grid>
                 <Grid item md={5} sm={12}>
-                    <RoleWidget />
+                    <RoleWidget dataGridHeight={250} />
                 </Grid>
                 <Grid item md={7} sm={12}>
-                    <EmployeeWidget />
+                    <EmployeeWidget dataGridHeight={250} />
                 </Grid>
                 <Grid item md={6} sm={12}>
                     <ScheduleWidget />

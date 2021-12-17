@@ -7,7 +7,6 @@ from ortools.linear_solver import pywraplp
 from ortools.init import pywrapinit
 from ortools.sat.python import cp_model
 
-
 from ..models import (
     LimitedAvailabilityDescriptor,
     Workplace,
@@ -70,15 +69,13 @@ class TranslatedModel:
         # Each employee works at most one role__shift_template per day
         #
         #
-        for employee in employees:
-            for day in days:
-
+        for e in employees:
+            for d in days:
                 self.model.Add(
                     sum(
-                        self.shifts[(employee, day, role, st)]
-                        for role, st in shiftGenerator(
-                            roles, workplace.shift_templates.all()
-                        )
+                        self.shifts[(e, d, r, st)]
+                        for r in roles
+                        for st in shift_templates
                     )
                     <= 1
                 )
@@ -91,10 +88,12 @@ class TranslatedModel:
         for e in employees:
             for la in e.limited_availabilities.filter(date__in=days).all():
                 la: LimitedAvailabilityDescriptor
+
                 if la.la_type == LimitedAvailabilityDescriptor.LA_Type.FREEDAY:
                     for r in roles:
                         for st in shift_templates:
                             self.model.Add(self.shifts[(e, la.date, r, st)] == 0)
+
                 elif la.la_type == LimitedAvailabilityDescriptor.LA_Type.PREFERENCE:
                     for r in roles:
                         for st in la.shift_templates.all():
@@ -106,7 +105,7 @@ class TranslatedModel:
         #
         days_grouped_by_weeks: Mapping[int, List[datetime.date]] = {}
         for day in days:
-            y, week, _ = day.isocalendar()
+            _, week, _ = day.isocalendar()
             if week not in days_grouped_by_weeks:
                 days_grouped_by_weeks[week] = []
 
@@ -123,15 +122,6 @@ class TranslatedModel:
                     )
 
         for week in weeks:
-            for e in employees:
-                self.model.Add(
-                    sum(
-                        week_employee_st_exists[(week, e, st)] for st in shift_templates
-                    )
-                    <= 1
-                )
-
-        for week in weeks:
             for d in week:
                 for e in employees:
                     for r in roles:
@@ -141,6 +131,15 @@ class TranslatedModel:
                                 <= week_employee_st_exists[(week, e, st)]
                             )
 
+        for week in weeks:
+            for e in employees:
+                self.model.Add(
+                    sum(
+                        week_employee_st_exists[(week, e, st)] for st in shift_templates
+                    )
+                    <= 1
+                )
+
         #
         # Maximize assignments to roles with higher priority
         # and minimize changes in role by week basis
@@ -149,25 +148,24 @@ class TranslatedModel:
         for week_idx, week in enumerate(weeks):
             for e in employees:
                 for r in roles:
-                    week_employee_role_exists[week, e, r] = self.model.NewBoolVar(
+                    week_employee_role_exists[(week, e, r)] = self.model.NewBoolVar(
                         f"week{week_idx}_employee{e.id}_role{role.id}_exists"
                     )
 
         for week in weeks:
-            for e in employees:
-                for r in roles:
-                    self.model.AddMaxEquality(
-                        week_employee_role_exists[week, e, r],
-                        (
-                            self.shifts[e, d, r, st]
-                            for st in shift_templates
-                            for d in week
-                        ),
-                    )
+            for d in week:
+                for e in employees:
+                    for r in roles:
+                        for st in shift_templates:
+                            self.model.Add(
+                                self.shifts[(e, d, r, st)]
+                                <= week_employee_role_exists[(week, e, r)]
+                            )
 
         self.model.Maximize(
             (
-                sum(
+                1000
+                * sum(
                     (
                         self.shifts[(e, d, r, st)]
                         * (r.priority + (r in e.preffered_roles.all() and 1 or 0))
@@ -177,13 +175,10 @@ class TranslatedModel:
                     for r in roles
                     for st in shift_templates
                 )
-                * 1000
                 - sum(
-                    sum(
-                        week_employee_role_exists[week, e, r]
-                        for e in employees
-                        for r in roles
-                    )
+                    week_employee_role_exists[week, e, r]
+                    for e in employees
+                    for r in roles
                     for week in weeks
                 )
             )

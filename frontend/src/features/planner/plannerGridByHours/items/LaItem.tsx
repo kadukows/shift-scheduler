@@ -1,4 +1,4 @@
-import { parse, startOfDay, endOfDay } from "date-fns";
+import { parse, startOfDay, addDays } from "date-fns";
 import * as React from "react";
 import { useSelector } from "react-redux";
 import { RootState } from "../../../../store";
@@ -51,7 +51,7 @@ const Impl = ({ la, stId }: ImplProps) => {
             : startOfDay(parsedDay),
         xEnd: st
             ? parse(st.time_to, "HH:mm:ss", parsedDay)
-            : endOfDay(parsedDay),
+            : startOfDay(addDays(parsedDay, 1)),
         yStart: { id: la.employee },
     };
 

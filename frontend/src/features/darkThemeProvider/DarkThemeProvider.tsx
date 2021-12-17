@@ -61,7 +61,7 @@ const DarkThemeProvider = ({ children }: React.PropsWithChildren<Props>) => {
                     ? "rgb(148, 148, 148)"
                     : "rgb(240, 240, 240)",
                 plannerByHoursItemBorder: `1px solid ${
-                    darkMode ? "white" : "lightgray"
+                    darkMode ? "white" : "gray"
                 }`,
             },
         };
