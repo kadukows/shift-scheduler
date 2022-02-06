@@ -1,7 +1,7 @@
 import collections
 import datetime
 from functools import cached_property
-from typing import List, Mapping, Tuple
+from typing import List, Mapping, Tuple, Set
 
 from ortools.linear_solver import pywraplp
 from ortools.init import pywrapinit
@@ -84,7 +84,6 @@ class TranslatedModel:
         # Account for limited availability per employee
         #
         #
-
         for e in employees:
             for la in e.limited_availabilities.filter(date__in=days).all():
                 la: LimitedAvailabilityDescriptor
@@ -98,6 +97,20 @@ class TranslatedModel:
                     for r in roles:
                         for st in la.shift_templates.all():
                             self.model.Add(self.shifts[(e, la.date, r, st)] == 0)
+
+        #
+        # Account for possible roles
+        #
+        #
+        all_roles = set(Role.objects.filter(workplace=workplace).all())
+        for e in employees:
+            possible_roles: Set[Role] = set(e.possible_roles.all())
+            if len(possible_roles) > 0:
+                not_possible_roles: Set[Role] = all_roles.difference(possible_roles)
+                for r in not_possible_roles:
+                    for d in days:
+                        for st in shift_templates:
+                            self.model.Add(self.shifts[(e, d, r, st)] == False)
 
         #
         # Employee should have stable shift_template in given week
@@ -166,10 +179,7 @@ class TranslatedModel:
             (
                 1000
                 * sum(
-                    (
-                        self.shifts[(e, d, r, st)]
-                        * (r.priority + (r in e.preffered_roles.all() and 1 or 0))
-                    )
+                    (self.shifts[(e, d, r, st)] * r.priority)
                     for e in employees
                     for d in days
                     for r in roles

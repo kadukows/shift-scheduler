@@ -63,8 +63,8 @@ const EmployeeWidget = ({ dataGridHeight }: Props) => {
         },
         {
             type: "choose_object",
-            name: "preffered_roles",
-            label: "Preffered roles",
+            name: "possible_roles",
+            label: "Possible roles",
             validation: yup.array().of(yup.number().required()),
             entitySelector: (state: RootState) =>
                 roleSelectors
@@ -85,14 +85,14 @@ const EmployeeWidget = ({ dataGridHeight }: Props) => {
 
             return React.useCallback(
                 (dispatch, token) =>
-                    async ({ first_name, last_name, preffered_roles }) => {
+                    async ({ first_name, last_name, possible_roles }) => {
                         const res = await axios.post<Employee>(
                             MANAGER_API_ROUTES.employee,
                             {
                                 first_name,
                                 last_name,
                                 workplace: workplaceId,
-                                preffered_roles,
+                                possible_roles,
                             },
                             getTokenRequestConfig(token)
                         );
@@ -125,22 +125,22 @@ const EmployeeWidget = ({ dataGridHeight }: Props) => {
         getDefaultValues: ({
             first_name,
             last_name,
-            preffered_roles,
+            possible_roles,
         }: Employee) => ({
             first_name,
             last_name,
-            preffered_roles,
+            possible_roles,
         }),
         submit:
             (dispatch, item, token) =>
-            async ({ first_name, last_name, preffered_roles }) => {
+            async ({ first_name, last_name, possible_roles }) => {
                 const res = await axios.put<Employee>(
                     `${MANAGER_API_ROUTES.employee}${item.id}/`,
                     {
                         first_name,
                         last_name,
                         workplace: item.workplace,
-                        preffered_roles,
+                        possible_roles,
                     },
                     getTokenRequestConfig(token)
                 );
@@ -174,7 +174,7 @@ const EmployeeWidget = ({ dataGridHeight }: Props) => {
         <EventProvider events={Object.values(EventTypes)}>
             <GenericAddDialog
                 {...addEmployeeDialogProps}
-                defaultValues={{ preffered_roles: [] }}
+                defaultValues={{ possible_roles: [] }}
             />
             <GenericUpdateDialog {...updateEmployeeDialogProps} />
             <KeyDialog />
@@ -292,5 +292,5 @@ const dataGridProps: GenericDashboardDataGridProps<Employee> = {
 interface Inputs {
     first_name: string;
     last_name: string;
-    preffered_roles: number[];
+    possible_roles: number[];
 }

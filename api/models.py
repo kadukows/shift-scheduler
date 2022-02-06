@@ -38,7 +38,7 @@ class Employee(LastModifiedBaseModel):
     )
     last_name: str = models.CharField(max_length=128, null=True)
     first_name: str = models.CharField(max_length=128, null=True)
-    preffered_roles = models.ManyToManyField("Role", blank=True)
+    possible_roles = models.ManyToManyField("Role", blank=True)
 
     def __str__(self):
         return f"({self.id}) {self.str_wo_id()}"
